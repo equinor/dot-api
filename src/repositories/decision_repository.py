@@ -1,20 +1,16 @@
 from src.models import Decision
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 class DecisionRepository:
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         self.session = session
 
-    def create(self, decisions: list[Decision]) -> list[Decision]:
+    async def create(self, decisions: list[Decision]) -> list[Decision]:
         self.session.add_all(decisions)
-        self.session.flush()
+        await self.session.flush()
         return decisions
 
-    def retrieve(self, ids: list[int]) -> list[Decision]:
-        return (
-            self.session
-                .query(Decision)
-                .where(Decision.id.in_(ids))
-                .all()
-        )
+    async def retrieve(self, ids: list[int]) -> list[Decision]:
+        return list((await self.session.scalars(select(Decision).where(Decision.id.in_(ids)))).all())
     
