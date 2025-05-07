@@ -12,5 +12,7 @@ class DecisionRepository:
         return decisions
 
     async def retrieve(self, ids: list[int]) -> list[Decision]:
-        return list((await self.session.scalars(select(Decision).where(Decision.id.in_(ids)))).all())
+        return list(
+            (await self.session.scalars(select(Decision).where(Decision.id.in_(ids)))).all()
+        )
     

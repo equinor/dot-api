@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List
 from src.models import (
     Decision
@@ -8,7 +8,7 @@ class DecisionDto(BaseModel):
     options: List[str]
 
 class DecisionIncomingDto(DecisionDto):
-    id: Optional[int]
+    id: Optional[int] = Field(default=None)
 
 class DecisionOutgoingDto(DecisionDto):
     id: int
