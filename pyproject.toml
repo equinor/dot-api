@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "dot-api"
+version = "0.1.0"
+description = "Python Fast Api for the Decision Optimization Project"
+authors = ["EinarSalbouvet <esalo@equinor.com>"]
+license = "GNU GENERAL PUBLIC LICENSE"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+alembic = "^1.15.2"
+sqlalchemy = "^2.0.40"
+fastapi = "^0.115.12"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
