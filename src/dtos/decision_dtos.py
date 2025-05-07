@@ -5,13 +5,13 @@ from src.models import (
 )
 
 class DecisionDto(BaseModel):
-    options: List[str]
+    options: List[str] = Field(default=[""])
 
 class DecisionIncomingDto(DecisionDto):
-    id: Optional[int] = Field(default=None)
+    id: Optional[int] = Field(default=None, gt=0)
 
 class DecisionOutgoingDto(DecisionDto):
-    id: int
+    id: int = Field(gt=0)
 
 
 class DecisionMapper:
