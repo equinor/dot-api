@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models import Decision
 from dtos.decision_dtos import (
-    DecisionIncommingDto, 
+    DecisionIncomingDto, 
     DecisionOutgoingDto, 
     DecisionMapper
 )
@@ -13,7 +13,7 @@ class DecisionService:
     def __init__(self, engine: AsyncEngine):
         self.engine=engine
 
-    async def create(self, dtos: list[DecisionIncommingDto]) -> list[DecisionOutgoingDto]:
+    async def create(self, dtos: list[DecisionIncomingDto]) -> list[DecisionOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             try:
                 decisions: list[Decision] = await DecisionRepository(session).create(DecisionMapper.to_entities(dtos))

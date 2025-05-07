@@ -7,7 +7,7 @@ from src.models import (
 class DecisionDto(BaseModel):
     options: List[str]
 
-class DecisionIncommingDto(DecisionDto):
+class DecisionIncomingDto(DecisionDto):
     id: Optional[int]
 
 class DecisionOutgoingDto(DecisionDto):
@@ -27,12 +27,12 @@ class DecisionMapper:
         return [DecisionMapper.to_outgoing_dto(entity) for entity in entities]
 
     @staticmethod
-    def to_entity(dto: DecisionIncommingDto) -> Decision:
+    def to_entity(dto: DecisionIncomingDto) -> Decision:
         return Decision(
             id=dto.id,
             options=",".join(dto.options)
         )
     
     @staticmethod
-    def to_entities(dtos: list[DecisionIncommingDto]) -> list[Decision]:
+    def to_entities(dtos: list[DecisionIncomingDto]) -> list[Decision]:
         return [DecisionMapper.to_entity(dto) for dto in dtos]
