@@ -1,33 +1,35 @@
-from src.models import Decision
+from src.models import Project
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-class DecisionRepository:
+class ProjectRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create(self, entities: list[Decision]) -> list[Decision]:
+    async def create(self, entities: list[Project]) -> list[Project]:
         self.session.add_all(entities)
         await self.session.flush()
         return entities
 
-    async def get(self, ids: list[int]) -> list[Decision]:
+    async def get(self, ids: list[int]) -> list[Project]:
         return list(
-            (await self.session.scalars(select(Decision).where(Decision.id.in_(ids)))).all()
+            (await self.session.scalars(select(Project).where(Project.id.in_(ids)))).all()
         )
     
-    async def get_all(self) -> list[Decision]:
+    async def get_all(self) -> list[Project]:
         return list(
-            (await self.session.scalars(select(Decision))).all()
+            (await self.session.scalars(select(Project))).all()
         )
     
-    async def update(self, entities: list[Decision]) -> list[Decision]:
+    async def update(self, entities: list[Project]) -> list[Project]:
         enities_to_update=await self.get([decision.id for decision in entities])
 
         for n, enity_to_update in enumerate(enities_to_update):
             entity=entities[n]
-            enity_to_update.options=entity.options
-
+            enity_to_update.name=entity.name
+            enity_to_update.description=entity.description
+            enity_to_update.objectives=entity.objectives
+            enity_to_update.opportunities=entity.opportunities
         await self.session.flush()
         return enities_to_update
     

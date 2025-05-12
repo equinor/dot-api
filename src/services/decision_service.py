@@ -16,16 +16,42 @@ class DecisionService:
     async def create(self, dtos: list[DecisionIncomingDto]) -> list[DecisionOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             try:
-                decisions: list[Decision] = await DecisionRepository(session).create(DecisionMapper.to_entities(dtos))
+                entities: list[Decision] = await DecisionRepository(session).create(DecisionMapper.to_entities(dtos))
                 # get the dtos while the entities are still connected to the session
-                result: list[DecisionOutgoingDto] = DecisionMapper.to_outgoing_dtos(decisions)
+                result: list[DecisionOutgoingDto] = DecisionMapper.to_outgoing_dtos(entities)
                 await session.commit()
             except Exception as e:
                 await session.rollback()
                 raise e
         return result
     
+    async def update(self, dtos: list[DecisionIncomingDto]) -> list[DecisionOutgoingDto]:
+        async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
+            try:
+                entities: list[Decision] = await DecisionRepository(session).update(DecisionMapper.to_entities(dtos))
+                # get the dtos while the entities are still connected to the session
+                result: list[DecisionOutgoingDto] = DecisionMapper.to_outgoing_dtos(entities)
+                await session.commit()
+            except Exception as e:
+                await session.rollback()
+                raise e
+        return result
+    
+    async def delete(self, ids: list[int]):
+        async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
+            try:
+                await DecisionRepository(session).delete(ids)
+                await session.commit()
+            except Exception as e:
+                await session.rollback()
+                raise e
+    
     async def get(self, ids: list[int]) -> list[DecisionOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
-            decisions: list[Decision] = await DecisionRepository(session).retrieve(ids)
+            decisions: list[Decision] = await DecisionRepository(session).get(ids)
+        return DecisionMapper.to_outgoing_dtos(decisions)
+    
+    async def get_all(self) -> list[DecisionOutgoingDto]:
+        async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
+            decisions: list[Decision] = await DecisionRepository(session).get_all()
         return DecisionMapper.to_outgoing_dtos(decisions)

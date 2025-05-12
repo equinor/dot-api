@@ -1,33 +1,34 @@
-from src.models import Decision
+from src.models import Graph
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-class DecisionRepository:
+class GraphRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create(self, entities: list[Decision]) -> list[Decision]:
+    async def create(self, entities: list[Graph]) -> list[Graph]:
         self.session.add_all(entities)
         await self.session.flush()
         return entities
 
-    async def get(self, ids: list[int]) -> list[Decision]:
+    async def get(self, ids: list[int]) -> list[Graph]:
         return list(
-            (await self.session.scalars(select(Decision).where(Decision.id.in_(ids)))).all()
+            (await self.session.scalars(select(Graph).where(Graph.id.in_(ids)))).all()
         )
     
-    async def get_all(self) -> list[Decision]:
+    async def get_all(self) -> list[Graph]:
         return list(
-            (await self.session.scalars(select(Decision))).all()
+            (await self.session.scalars(select(Graph))).all()
         )
     
-    async def update(self, entities: list[Decision]) -> list[Decision]:
+    async def update(self, entities: list[Graph]) -> list[Graph]:
         enities_to_update=await self.get([decision.id for decision in entities])
 
         for n, enity_to_update in enumerate(enities_to_update):
             entity=entities[n]
-            enity_to_update.options=entity.options
-
+            enity_to_update.name=entity.name
+            enity_to_update.project_id=entity.project_id
+            
         await self.session.flush()
         return enities_to_update
     
