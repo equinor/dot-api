@@ -1,4 +1,3 @@
-from uuid import UUID
 from typing import Optional
 from datetime import datetime
 from sqlalchemy.sql.schema import MetaData
@@ -9,7 +8,6 @@ from sqlalchemy.orm import (
     Mapped, 
     relationship, 
     mapped_column,
-    backref,
 )
 
 Base = declarative_base()
@@ -20,9 +18,9 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
 
     name: Mapped[str] = mapped_column(String(30))
-    azure_id: Mapped[UUID] = mapped_column(unique=True)
+    azure_id: Mapped[str] = mapped_column(unique=True)
 
-    def __init__(self, id: Optional[int], name: str, azure_id: UUID):
+    def __init__(self, id: Optional[int], name: str, azure_id: str):
         if id is not None:
             self.id = id
         self.name = name
@@ -65,7 +63,17 @@ class Project(Base, BaseAuditableEntity):
     name: Mapped[str] = mapped_column(String(60), index=True)
     description: Mapped[str] = mapped_column(String(600))
 
-    def __init__(self, id: Optional[int], description: str, name: str, user_id: int):
+    opportunities: Mapped[list["Opportunity"]] = relationship(
+        "Opportunity",
+        cascade="all, delete-orphan",
+    )
+
+    objectives: Mapped[list["Objective"]] = relationship(
+        "Objective",
+        cascade="all, delete-orphan",
+    )
+
+    def __init__(self, id: Optional[int], description: str, name: str, user_id: int, objectives: list["Objective"], opportunities: list["Opportunity"]):
         if id is not None:
             self.id = id
         else:
@@ -74,17 +82,11 @@ class Project(Base, BaseAuditableEntity):
         self.name = name
         self.description = description
         self.updated_by_id = user_id
+        self.objectives=objectives
+        self.opportunities=opportunities
 
     def __repr__(self):
         return f"id: {self.id}, name: {self.name}"
-    
-    def get_oppertunities(self):
-        self.opportunities: list["Opportunity"]
-        return self.opportunities
-    
-    def get_objectives(self):
-        self.objectives: list["Objective"]
-        return self.objectives
     
 class Opportunity(Base, BaseAuditableEntity):
     __tablename__ = "opportunity"
@@ -98,7 +100,7 @@ class Opportunity(Base, BaseAuditableEntity):
     project: Mapped[Project] = relationship(
         Project, 
         foreign_keys=[project_id],
-        backref=backref("opportunities", cascade="all, delete-orphan")
+        back_populates="opportunities",
     )
 
     def __init__(self, id: Optional[int], project_id: int, description: str, name: str, user_id: int):
@@ -127,7 +129,7 @@ class Objective(Base, BaseAuditableEntity):
     project: Mapped[Project] = relationship(
         Project, 
         foreign_keys=[project_id],
-        backref=backref("objectives", cascade="all, delete-orphan")
+        back_populates="objectives",
     )
 
     def __init__(self, id: Optional[int], project_id: int, description: str, name: str, user_id: int):
@@ -153,6 +155,8 @@ class Graph(Base, BaseAuditableEntity):
     name: Mapped[str] = mapped_column(String(60), index=True, default="")
 
     project: Mapped[Project] = relationship(Project, foreign_keys=[project_id])
+
+    nodes: Mapped[list["Node"]] = relationship("Node", back_populates="graph")
 
     def __init__(self, id: Optional[int], name: str, project_id: int, user_id: int):
         if id is not None:
@@ -199,16 +203,32 @@ class Node(Base, BaseAuditableEntity):
 
     type: Mapped[str] = mapped_column(String(30), default="TBD")
 
-    graph: Mapped[Graph] = relationship(Graph, foreign_keys=[graph_id])
+    graph: Mapped[Graph] = relationship(Graph, foreign_keys=[graph_id], back_populates="nodes")
+
     decision: Mapped[Optional[Decision]] = relationship(
         Decision, 
         foreign_keys=[decision_id], 
-        # backref=backref("node", cascade="all, delete-orphan"),
+        cascade="all, delete-orphan",
+        single_parent=True,
     )
     probability: Mapped[Optional[Probability]] = relationship(
         Probability, 
         foreign_keys=[probability_id], 
-        # backref=backref("node", cascade="all, delete-orphan"),
+        cascade="all, delete-orphan",
+        single_parent=True,
+    )
+
+    higher_edges: Mapped[list["Edge"]] = relationship(
+        "Edge",
+        foreign_keys="[Edge.higher_id]",
+        back_populates="higher_node",
+        cascade="all, delete-orphan",
+    )
+    lower_edges: Mapped[list["Edge"]] = relationship(
+        "Edge",
+        foreign_keys="[Edge.lower_id]",
+        back_populates="lower_node",
+        cascade="all, delete-orphan",
     )
 
     def __init__(self, id: Optional[int], graph_id: int, type: str, user_id: int, decision_id: Optional[int] = None, probability_id: Optional[int] = None, decision: Optional[Decision] = None, probability: Optional[Probability] = None):
@@ -226,16 +246,16 @@ class Node(Base, BaseAuditableEntity):
         self.updated_by_id = user_id
 
     def higher_neighbors(self) -> list["Node"]:
-        self.lower_edges: list["Edge"]
+        # self.higher_edges: list["Edge"]
         try:
-            return [x.higher_node for x in self.lower_edges]
+            return [x.higher_node for x in self.higher_edges]
         except:
             return []
 
     def lower_neighbors(self) -> list["Node"]:
-        self.higher_edges: list["Edge"]
+        # self.lower_edges: list["Edge"]
         try:
-            return [x.lower_node for x in self.higher_edges]
+            return [x.lower_node for x in self.lower_edges]
         except:
             return []
 
@@ -251,13 +271,13 @@ class Edge(Base):
     lower_node: Mapped[Node] = relationship(
         Node, 
         primaryjoin=lower_id == Node.id, 
-        backref=backref("lower_edges", cascade="all, delete-orphan"),
+        back_populates="lower_edges",
     )
 
     higher_node: Mapped[Node] = relationship(
         Node, 
         primaryjoin=higher_id == Node.id, 
-        backref=backref("higher_edges", cascade="all, delete-orphan"), 
+        back_populates="higher_edges", 
     )
 
     def __init__(self, lower_node_id: int, higher_node_id: int, graph_id: int):
