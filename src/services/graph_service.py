@@ -56,9 +56,11 @@ class GraphService:
     async def get(self, ids: list[int]) -> list[GraphOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             graphs: list[Graph] = await GraphRepository(session).get(ids)
-        return GraphMapper.to_outgoing_dtos(graphs)
+            result=GraphMapper.to_outgoing_dtos(graphs)
+        return result
     
     async def get_all(self) -> list[GraphOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             graphs: list[Graph] = await GraphRepository(session).get_all()
-        return GraphMapper.to_outgoing_dtos(graphs)
+            result=GraphMapper.to_outgoing_dtos(graphs)
+        return result

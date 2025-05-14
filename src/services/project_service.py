@@ -56,9 +56,11 @@ class ProjectService:
     async def get(self, ids: list[int]) -> list[ProjectOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             projects: list[Project] = await ProjectRepository(session).get(ids)
-        return ProjectMapper.to_outgoing_dtos(projects)
+            result=ProjectMapper.to_outgoing_dtos(projects)
+        return result
     
     async def get_all(self) -> list[ProjectOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             projects: list[Project] = await ProjectRepository(session).get_all()
-        return ProjectMapper.to_outgoing_dtos(projects)
+            result = ProjectMapper.to_outgoing_dtos(projects)
+        return result

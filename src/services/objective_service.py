@@ -56,9 +56,11 @@ class ObjectiveService:
     async def get(self, ids: list[int]) -> list[ObjectiveOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             objectives: list[Objective] = await ObjectiveRepository(session).get(ids)
-        return ObjectiveMapper.to_outgoing_dtos(objectives)
+            result=ObjectiveMapper.to_outgoing_dtos(objectives)
+        return result
     
     async def get_all(self) -> list[ObjectiveOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             objectives: list[Objective] = await ObjectiveRepository(session).get_all()
-        return ObjectiveMapper.to_outgoing_dtos(objectives)
+            result=ObjectiveMapper.to_outgoing_dtos(objectives)
+        return result

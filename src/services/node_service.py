@@ -56,10 +56,12 @@ class NodeService:
     async def get(self, ids: list[int]) -> list[NodeOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             nodes: list[Node] = await NodeRepository(session).get(ids)
-        return NodeMapper.to_outgoing_dtos(nodes)
+            result=NodeMapper.to_outgoing_dtos(nodes)
+        return result
     
     async def get_all(self) -> list[NodeOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             nodes: list[Node] = await NodeRepository(session).get_all()
-        return NodeMapper.to_outgoing_dtos(nodes)
+            result=NodeMapper.to_outgoing_dtos(nodes)
+        return result
     

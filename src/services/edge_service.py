@@ -48,9 +48,11 @@ class EdgeService:
     async def get(self, dtos: list[EdgeDto]) -> list[EdgeDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             edges: list[Edge] = await EdgeRepository(session).get(EdgeMapper.to_entities(dtos))
-        return EdgeMapper.to_dtos(edges)
+            result=EdgeMapper.to_dtos(edges)
+        return result
     
     async def get_all(self) -> list[EdgeDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             edges: list[Edge] = await EdgeRepository(session).get_all()
-        return EdgeMapper.to_dtos(edges)
+            result=EdgeMapper.to_dtos(edges)
+        return result

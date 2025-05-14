@@ -56,9 +56,11 @@ class OpportunityService:
     async def get(self, ids: list[int]) -> list[OpportunityOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             opportunities: list[Opportunity] = await OpportunityRepository(session).get(ids)
-        return OpportunityMapper.to_outgoing_dtos(opportunities)
+            result=OpportunityMapper.to_outgoing_dtos(opportunities)
+        return result
     
     async def get_all(self) -> list[OpportunityOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             opportunities: list[Opportunity] = await OpportunityRepository(session).get_all()
-        return OpportunityMapper.to_outgoing_dtos(opportunities)
+            result=OpportunityMapper.to_outgoing_dtos(opportunities)
+        return result

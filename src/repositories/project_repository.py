@@ -1,6 +1,7 @@
 from src.models import Project
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 class ProjectRepository:
     def __init__(self, session: AsyncSession):
@@ -12,13 +13,21 @@ class ProjectRepository:
         return entities
 
     async def get(self, ids: list[int]) -> list[Project]:
+        query=select(Project).where(Project.id.in_(ids)).options(
+            selectinload(Project.opportunities),
+            selectinload(Project.objectives)
+        )
         return list(
-            (await self.session.scalars(select(Project).where(Project.id.in_(ids)))).all()
+            (await self.session.scalars(query)).all()
         )
     
     async def get_all(self) -> list[Project]:
+        query=select(Project).options(
+            selectinload(Project.opportunities),
+            selectinload(Project.objectives)
+        )
         return list(
-            (await self.session.scalars(select(Project))).all()
+            (await self.session.scalars(query)).all()
         )
     
     async def update(self, entities: list[Project]) -> list[Project]:

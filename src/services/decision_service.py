@@ -49,9 +49,11 @@ class DecisionService:
     async def get(self, ids: list[int]) -> list[DecisionOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             decisions: list[Decision] = await DecisionRepository(session).get(ids)
-        return DecisionMapper.to_outgoing_dtos(decisions)
+            result=DecisionMapper.to_outgoing_dtos(decisions)
+        return result
     
     async def get_all(self) -> list[DecisionOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             decisions: list[Decision] = await DecisionRepository(session).get_all()
-        return DecisionMapper.to_outgoing_dtos(decisions)
+            result=DecisionMapper.to_outgoing_dtos(decisions)
+        return result

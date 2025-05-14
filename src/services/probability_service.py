@@ -49,9 +49,11 @@ class ProbabilityService:
     async def get(self, ids: list[int]) -> list[ProbabilityOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             decisions: list[Probability] = await ProbabilityRepository(session).get(ids)
-        return ProbabilityMapper.to_outgoing_dtos(decisions)
+            result=ProbabilityMapper.to_outgoing_dtos(decisions)
+        return result
     
     async def get_all(self) -> list[ProbabilityOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             decisions: list[Probability] = await ProbabilityRepository(session).get_all()
-        return ProbabilityMapper.to_outgoing_dtos(decisions)
+            result=ProbabilityMapper.to_outgoing_dtos(decisions)
+        return result

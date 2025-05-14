@@ -1,4 +1,3 @@
-from uuid import UUID
 from typing import Optional
 from src.models import User
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,10 +10,15 @@ class UserRepository:
     async def get_or_create(self, entity: User) -> User:
         user=await self.get_by_azure_id(entity.azure_id)
         if user is None:
-            await self.create([entity])
+            user = await self.create(entity)
         return user
 
-    async def create(self, entities: list[User]) -> list[User]:
+    async def create(self, entity: User) -> User:
+        self.session.add(entity)
+        await self.session.flush()
+        return entity
+
+    async def create_all(self, entities: list[User]) -> list[User]:
         self.session.add_all(entities)
         await self.session.flush()
         return entities
@@ -29,7 +33,7 @@ class UserRepository:
             (await self.session.scalars(select(User))).all()
         )
     
-    async def get_by_azure_id(self, azure_id: UUID) -> Optional[User]:
+    async def get_by_azure_id(self, azure_id: str) -> Optional[User]:
         return (await self.session.scalars(select(User).where(User.azure_id==azure_id))).first()
     
     async def update(self, entities: list[User]) -> list[User]:

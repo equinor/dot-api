@@ -1,13 +1,12 @@
 from pydantic import BaseModel
 from typing import Optional
-from uuid import UUID
 from src.models import (
     User
 )
 
 class UserDto(BaseModel):
     name: str
-    azure_id: UUID
+    azure_id: str
 
 class UserIncomingDto(UserDto):
     id: Optional[int]

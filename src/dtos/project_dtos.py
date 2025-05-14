@@ -9,14 +9,16 @@ from src.dtos.opportunity_dtos import *
 class ProjectDto(BaseModel):
     name: str
     description: str
-    Objectives: List[ObjectiveDto]
-    Opportunities: List[OpportunityDto]
 
 class ProjectIncomingDto(ProjectDto):
     id: Optional[int]
+    Objectives: List[ObjectiveIncomingDto]
+    Opportunities: List[OpportunityIncomingDto]
 
 class ProjectOutgoingDto(ProjectDto):
     id: int
+    Objectives: List[ObjectiveOutgoingDto]
+    Opportunities: List[OpportunityOutgoingDto]
 
 class ProjectMapper:
     @staticmethod
@@ -25,8 +27,8 @@ class ProjectMapper:
             id=entity.id,
             name=entity.name,
             description=entity.description,
-            Objectives=[ObjectiveMapper.to_outgoing_dto(obj) for obj in entity.get_objectives()],
-            Opportunities=[OpportunityMapper.to_outgoing_dto(opp) for opp in entity.get_oppertunities()]
+            Objectives=ObjectiveMapper.to_outgoing_dtos(entity.objectives),
+            Opportunities=OpportunityMapper.to_outgoing_dtos(entity.opportunities)
         )
 
     @staticmethod
@@ -36,6 +38,8 @@ class ProjectMapper:
             name=dto.name,
             description=dto.description,
             user_id=user_id,
+            opportunities=OpportunityMapper.to_entities(dto.Opportunities, user_id),
+            objectives=ObjectiveMapper.to_entities(dto.Objectives, user_id)
         )
     
     @staticmethod
