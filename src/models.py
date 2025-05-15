@@ -73,6 +73,8 @@ class Project(Base, BaseAuditableEntity):
         cascade="all, delete-orphan",
     )
 
+    graphs: Mapped[list["Graph"]] = relationship("Graph", back_populates="project")
+
     def __init__(self, id: Optional[int], description: str, name: str, user_id: int, objectives: list["Objective"], opportunities: list["Opportunity"]):
         if id is not None:
             self.id = id
@@ -157,6 +159,8 @@ class Graph(Base, BaseAuditableEntity):
     project: Mapped[Project] = relationship(Project, foreign_keys=[project_id])
 
     nodes: Mapped[list["Node"]] = relationship("Node", back_populates="graph")
+
+    edges: Mapped[list["Edge"]] = relationship("Edge")
 
     def __init__(self, id: Optional[int], name: str, project_id: int, user_id: int):
         if id is not None:
@@ -262,8 +266,10 @@ class Node(Base, BaseAuditableEntity):
 class Edge(Base):
     __tablename__ = "edge"
 
-    lower_id: Mapped[int] = mapped_column(ForeignKey(Node.id), primary_key=True)
-    higher_id: Mapped[int] = mapped_column(ForeignKey(Node.id), primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    lower_id: Mapped[int] = mapped_column(ForeignKey(Node.id))
+    higher_id: Mapped[int] = mapped_column(ForeignKey(Node.id))
     graph_id: Mapped[int] = mapped_column(ForeignKey(Graph.id))
 
     graph: Mapped[Graph] = relationship(Graph, foreign_keys=[graph_id])
@@ -280,7 +286,9 @@ class Edge(Base):
         back_populates="higher_edges", 
     )
 
-    def __init__(self, lower_node_id: int, higher_node_id: int, graph_id: int):
+    def __init__(self, id: Optional[int], lower_node_id: int, higher_node_id: int, graph_id: int):
+        if id is not None:
+            self.id = id
         self.lower_id = lower_node_id
         self.higher_id = higher_node_id
         self.graph_id = graph_id

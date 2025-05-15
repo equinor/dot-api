@@ -1,8 +1,6 @@
 from src.models import Edge
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from sqlalchemy.sql.elements import ColumnElement
-from sqlalchemy import select, and_, or_
 
 class EdgeRepository:
     def __init__(self, session: AsyncSession):
@@ -13,16 +11,11 @@ class EdgeRepository:
         await self.session.flush()
         return entities
 
-    async def get(self, edges: list[Edge]) -> list[Edge]:
+    async def get(self, ids: list[int]) -> list[Edge]:
         """
         No idea if this actually works
         """
-        conditions: list[ColumnElement[bool]] = [
-            and_(Edge.lower_id == edge.lower_id, Edge.higher_id == edge.higher_id)
-            for edge in edges
-        ]
-        
-        query = select(Edge).where(or_(*conditions))
+        query = select(Edge).where(Edge.id.in_(ids))
         result = await self.session.scalars(query)
         return list(result.all())
     
@@ -31,14 +24,14 @@ class EdgeRepository:
             (await self.session.scalars(select(Edge))).all()
         )
     
-    async def delete(self, edges: list[Edge]) -> None:
-        entities = await self.get(edges)
+    async def delete(self, ids: list[int]) -> None:
+        entities = await self.get(ids)
         for entity in entities:
             await self.session.delete(entity)
         await self.session.flush()
 
     async def update(self, edges: list[Edge]) -> list[Edge]:
-        entities_to_update=await self.get(edges)
+        entities_to_update=await self.get([edge.id for edge in edges])
         for n, edge_to_update in enumerate(entities_to_update):
             edge=edges[n]
             edge_to_update.lower_id=edge.lower_id

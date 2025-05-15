@@ -36,18 +36,18 @@ class EdgeService:
                 raise e
         return result
     
-    async def delete(self, dtos: list[EdgeDto]):
+    async def delete(self, ids: list[int]):
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             try:
-                await EdgeRepository(session).delete(EdgeMapper.to_entities(dtos))
+                await EdgeRepository(session).delete(ids)
                 await session.commit()
             except Exception as e:
                 await session.rollback()
                 raise e
     
-    async def get(self, dtos: list[EdgeDto]) -> list[EdgeDto]:
+    async def get(self, ids: list[int]) -> list[EdgeDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
-            edges: list[Edge] = await EdgeRepository(session).get(EdgeMapper.to_entities(dtos))
+            edges: list[Edge] = await EdgeRepository(session).get(ids)
             result=EdgeMapper.to_dtos(edges)
         return result
     

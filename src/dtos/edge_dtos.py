@@ -5,6 +5,7 @@ from src.models import (
 
 # Edge DTOs
 class EdgeDto(BaseModel):
+    id: int
     lower_id: int
     higher_id: int
     graph_id: int
@@ -13,6 +14,7 @@ class EdgeMapper:
     @staticmethod
     def to_dto(entity: Edge) -> EdgeDto:
         return EdgeDto(
+            id=entity.id,
             lower_id=entity.lower_id,
             higher_id=entity.higher_id,
             graph_id=entity.graph_id
@@ -21,6 +23,7 @@ class EdgeMapper:
     @staticmethod
     def to_entity(dto: EdgeDto) -> Edge:
         return Edge(
+            id=dto.id,
             lower_node_id=dto.lower_id,
             higher_node_id=dto.higher_id,
             graph_id=dto.graph_id

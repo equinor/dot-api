@@ -15,13 +15,13 @@ async def create_edges(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/edges/get")
+@router.get("/edges/{id}")
 async def get_edge(
-    dtos: list[EdgeDto],
+    id: int,
     edge_service: EdgeService = Depends(get_edge_service)
 ) -> EdgeDto:
     try:
-        edges: list[EdgeDto] = await edge_service.get(dtos)
+        edges: list[EdgeDto] = await edge_service.get([id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
@@ -42,11 +42,11 @@ async def get_all_edge(
 
 @router.delete("/edges/{id}")
 async def delete_edge(
-    dtos: list[EdgeDto],
+    id: int,
     edge_service: EdgeService = Depends(get_edge_service)
 ):
     try:
-        await edge_service.delete(dtos)
+        await edge_service.delete([id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
