@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from src.dtos.edge_dtos import EdgeDto
+from src.dtos.edge_dtos import *
 from src.services.edge_service import EdgeService
 from src.dependencies import get_edge_service
 
@@ -7,9 +7,9 @@ router = APIRouter(tags=["edges"])
 
 @router.post("/edges")
 async def create_edges(
-    dtos: list[EdgeDto],
+    dtos: list[EdgeIncomingDto],
     edge_service: EdgeService = Depends(get_edge_service)
-)-> list[EdgeDto]:
+)-> list[EdgeOutgoingDto]:
     try:
         return list(await edge_service.create(dtos))
     except Exception as e:
@@ -19,9 +19,9 @@ async def create_edges(
 async def get_edge(
     id: int,
     edge_service: EdgeService = Depends(get_edge_service)
-) -> EdgeDto:
+) -> EdgeOutgoingDto:
     try:
-        edges: list[EdgeDto] = await edge_service.get([id])
+        edges: list[EdgeOutgoingDto] = await edge_service.get([id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
@@ -33,9 +33,9 @@ async def get_edge(
 @router.get("/edges")
 async def get_all_edge(
     edge_service: EdgeService = Depends(get_edge_service)
-) -> list[EdgeDto]:
+) -> list[EdgeOutgoingDto]:
     try:
-        edges: list[EdgeDto] = await edge_service.get_all()
+        edges: list[EdgeOutgoingDto] = await edge_service.get_all()
         return edges
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -52,9 +52,9 @@ async def delete_edge(
         
 @router.put("/edges")
 async def update_edges(
-    dtos: list[EdgeDto],
+    dtos: list[EdgeIncomingDto],
     edge_service: EdgeService = Depends(get_edge_service)
-)-> list[EdgeDto]:
+)-> list[EdgeOutgoingDto]:
     try:
         return list(await edge_service.update(dtos))
     except Exception as e:

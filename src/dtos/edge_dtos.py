@@ -2,18 +2,24 @@ from pydantic import BaseModel
 from src.models import (
     Edge
 )
+from typing import Optional
 
 # Edge DTOs
 class EdgeDto(BaseModel):
-    id: int
     lower_id: int
     higher_id: int
     graph_id: int
 
+class EdgeIncomingDto(EdgeDto):
+    id: Optional[int]
+
+class EdgeOutgoingDto(EdgeDto):
+    id: int
+
 class EdgeMapper:
     @staticmethod
-    def to_dto(entity: Edge) -> EdgeDto:
-        return EdgeDto(
+    def to_outgoing_dto(entity: Edge) -> EdgeOutgoingDto:
+        return EdgeOutgoingDto(
             id=entity.id,
             lower_id=entity.lower_id,
             higher_id=entity.higher_id,
@@ -21,7 +27,7 @@ class EdgeMapper:
         )
 
     @staticmethod
-    def to_entity(dto: EdgeDto) -> Edge:
+    def to_entity(dto: EdgeIncomingDto) -> Edge:
         return Edge(
             id=dto.id,
             lower_node_id=dto.lower_id,
@@ -30,9 +36,9 @@ class EdgeMapper:
         )
     
     @staticmethod
-    def to_dtos(entities: list[Edge]) -> list[EdgeDto]:
-        return [EdgeMapper.to_dto(entity) for entity in entities]
+    def to_outgoing_dtos(entities: list[Edge]) -> list[EdgeOutgoingDto]:
+        return [EdgeMapper.to_outgoing_dto(entity) for entity in entities]
     
     @staticmethod
-    def to_entities(dtos: list[EdgeDto]) -> list[Edge]:
+    def to_entities(dtos: list[EdgeIncomingDto]) -> list[Edge]:
         return [EdgeMapper.to_entity(dto) for dto in dtos]
