@@ -1,36 +1,32 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from src.models import Decision
-from src.dtos.decision_dtos import (
-    DecisionIncomingDto, 
-    DecisionOutgoingDto, 
-    DecisionMapper
-)
-from src.repositories.decision_repository import DecisionRepository
+from src.models import Edge
+from src.dtos.edge_dtos import *
+from src.repositories.edge_repository import EdgeRepository
 
-class DecisionService:
+class EdgeService:
     def __init__(self, engine: AsyncEngine):
         self.engine=engine
 
-    async def create(self, dtos: list[DecisionIncomingDto]) -> list[DecisionOutgoingDto]:
+    async def create(self, dtos: list[EdgeIncomingDto]) -> list[EdgeOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             try:
-                entities: list[Decision] = await DecisionRepository(session).create(DecisionMapper.to_entities(dtos))
+                entities: list[Edge] = await EdgeRepository(session).create(EdgeMapper.to_entities(dtos))
                 # get the dtos while the entities are still connected to the session
-                result: list[DecisionOutgoingDto] = DecisionMapper.to_outgoing_dtos(entities)
+                result: list[EdgeOutgoingDto] = EdgeMapper.to_outgoing_dtos(entities)
                 await session.commit()
             except Exception as e:
                 await session.rollback()
                 raise e
         return result
     
-    async def update(self, dtos: list[DecisionIncomingDto]) -> list[DecisionOutgoingDto]:
+    async def update(self, dtos: list[EdgeIncomingDto]) -> list[EdgeOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             try:
-                entities: list[Decision] = await DecisionRepository(session).update(DecisionMapper.to_entities(dtos))
+                entities: list[Edge] = await EdgeRepository(session).update(EdgeMapper.to_entities(dtos))
                 # get the dtos while the entities are still connected to the session
-                result: list[DecisionOutgoingDto] = DecisionMapper.to_outgoing_dtos(entities)
+                result: list[EdgeOutgoingDto] = EdgeMapper.to_outgoing_dtos(entities)
                 await session.commit()
             except Exception as e:
                 await session.rollback()
@@ -40,20 +36,20 @@ class DecisionService:
     async def delete(self, ids: list[int]):
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             try:
-                await DecisionRepository(session).delete(ids)
+                await EdgeRepository(session).delete(ids)
                 await session.commit()
             except Exception as e:
                 await session.rollback()
                 raise e
     
-    async def get(self, ids: list[int]) -> list[DecisionOutgoingDto]:
+    async def get(self, ids: list[int]) -> list[EdgeOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
-            decisions: list[Decision] = await DecisionRepository(session).get(ids)
-            result=DecisionMapper.to_outgoing_dtos(decisions)
+            edges: list[Edge] = await EdgeRepository(session).get(ids)
+            result=EdgeMapper.to_outgoing_dtos(edges)
         return result
     
-    async def get_all(self) -> list[DecisionOutgoingDto]:
+    async def get_all(self) -> list[EdgeOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
-            decisions: list[Decision] = await DecisionRepository(session).get_all()
-            result=DecisionMapper.to_outgoing_dtos(decisions)
+            edges: list[Edge] = await EdgeRepository(session).get_all()
+            result=EdgeMapper.to_outgoing_dtos(edges)
         return result

@@ -23,15 +23,15 @@ class DecisionMapper:
         )
     
     @staticmethod
-    def to_outgoing_dtos(entities: list[Decision]) -> list[DecisionOutgoingDto]:
-        return [DecisionMapper.to_outgoing_dto(entity) for entity in entities]
-
-    @staticmethod
     def to_entity(dto: DecisionIncomingDto) -> Decision:
         return Decision(
             id=dto.id,
             options=",".join(dto.options)
         )
+
+    @staticmethod
+    def to_outgoing_dtos(entities: list[Decision]) -> list[DecisionOutgoingDto]:
+        return [DecisionMapper.to_outgoing_dto(entity) for entity in entities]
     
     @staticmethod
     def to_entities(dtos: list[DecisionIncomingDto]) -> list[Decision]:
