@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from src.dtos.project_dtos import ProjectIncomingDto, ProjectOutgoingDto
+from src.dtos.project_dtos import ProjectIncomingDto, ProjectOutgoingDto, ProjectModelDto
 from src.dtos.user_dtos import UserIncomingDto
 from src.services.project_service import ProjectService
 from src.dependencies import get_project_service
@@ -41,7 +41,17 @@ async def get_all_project(
         return projects
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
+    
+@router.get("/projects//full-projection")
+async def get_all_projects_full_projection(
+    project_service: ProjectService = Depends(get_project_service)
+) -> list[ProjectModelDto]:
+    try:
+        projects: list[ProjectModelDto] = await project_service.get_full_projects()
+        return projects
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
 @router.delete("/projects/{id}")
 async def delete_project(
     id: int,

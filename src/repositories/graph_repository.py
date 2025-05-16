@@ -1,6 +1,8 @@
 from src.models import Graph
+from src.models import Node
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 class GraphRepository:
     def __init__(self, session: AsyncSession):
@@ -12,8 +14,15 @@ class GraphRepository:
         return entities
 
     async def get(self, ids: list[int]) -> list[Graph]:
+        query=select(Graph).where(Graph.id.in_(ids)).options(
+            selectinload(Graph.nodes).options(
+                selectinload(Node.decision),
+                selectinload(Node.probability),
+            ),
+            selectinload(Graph.edges),
+        )
         return list(
-            (await self.session.scalars(select(Graph).where(Graph.id.in_(ids)))).all()
+            (await self.session.scalars(query)).all()
         )
     
     async def get_all(self) -> list[Graph]:

@@ -5,6 +5,7 @@ from src.models import (
 )
 from src.dtos.objective_dtos import *
 from src.dtos.opportunity_dtos import *
+from src.dtos.graph_dtos import *
 
 class ProjectDto(BaseModel):
     name: str
@@ -19,6 +20,9 @@ class ProjectOutgoingDto(ProjectDto):
     id: int
     Objectives: List[ObjectiveOutgoingDto]
     Opportunities: List[OpportunityOutgoingDto]
+
+class ProjectModelDto(ProjectOutgoingDto):
+    graphs: list[GraphModelDto]
 
 class ProjectMapper:
     @staticmethod
@@ -43,9 +47,24 @@ class ProjectMapper:
         )
     
     @staticmethod
+    def to_project_model_dto(entity: Project) -> ProjectModelDto:
+        return ProjectModelDto(
+            id=entity.id,
+            name=entity.name,
+            description=entity.description,
+            Objectives=ObjectiveMapper.to_outgoing_dtos(entity.objectives),
+            Opportunities=OpportunityMapper.to_outgoing_dtos(entity.opportunities),
+            graphs=GraphMapper.to_dtos_with_nodes(entity.graphs)
+        )
+    
+    @staticmethod
     def to_outgoing_dtos(entities: list[Project]) -> list[ProjectOutgoingDto]:
         return [ProjectMapper.to_outgoing_dto(entity) for entity in entities]
     
     @staticmethod
     def to_entities(dtos: list[ProjectIncomingDto], user_id: int) -> list[Project]:
         return [ProjectMapper.to_entity(dto, user_id) for dto in dtos]
+    
+    @staticmethod
+    def to_project_model_dtos(entities: list[Project]) -> list[ProjectModelDto]:
+        return [ProjectMapper.to_project_model_dto(entity) for entity in entities]

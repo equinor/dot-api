@@ -2,11 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models import Project
-from src.dtos.project_dtos import (
-    ProjectIncomingDto, 
-    ProjectOutgoingDto, 
-    ProjectMapper
-)
+from src.dtos.project_dtos import *
 from src.dtos.user_dtos import (
     UserIncomingDto,
     UserMapper,
@@ -63,4 +59,10 @@ class ProjectService:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             projects: list[Project] = await ProjectRepository(session).get_all()
             result = ProjectMapper.to_outgoing_dtos(projects)
+        return result
+
+    async def get_full_projects(self) -> list[ProjectModelDto]:
+        async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
+            projects: list[Project] = await ProjectRepository(session).get_project_full_projection()
+            result=ProjectMapper.to_project_model_dtos(projects)
         return result

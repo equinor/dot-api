@@ -15,7 +15,9 @@ class NodeRepository:
     async def get(self, ids: list[int]) -> list[Node]:
         query=select(Node).where(Node.id.in_(ids)).options(
             selectinload(Node.decision), 
-            selectinload(Node.probability)
+            selectinload(Node.probability),
+            selectinload(Node.lower_edges),
+            selectinload(Node.higher_edges),
         )
         return list(
             (await self.session.scalars(query)).all()
@@ -24,7 +26,9 @@ class NodeRepository:
     async def get_all(self) -> list[Node]:
         query=select(Node).options(
             selectinload(Node.decision), 
-            selectinload(Node.probability)
+            selectinload(Node.probability),
+            selectinload(Node.lower_edges),
+            selectinload(Node.higher_edges),
         )
         return list(
             (await self.session.scalars(query)).all()

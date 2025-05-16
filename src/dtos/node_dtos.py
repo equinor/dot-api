@@ -7,6 +7,14 @@ from src.dtos.user_dtos import *
 from src.dtos.decision_dtos import *
 from src.dtos.probability_dtos import *
 from src.dtos.node_dtos import *
+from src.dtos.edge_dtos import *
+
+from enum import Enum
+
+class Type(Enum):
+    TBA="TBA"
+    decision="decision"
+    probability="probability"
 
 class NodeDto(BaseModel):
     graph_id: int
@@ -21,6 +29,13 @@ class NodeOutgoingDto(NodeDto):
     id: int
     decision: Optional[DecisionOutgoingDto]
     probability: Optional[ProbabilityOutgoingDto]
+
+class NodeWithEdgesDto(NodeDto):
+    id: int
+    decision: Optional[DecisionOutgoingDto]
+    probability: Optional[ProbabilityOutgoingDto]
+    higher_edges: list[EdgeOutgoingDto]
+    lower_edges: list[EdgeOutgoingDto]
 
 class NodeMapper:
     @staticmethod
@@ -47,9 +62,26 @@ class NodeMapper:
         )
     
     @staticmethod
+    def to_dto_with_neighbours(entity: Node) -> NodeWithEdgesDto:
+        entity.lower_neighbors()
+        return NodeWithEdgesDto(
+            id=entity.id,
+            graph_id=entity.graph_id,
+            type=entity.type,
+            decision=DecisionMapper.to_outgoing_dto(entity.decision) if entity.decision else None,
+            probability=ProbabilityMapper.to_outgoing_dto(entity.probability) if entity.probability else None,
+            higher_edges=EdgeMapper.to_outgoing_dtos(entity.higher_edges),
+            lower_edges=EdgeMapper.to_outgoing_dtos(entity.lower_edges),
+        )
+    
+    @staticmethod
     def to_outgoing_dtos(entities: list[Node]) -> list[NodeOutgoingDto]:
         return [NodeMapper.to_outgoing_dto(entity) for entity in entities]
     
     @staticmethod
     def to_entities(dtos: list[NodeIncomingDto], user_id: int) -> list[Node]:
         return [NodeMapper.to_entity(dto, user_id) for dto in dtos]
+    
+    @staticmethod
+    def to_dtos_with_neighbours(entities: list[Node]) -> list[NodeWithEdgesDto]:
+        return [NodeMapper.to_dto_with_neighbours(entity) for entity in entities]
