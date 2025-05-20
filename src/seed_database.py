@@ -52,7 +52,7 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_graphs: in
         )
         opportunity = add_auditable_fields(opportunity, user)
         entities.append(opportunity)
-
+        former_node_id=None
         for graph_index in range(num_graphs):
             graph_id=project_index * num_graphs + graph_index + 1
             graph = Graph(
@@ -88,9 +88,8 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_graphs: in
                 )
                 node = add_auditable_fields(node, user)
                 entities.append(node)
-                former_node_id=node_id
 
-                if node_index > 0:
+                if node_index > 0 and former_node_id is not None:
                     edge=Edge(
                         id=node_id-1, 
                         lower_node_id=former_node_id, 
@@ -98,6 +97,7 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_graphs: in
                         graph_id=graph.id
                     )
                     entities.append(edge)
+                former_node_id=node_id
 
     async with AsyncSession(conn) as session:
         session.add_all(entities)    
