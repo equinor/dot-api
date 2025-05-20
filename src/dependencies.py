@@ -9,6 +9,7 @@ from src.services.edge_service import EdgeService
 from src.services.node_service import NodeService
 from src.database import connection_strings
 from src.models import metadata
+from src.seed_database import seed_database
 
 # use adapter to change based on environment
 connection_string = connection_strings.sql_lite_memory.value
@@ -23,6 +24,7 @@ async def get_async_engine() -> AsyncEngine:
         if connection_string==connection_strings.sql_lite_memory.value:
             async with async_engine.begin() as conn:
                 await conn.run_sync(metadata.create_all)
+                await seed_database(conn, num_projects=10, num_graphs=10, num_nodes=50)
                 
     return async_engine
 

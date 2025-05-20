@@ -73,7 +73,11 @@ class Project(Base, BaseAuditableEntity):
         cascade="all, delete-orphan",
     )
 
-    graphs: Mapped[list["Graph"]] = relationship("Graph", back_populates="project")
+    graphs: Mapped[list["Graph"]] = relationship(
+        "Graph", 
+        back_populates="project",
+        cascade="all, delete-orphan",
+    )
 
     def __init__(self, id: Optional[int], description: str, name: str, user_id: int, objectives: list["Objective"], opportunities: list["Opportunity"]):
         if id is not None:
@@ -158,9 +162,16 @@ class Graph(Base, BaseAuditableEntity):
 
     project: Mapped[Project] = relationship(Project, foreign_keys=[project_id])
 
-    nodes: Mapped[list["Node"]] = relationship("Node", back_populates="graph")
+    nodes: Mapped[list["Node"]] = relationship(
+        "Node", 
+        back_populates="graph", 
+        cascade="all, delete-orphan",
+    )
 
-    edges: Mapped[list["Edge"]] = relationship("Edge")
+    edges: Mapped[list["Edge"]] = relationship(
+        "Edge",
+        cascade="all, delete-orphan",
+    )
 
     def __init__(self, id: Optional[int], name: str, project_id: int, user_id: int):
         if id is not None:

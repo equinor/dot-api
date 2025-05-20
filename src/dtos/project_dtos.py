@@ -10,6 +10,10 @@ class ProjectDto(BaseModel):
     name: str
     description: str
 
+class ProjectCreateDto(ProjectDto):
+    Objectives: List[ObjectiveViaProjectDto]
+    Opportunities: List[OpportunityViaProjectDto]
+
 class ProjectIncomingDto(ProjectDto):
     id: Optional[int]
     Objectives: List[ObjectiveIncomingDto]
@@ -43,9 +47,24 @@ class ProjectMapper:
         )
     
     @staticmethod
+    def from_create_to_entity(dto: ProjectCreateDto, user_id: int) -> Project:
+        return Project(
+            id=None,
+            name=dto.name,
+            description=dto.description,
+            user_id=user_id,
+            opportunities=[], # must create the project first
+            objectives=[], # must create the project first
+        )
+    
+    @staticmethod
     def to_outgoing_dtos(entities: list[Project]) -> list[ProjectOutgoingDto]:
         return [ProjectMapper.to_outgoing_dto(entity) for entity in entities]
     
     @staticmethod
     def to_entities(dtos: list[ProjectIncomingDto], user_id: int) -> list[Project]:
         return [ProjectMapper.to_entity(dto, user_id) for dto in dtos]
+    
+    @staticmethod
+    def from_create_to_entities(dtos: list[ProjectCreateDto], user_id: int) -> list[Project]:
+        return [ProjectMapper.from_create_to_entity(dto, user_id) for dto in dtos]
