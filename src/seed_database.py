@@ -20,16 +20,17 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_graphs: in
     entities: list[Any]=[user1, user2]
 
     for project_index in range(num_projects):
+        user = user1 if project_index % 2 == 0 else user2
         # Create a project with a UUID name and description
         project = Project(
             id=project_index + 1,
             name=str(uuid4()),
             description=str(uuid4()),
-            user_id=user1.id if project_index % 2 == 0 else user2.id,
+            user_id=user.id,
             objectives=[],
             opportunities=[]
         )
-        project = add_auditable_fields(project, user1 if project_index % 2 == 0 else user2)
+        project = add_auditable_fields(project, user)
         entities.append(project)
 
         objective=Objective(
@@ -39,7 +40,7 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_graphs: in
             name=str(uuid4()),
             user_id=project.created_by_id
         )
-        objective = add_auditable_fields(objective, user1 if project_index % 2 == 0 else user2)
+        objective = add_auditable_fields(objective, user)
         entities.append(objective)
 
         opportunity=Opportunity(
@@ -49,7 +50,7 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_graphs: in
             name=str(uuid4()),
             user_id=project.created_by_id
         )
-        opportunity = add_auditable_fields(opportunity, user1 if project_index % 2 == 0 else user2)
+        opportunity = add_auditable_fields(opportunity, user)
         entities.append(opportunity)
 
         for graph_index in range(num_graphs):
@@ -60,7 +61,7 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_graphs: in
                 project_id=project.id,
                 user_id=project.created_by_id
             )
-            graph = add_auditable_fields(graph, user1 if project_index % 2 == 0 else user2)
+            graph = add_auditable_fields(graph, user)
             entities.append(graph)
 
             for node_index in range(num_nodes):
@@ -85,7 +86,7 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_graphs: in
                     decision_id=decision.id,
                     probability_id=probability.id  
                 )
-                node = add_auditable_fields(node, user1 if project_index % 2 == 0 else user2)
+                node = add_auditable_fields(node, user)
                 entities.append(node)
                 former_node_id=node_id
 
