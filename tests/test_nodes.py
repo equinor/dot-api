@@ -1,6 +1,9 @@
 import pytest
 from httpx import AsyncClient
-from tests.utils import parse_response_to_dto, parse_response_to_dtos
+from tests.utils import (
+    parse_response_to_dto_test,
+    parse_response_to_dtos_test,
+)
 from src.dtos.node_dtos import NodeIncomingDto, NodeOutgoingDto
 from src.dtos.decision_dtos import DecisionIncomingDto
 from src.dtos.probability_dtos import ProbabilityIncomingDto
@@ -9,18 +12,16 @@ from src.dtos.probability_dtos import ProbabilityIncomingDto
 @pytest.mark.asyncio
 async def test_get_nodes(client: AsyncClient):
     response = await client.get("/nodes")
-
-    parse_response_to_dtos(response, NodeOutgoingDto)
-
     assert response.status_code == 200
+
+    parse_response_to_dtos_test(response, NodeOutgoingDto)
 
 @pytest.mark.asyncio
 async def test_get_node(client: AsyncClient):
     response = await client.get("/nodes/20")
-
-    parse_response_to_dto(response, NodeOutgoingDto)
-
     assert response.status_code == 200
+
+    parse_response_to_dto_test(response, NodeOutgoingDto)
 
 @pytest.mark.asyncio
 async def test_create_node(client: AsyncClient):
@@ -30,14 +31,14 @@ async def test_create_node(client: AsyncClient):
     response=await client.post("/nodes", json=payload)
     assert response.status_code == 200
 
-    response_content=parse_response_to_dtos(response, NodeOutgoingDto)
+    response_content=parse_response_to_dtos_test(response, NodeOutgoingDto)
     assert response_content[0].decision is not None and response_content[0].decision.options==decision_options
 
 
 @pytest.mark.asyncio
 async def test_update_node(client: AsyncClient):
     node_id=3
-    example_node=parse_response_to_dto(await client.get(f"/nodes/{node_id}"), NodeOutgoingDto)
+    example_node=parse_response_to_dto_test(await client.get(f"/nodes/{node_id}"), NodeOutgoingDto)
     if example_node.decision is None or example_node.probability is None:
         raise Exception("example_node.decision should not be None")
 
@@ -55,7 +56,7 @@ async def test_update_node(client: AsyncClient):
     response=await client.put("/nodes", json=payload)
     assert response.status_code == 200
 
-    response_content=parse_response_to_dtos(response, NodeOutgoingDto)
+    response_content=parse_response_to_dtos_test(response, NodeOutgoingDto)
     assert response_content[0].probability is not None and response_content[0].probability.probabilities==new_probabilities
     assert response_content[0].decision is not None and response_content[0].decision.options==new_options
     assert response_content[0].type==new_type
