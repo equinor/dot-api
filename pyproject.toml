@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "dot-api"
+name = "src"
 version = "0.1.0"
 description = "Python Fast Api for the Decision Optimization Project"
 authors = ["EinarSalbouvet <esalo@equinor.com>"]
@@ -16,6 +16,7 @@ uvicorn = "^0.34.2"
 pytest = "^8.3.5"
 httpx = "^0.28.1"
 pytest-asyncio = "^0.26.0"
+pytest-cov = "^6.1.1"
 
 
 [build-system]

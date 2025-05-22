@@ -2,27 +2,34 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models import Project
-from src.dtos.project_dtos import (
-    ProjectIncomingDto, 
-    ProjectOutgoingDto, 
-    ProjectMapper
-)
-from src.dtos.user_dtos import (
-    UserIncomingDto,
-    UserMapper,
-)
+from src.dtos.project_dtos import *
+from src.dtos.user_dtos import *
+from src.dtos.objective_dtos import *
+from src.dtos.opportunity_dtos import *
 from src.repositories.project_repository import ProjectRepository
 from src.repositories.user_repository import UserRepository
+from src.repositories.objective_repository import ObjectiveRepository
+from src.repositories.opportunity_repository import OpportunityRepository
 
 class ProjectService:
     def __init__(self, engine: AsyncEngine):
         self.engine=engine
 
-    async def create(self, dtos: list[ProjectIncomingDto], user_dto: UserIncomingDto) -> list[ProjectOutgoingDto]:
+    async def create(self, dtos: list[ProjectCreateDto], user_dto: UserIncomingDto) -> list[ProjectOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             try:
                 user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
-                entities: list[Project] = await ProjectRepository(session).create(ProjectMapper.to_entities(dtos, user.id))
+                # create projects
+                entities: list[Project] = await ProjectRepository(session).create(ProjectMapper.from_create_to_entities(dtos, user.id))
+
+                # create objectives/opportunities
+                for n, dto in enumerate(dtos):
+                    objectives=await ObjectiveRepository(session).create(ObjectiveMapper.via_project_to_entities(dto.Objectives, user.id, entities[n].id))
+                    opportunities=await OpportunityRepository(session).create(OpportunityMapper.via_project_to_entities(dto.Opportunities, user.id, entities[n].id))
+
+                    entities[n].objectives=objectives
+                    entities[n].opportunities=opportunities
+
                 # get the dtos while the entities are still connected to the session
                 result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(entities)
                 await session.commit()

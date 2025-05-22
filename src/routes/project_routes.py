@@ -1,18 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException
-from src.dtos.project_dtos import ProjectIncomingDto, ProjectOutgoingDto
-from src.dtos.user_dtos import UserIncomingDto
+from src.dtos.project_dtos import ProjectIncomingDto, ProjectOutgoingDto, ProjectCreateDto
 from src.services.project_service import ProjectService
 from src.dependencies import get_project_service
+from src.services.user_service import get_temp_user
 
 router = APIRouter(tags=["projects"])
 
 @router.post("/projects")
 async def create_projects(
-    dtos: list[ProjectIncomingDto],
-    user_dto: UserIncomingDto,
+    dtos: list[ProjectCreateDto],
     project_service: ProjectService = Depends(get_project_service)
 )-> list[ProjectOutgoingDto]:
     try:
+        user_dto=get_temp_user()
         return list(await project_service.create(dtos, user_dto))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -55,10 +55,10 @@ async def delete_project(
 @router.put("/projects")
 async def update_projects(
     dtos: list[ProjectIncomingDto],
-    user_dto: UserIncomingDto,
     project_service: ProjectService = Depends(get_project_service)
 )-> list[ProjectOutgoingDto]:
     try:
+        user_dto=get_temp_user()
         return list(await project_service.update(dtos, user_dto))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
