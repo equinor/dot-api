@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 alembic = "^1.15.2"
-sqlalchemy = "^2.0.40"
+sqlalchemy = "^2.0.41"
 fastapi = "^0.115.12"
 aiosqlite = "^0.21.0"
 uvicorn = "^0.34.2"
