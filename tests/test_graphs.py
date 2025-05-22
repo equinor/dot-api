@@ -19,10 +19,8 @@ async def test_get_graphs(client: AsyncClient):
 async def test_get_graph(client: AsyncClient):
     response = await client.get("/graphs/20")
     assert response.status_code == 200
-    try:
-        parse_response_to_dto_test(response, GraphOutgoingDto)
-    except:
-        pytest.fail("Response parsing encountered an exception")
+    
+    parse_response_to_dto_test(response, GraphOutgoingDto)
 
 @pytest.mark.asyncio
 async def test_create_graph(client: AsyncClient):
