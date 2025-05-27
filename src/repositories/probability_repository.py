@@ -1,4 +1,4 @@
-from src.models import Probability
+from src.models.probability import Probability
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 

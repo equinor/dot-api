@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from src.models import (
+from src.models.edge import (
     Edge
 )
 from typing import Optional

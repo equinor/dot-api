@@ -1,4 +1,4 @@
-from src.models import Node
+from src.models.node import Node
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload

@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from src.models import Project
+from src.models.project import Project
 from src.dtos.project_dtos import *
 from src.dtos.user_dtos import *
 from src.dtos.objective_dtos import *

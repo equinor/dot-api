@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
-from src.models import (
+from src.models.decision import (
     Decision
 )
 

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
-from src.models import (
+from src.models.objective import (
     Objective
 )
 

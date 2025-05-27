@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from src.models import Decision
+from src.models.decision import Decision
 from src.dtos.decision_dtos import (
     DecisionIncomingDto, 
     DecisionOutgoingDto, 
