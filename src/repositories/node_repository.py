@@ -35,7 +35,7 @@ class NodeRepository:
 
         for n, enity_to_update in enumerate(enities_to_update):
             entity=entities[n]
-            enity_to_update.graph_id=entity.graph_id
+            enity_to_update.scenario_id=entity.scenario_id
             enity_to_update.type=entity.type
 
             if (entity.decision is not None):

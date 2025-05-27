@@ -7,34 +7,34 @@ from sqlalchemy.orm import (
 )
 from src.models.base import Base
 from src.models.node import Node
-from src.models.graph import Graph
+from src.models.scenario import Scenario
 
 class Edge(Base):
     __tablename__ = "edge"
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    lower_id: Mapped[int] = mapped_column(ForeignKey(Node.id))
-    higher_id: Mapped[int] = mapped_column(ForeignKey(Node.id))
-    graph_id: Mapped[int] = mapped_column(ForeignKey(Graph.id))
+    tail_id: Mapped[int] = mapped_column(ForeignKey(Node.id))
+    head_id: Mapped[int] = mapped_column(ForeignKey(Node.id))
+    scenario_id: Mapped[int] = mapped_column(ForeignKey(Scenario.id))
 
-    graph: Mapped[Graph] = relationship(Graph, foreign_keys=[graph_id])
+    scenario: Mapped[Scenario] = relationship(Scenario, foreign_keys=[scenario_id])
 
-    lower_node: Mapped[Node] = relationship(
+    tail_node: Mapped[Node] = relationship(
         Node, 
-        primaryjoin=lower_id == Node.id, 
-        back_populates="lower_edges",
+        primaryjoin=tail_id == Node.id, 
+        back_populates="tail_edges",
     )
 
-    higher_node: Mapped[Node] = relationship(
+    head_node: Mapped[Node] = relationship(
         Node, 
-        primaryjoin=higher_id == Node.id, 
-        back_populates="higher_edges", 
+        primaryjoin=head_id == Node.id, 
+        back_populates="head_edges", 
     )
 
-    def __init__(self, id: Optional[int], lower_node_id: int, higher_node_id: int, graph_id: int):
+    def __init__(self, id: Optional[int], tail_node_id: int, head_node_id: int, scenario_id: int):
         if id is not None:
             self.id = id
-        self.lower_id = lower_node_id
-        self.higher_id = higher_node_id
-        self.graph_id = graph_id
+        self.tail_id = tail_node_id
+        self.head_id = head_node_id
+        self.scenario_id = scenario_id

@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 from src.models.project import Project
 from src.models.base_auditable_entity import BaseAuditableEntity
 
-class Graph(Base, BaseAuditableEntity):
-    __tablename__ = "graph"
+class Scenario(Base, BaseAuditableEntity):
+    __tablename__ = "scenario"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     project_id: Mapped[int] = mapped_column(ForeignKey(Project.id), index=True)
@@ -24,7 +24,7 @@ class Graph(Base, BaseAuditableEntity):
 
     nodes: Mapped[list["Node"]] = relationship(
         "Node", 
-        back_populates="graph", 
+        back_populates="scenario", 
         cascade="all, delete-orphan",
     )
 

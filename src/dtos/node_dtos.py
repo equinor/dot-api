@@ -9,7 +9,7 @@ from src.dtos.probability_dtos import *
 from src.dtos.node_dtos import *
 
 class NodeDto(BaseModel):
-    graph_id: int
+    scenario_id: int
     type: str
 
 class NodeIncomingDto(NodeDto):
@@ -27,7 +27,7 @@ class NodeMapper:
     def to_outgoing_dto(entity: Node) -> NodeOutgoingDto:
         return NodeOutgoingDto(
             id=entity.id,
-            graph_id=entity.graph_id,
+            scenario_id=entity.scenario_id,
             type=entity.type,
             decision=DecisionMapper.to_outgoing_dto(entity.decision) if entity.decision else None,
             probability=ProbabilityMapper.to_outgoing_dto(entity.probability) if entity.probability else None
@@ -38,7 +38,7 @@ class NodeMapper:
         # decision and probability ids are not assigned here as the node controls the decisions and probabilities
         return Node(
             id=dto.id,
-            graph_id=dto.graph_id,
+            scenario_id=dto.scenario_id,
             type=dto.type,
             user_id=user_id,
             decision=DecisionMapper.to_entity(dto.decision) if dto.decision else None,

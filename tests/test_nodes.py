@@ -26,7 +26,7 @@ async def test_get_node(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_create_node(client: AsyncClient):
     decision_options=["testing node create", "yes", "no"]
-    payload = [NodeIncomingDto(id=None, graph_id=3, type="decision", decision=DecisionIncomingDto(id=None, options=decision_options), probability=None).model_dump()]
+    payload = [NodeIncomingDto(id=None, scenario_id=3, type="decision", decision=DecisionIncomingDto(id=None, options=decision_options), probability=None).model_dump()]
 
     response=await client.post("/nodes", json=payload)
     assert response.status_code == 200
@@ -47,7 +47,7 @@ async def test_update_node(client: AsyncClient):
     new_type="probability"
     payload=[NodeIncomingDto(
         id=example_node.id, 
-        graph_id=example_node.graph_id, 
+        scenario_id=example_node.scenario_id, 
         type=new_type,
         decision=DecisionIncomingDto(id=example_node.decision.id, options=new_options),
         probability=ProbabilityIncomingDto(id=example_node.probability.id, probabilities=new_probabilities)

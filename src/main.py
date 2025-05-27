@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI, status
 import src.routes.decision_routes as decision_routes
 import src.routes.edge_routes as edge_routes
-import src.routes.graph_routes as graph_routes
+import src.routes.scenario_routes as scenario_routes
 import src.routes.node_routes as node_routes
 import src.routes.objective_routes as objective_routes
 import src.routes.opportunity_routes as opportunity_routes
@@ -17,7 +17,7 @@ async def root():
 
 app.include_router(decision_routes.router)
 app.include_router(edge_routes.router)
-app.include_router(graph_routes.router)
+app.include_router(scenario_routes.router)
 app.include_router(node_routes.router)
 app.include_router(objective_routes.router)
 app.include_router(opportunity_routes.router)

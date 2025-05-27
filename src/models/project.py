@@ -8,7 +8,7 @@ from src.models.base_auditable_entity import BaseAuditableEntity
 if TYPE_CHECKING:
     from src.models.opportunity import Opportunity
     from src.models.objective import Objective
-    from src.models.graph import Graph
+    from models.scenario import Scenario
 
 class Project(Base, BaseAuditableEntity):
     __tablename__ = "project"
@@ -27,8 +27,8 @@ class Project(Base, BaseAuditableEntity):
         cascade="all, delete-orphan",
     )
 
-    graphs: Mapped[list["Graph"]] = relationship(
-        "Graph", 
+    scenarios: Mapped[list["Scenario"]] = relationship(
+        "Scenario", 
         back_populates="project",
         cascade="all, delete-orphan",
     )
