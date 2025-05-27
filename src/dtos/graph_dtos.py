@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
-from src.models.edge import (
+from src.models.graph import (
     Graph
 )
 
