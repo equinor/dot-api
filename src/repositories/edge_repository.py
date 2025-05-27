@@ -1,4 +1,4 @@
-from src.models import Edge
+from src.models.edge import Edge
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 

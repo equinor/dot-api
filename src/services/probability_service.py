@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from src.models import Probability
+from src.models.probability import Probability
 from src.dtos.probability_dtos import (
     ProbabilityIncomingDto, 
     ProbabilityOutgoingDto, 

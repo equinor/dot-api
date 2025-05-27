@@ -1,4 +1,4 @@
-from src.models import Objective
+from src.models.objective import Objective
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 

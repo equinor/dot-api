@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from src.models import Edge
+from src.models.edge import Edge
 from src.dtos.edge_dtos import *
 from src.repositories.edge_repository import EdgeRepository
 

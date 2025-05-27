@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from src.models import Graph
+from src.models.graph import Graph
 from src.dtos.graph_dtos import (
     GraphIncomingDto, 
     GraphOutgoingDto, 

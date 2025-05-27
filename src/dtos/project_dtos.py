@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional, List
-from src.models import (
+from src.models.project import (
     Project
 )
 from src.dtos.objective_dtos import *
