@@ -17,9 +17,6 @@ class Issue(Base, BaseAuditableEntity):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     scenario_id: Mapped[int] = mapped_column(ForeignKey(Scenario.id))
-    node_id: Mapped[int] = mapped_column(ForeignKey(Node.id))
-    decision_id: Mapped[Optional[int]] = mapped_column(ForeignKey(Decision.id))
-    probability_id: Mapped[Optional[int]] = mapped_column(ForeignKey(Probability.id))
 
     type: Mapped[str] = mapped_column(String(30), default="Undecided")
     boundary: Mapped[str] = mapped_column(String(30), default="out")
@@ -28,23 +25,25 @@ class Issue(Base, BaseAuditableEntity):
 
     node: Mapped[Node] = relationship(
         Node, 
-        foreign_keys=[node_id], 
+        back_populates="issue",
+        cascade="all, delete-orphan",
+        single_parent=True,
     )
 
     decision: Mapped[Optional[Decision]] = relationship(
         Decision, 
-        foreign_keys=[decision_id], 
+        back_populates="issue",
         cascade="all, delete-orphan",
         single_parent=True,
     )
     probability: Mapped[Optional[Probability]] = relationship(
         Probability, 
-        foreign_keys=[probability_id], 
+        back_populates="issue",
         cascade="all, delete-orphan",
         single_parent=True,
     )
 
-    def __init__(self, id: Optional[int], scenario_id: int, type: str, boundary: str, user_id: int, node_id: int, node: Node, decision_id: Optional[int] = None, probability_id: Optional[int] = None, decision: Optional[Decision] = None, probability: Optional[Probability] = None):
+    def __init__(self, id: Optional[int], scenario_id: int, type: str, boundary: str, user_id: int, node: Node, decision: Optional[Decision] = None, probability: Optional[Probability] = None):
         if id is not None:
             self.id = id
         else:
@@ -54,9 +53,6 @@ class Issue(Base, BaseAuditableEntity):
         self.type = type
         self.boundary = boundary
         self.updated_by_id = user_id
-        self.node_id = node_id
         self.Node = node
-        self.decision_id = decision_id
         self.decision = decision
-        self.probability_id = probability_id
         self.probability = probability

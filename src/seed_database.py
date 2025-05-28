@@ -69,12 +69,14 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
                 issue_node_id=project_index * num_scenarios*num_nodes + scenario_index * num_nodes + issue_node_index + 1
                 decision = Decision(
                     id=issue_node_id,
+                    issue_id=issue_node_id,
                     options="yes,no"
                 )
                 entities.append(decision)
 
                 probability = Probability(
                     id=issue_node_id,
+                    issue_id=issue_node_id,
                     probabilities="0.5,0.5"
                 )
                 entities.append(probability)
@@ -82,23 +84,18 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
                 node = Node(
                     id=issue_node_id,
                     scenario_id=scenario.id,
-                    issue_id=None,
+                    issue_id=issue_node_id,
                     name=str(uuid4()),
                 )
 
                 issue = Issue(
                     id=issue_node_id,
                     scenario_id=scenario.id,
-                    node_id=node.id,
                     node=node,
                     type="Decision",
                     boundary="out",
                     user_id=scenario.created_by_id,
-                    decision_id=decision.id,
-                    probability_id=probability.id,
                 )
-
-                node.issue_id=issue.id
 
                 issue = add_auditable_fields(issue, user)
                 entities.append(node)

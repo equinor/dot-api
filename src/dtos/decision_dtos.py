@@ -9,9 +9,11 @@ class DecisionDto(BaseModel):
 
 class DecisionIncomingDto(DecisionDto):
     id: Optional[int] = Field(default=None, gt=0)
+    issue_id: Optional[int]
 
 class DecisionOutgoingDto(DecisionDto):
     id: int = Field(gt=0)
+    issue_id: int
 
 
 class DecisionMapper:
@@ -19,6 +21,7 @@ class DecisionMapper:
     def to_outgoing_dto(entity: Decision) -> DecisionOutgoingDto:
         return DecisionOutgoingDto(
             id=entity.id,
+            issue_id=entity.issue_id,
             options=entity.options.split(",")
         )
     
@@ -26,6 +29,7 @@ class DecisionMapper:
     def to_entity(dto: DecisionIncomingDto) -> Decision:
         return Decision(
             id=dto.id,
+            issue_id=dto.issue_id if dto.issue_id else None,
             options=",".join(dto.options)
         )
 

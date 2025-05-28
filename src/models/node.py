@@ -21,10 +21,7 @@ class Node(Base):
     name: Mapped[str] = mapped_column(String(60), index=True)
 
     scenario: Mapped[Scenario] = relationship(Scenario, foreign_keys=[scenario_id], back_populates="nodes")
-    issue: Mapped["Issue"] = relationship(
-        "Issue", 
-        foreign_keys=[issue_id], 
-    )
+    issue: Mapped["Issue"] = relationship("Issue", back_populates="node")
 
     head_edges: Mapped[list["Edge"]] = relationship(
         "Edge",
@@ -39,14 +36,12 @@ class Node(Base):
         cascade="all, delete-orphan",
     )
 
-    def __init__(self, id: Optional[int], scenario_id: int, name: str, issue_id: Optional[int]):
+    def __init__(self, id: Optional[int], scenario_id: int, name: str, issue_id: int):
         if id is not None:
             self.id = id
         
-        if issue_id:
-            self.issue_id=issue_id
-
         self.scenario_id = scenario_id
+        self.issue_id=issue_id
         self.name = name
 
     def head_neighbors(self) -> list["Node"]:

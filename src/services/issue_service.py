@@ -4,41 +4,58 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from src.models.issue import Issue
 from src.dtos.issue_dtos import *
 from src.dtos.node_dtos import *
+from src.dtos.decision_dtos import *
+from src.dtos.probability_dtos import *
 from src.dtos.user_dtos import (
     UserIncomingDto,
     UserMapper,
 )
 from src.repositories.issue_repository import IssueRepository
 from src.repositories.node_repository import NodeRepository
+from src.repositories.decision_repository import DecisionRepository
+from src.repositories.probability_repository import ProbabilityRepository
 from src.repositories.user_repository import UserRepository
 
 class IssueService:
     def __init__(self, engine: AsyncEngine):
         self.engine=engine
     
-    def _extract_nodes(self, dtos: list[IssueIncomingDto]) -> tuple[list[IssueIncomingDto], list[NodeIncomingDto]]:
+    def _extract_related_entities(self, dtos: list[IssueIncomingDto]) -> tuple[list[IssueIncomingDto], list[NodeIncomingDto], list[Optional[DecisionIncomingDto]], list[Optional[ProbabilityIncomingDto]]]:
         nodes: list[NodeIncomingDto]=[]
+        decisions: list[Optional[DecisionIncomingDto]]=[]
+        probabilities: list[Optional[ProbabilityIncomingDto]]=[]
         for dto in dtos:
             if dto.node:
                 nodes.append(dto.node)
             else:
                 # issue id is set later
                 nodes.append(NodeIncomingDto(scenario_id=dto.scenario_id, issue_id=0, id=None))
+
+            decisions.append(dto.decision)
+            probabilities.append(dto.probability)
             dto.node=None
-        return dtos, nodes
+            dto.decision=None
+            dto.probability=None
+        return dtos, nodes, decisions, probabilities
 
     async def create(self, dtos: list[IssueIncomingDto], user_dto: UserIncomingDto) -> list[IssueOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             try:
                 user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
                 # remove node dto to create later
-                dtos, node_dtos = self._extract_nodes(dtos)
+                dtos, node_dtos, decision_dtos, probability_dtos = self._extract_related_entities(dtos)
                 entities: list[Issue] = await IssueRepository(session).create(IssueMapper.to_entities(dtos, user.id))
                 # get the dtos while the entities are still connected to the session
-                for entity, node_dto in zip(entities, node_dtos):
+                for entity, node_dto, decision_dto, probability_dto in zip(entities, node_dtos, decision_dtos, probability_dtos):
                     node_dto.issue_id=entity.id
                     node=(await NodeRepository(session).create(NodeMapper.to_entity(node_dto)))[0]
                     entity.node=node
+                    if decision_dto:
+                        decision=(await DecisionRepository(session).create(DecisionMapper.to_entity(decision_dto)))[0]
+                        entity.decision=decision
+                    if probability_dto:
+                        probability=(await ProbabilityRepository(session).create(ProbabilityMapper.to_entity(probability_dto)))[0]
+                        entity.probability=probability
                 result: list[IssueOutgoingDto] = IssueMapper.to_outgoing_dtos(entities)
                 await session.commit()
             except Exception as e:

@@ -10,7 +10,6 @@ from src.dtos.node_dtos import *
 
 class IssueDto(BaseModel):
     scenario_id: int
-    node_id: int
     type: str
     boundary: str
 
@@ -37,7 +36,6 @@ class IssueMapper:
         return IssueOutgoingDto(
             id=entity.id,
             scenario_id=entity.scenario_id,
-            node_id=entity.node_id,
             type=entity.type,
             boundary=entity.boundary,
             node=NodeMapper.to_outgoing_dto_via_issue(entity.node),
@@ -50,7 +48,6 @@ class IssueMapper:
         return IssueViaNodeOutgoingDto(
             id=entity.id,
             scenario_id=entity.scenario_id,
-            node_id=entity.node_id,
             type=entity.type,
             boundary=entity.boundary,
             decision=DecisionMapper.to_outgoing_dto(entity.decision) if entity.decision else None,
@@ -63,7 +60,6 @@ class IssueMapper:
         return Issue(
             id=dto.id,
             scenario_id=dto.scenario_id,
-            node_id=dto.node_id,
             type=dto.type,
             boundary=dto.boundary,
             user_id=user_id,

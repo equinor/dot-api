@@ -9,6 +9,7 @@ class ProbabilityDto(BaseModel):
 
 class ProbabilityIncomingDto(ProbabilityDto):
     id: Optional[int]
+    issue_id: Optional[int]
 
 class ProbabilityOutgoingDto(ProbabilityDto):
     id: int
@@ -25,6 +26,7 @@ class ProbabilityMapper:
     def to_entity(dto: ProbabilityIncomingDto) -> Probability:
         return Probability(
             id=dto.id,
+            issue_id=dto.issue_id if dto.issue_id else None,
             probabilities=",".join(map(str, dto.probabilities))
         )
     

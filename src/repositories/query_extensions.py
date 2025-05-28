@@ -37,6 +37,6 @@ class QueryExtensions:
     def load_project_with_relationships() -> list[_AbstractLoad]:
         return [
             selectinload(Project.scenarios).options(
-                *QueryExtensions.load_project_with_relationships()
+                *QueryExtensions.load_scenario_with_relationships()
             )
         ]
