@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from src.models import Opportunity
+from src.models.opportunity import Opportunity
 from src.dtos.opportunity_dtos import (
     OpportunityIncomingDto, 
     OpportunityOutgoingDto, 

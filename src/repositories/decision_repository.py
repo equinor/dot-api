@@ -1,4 +1,4 @@
-from src.models import Decision
+from src.models.decision import Decision
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 

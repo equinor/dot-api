@@ -1,4 +1,4 @@
-from src.models import Graph
+from src.models.graph import Graph
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 

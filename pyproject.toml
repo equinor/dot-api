@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "dot-api"
+name = "src"
 version = "0.1.0"
 description = "Python Fast Api for the Decision Optimization Project"
 authors = ["EinarSalbouvet <esalo@equinor.com>"]
@@ -8,8 +8,8 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-alembic = "^1.15.2"
-sqlalchemy = "^2.0.40"
+alembic = "^1.16.1"
+sqlalchemy = "^2.0.41"
 fastapi = "^0.115.12"
 aiosqlite = "^0.21.0"
 uvicorn = "^0.34.2"
@@ -19,6 +19,7 @@ pytest-asyncio = "^0.26.0"
 requests = "^2.32.3"
 authlib = "^1.6.0"
 jwt = "^1.3.1"
+pytest-cov = "^6.1.1"
 
 
 [build-system]

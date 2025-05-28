@@ -1,18 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.objective_dtos import ObjectiveIncomingDto, ObjectiveOutgoingDto
-from src.dtos.user_dtos import UserIncomingDto
 from src.services.objective_service import ObjectiveService
 from src.dependencies import get_objective_service
+from src.services.user_service import get_temp_user
 
 router = APIRouter(tags=["objectives"])
 
 @router.post("/objectives")
 async def create_objectives(
     dtos: list[ObjectiveIncomingDto],
-    user_dto: UserIncomingDto,
     objective_service: ObjectiveService = Depends(get_objective_service)
 )-> list[ObjectiveOutgoingDto]:
     try:
+        user_dto=get_temp_user()
         return list(await objective_service.create(dtos, user_dto))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -55,10 +55,10 @@ async def delete_objective(
 @router.put("/objectives")
 async def update_objectives(
     dtos: list[ObjectiveIncomingDto],
-    user_dto: UserIncomingDto,
     objective_service: ObjectiveService = Depends(get_objective_service)
 )-> list[ObjectiveOutgoingDto]:
     try:
+        user_dto=get_temp_user()
         return list(await objective_service.update(dtos, user_dto))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

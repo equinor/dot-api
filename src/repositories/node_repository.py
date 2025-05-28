@@ -1,4 +1,4 @@
-from src.models import Node
+from src.models.node import Node
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -39,10 +39,10 @@ class NodeRepository:
             enity_to_update.type=entity.type
 
             if (entity.decision is not None):
-                enity_to_update.decision=entity.decision
+                enity_to_update.decision=await self.session.merge(entity.decision)
 
             if (entity.probability is not None):
-                enity_to_update.probability=entity.probability
+                enity_to_update.probability=await self.session.merge(entity.probability)
             
         await self.session.flush()
         return enities_to_update

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional, List
-from src.models import (
+from src.models.probability import (
     Probability
 )
 

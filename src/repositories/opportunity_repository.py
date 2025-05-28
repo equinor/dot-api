@@ -1,4 +1,4 @@
-from src.models import Opportunity
+from src.models.opportunity import Opportunity
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 

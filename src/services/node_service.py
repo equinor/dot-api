@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from src.models import Node
+from src.models.node import Node
 from src.dtos.node_dtos import (
     NodeIncomingDto, 
     NodeOutgoingDto, 
