@@ -6,7 +6,7 @@ import src.routes.scenario_routes as scenario_routes
 import src.routes.node_routes as node_routes
 import src.routes.objective_routes as objective_routes
 import src.routes.opportunity_routes as opportunity_routes
-import src.routes.probability_routes as probability_routes
+import src.routes.uncertainty_routes as uncertainty_routes
 import src.routes.project_routes as project_routes
 import src.routes.issue_routes as issue_routes
 
@@ -22,7 +22,7 @@ app.include_router(scenario_routes.router)
 app.include_router(node_routes.router)
 app.include_router(objective_routes.router)
 app.include_router(opportunity_routes.router)
-app.include_router(probability_routes.router)
+app.include_router(uncertainty_routes.router)
 app.include_router(project_routes.router)
 app.include_router(issue_routes.router)
 

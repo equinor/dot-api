@@ -7,7 +7,7 @@ class QueryExtensions:
     def load_issue_with_relationships() -> list[_AbstractLoad]:
         return [
             selectinload(Issue.decision),
-            selectinload(Issue.probability),
+            selectinload(Issue.uncertainty),
             selectinload(Issue.node),
         ]
     
@@ -16,7 +16,7 @@ class QueryExtensions:
         return [
             selectinload(Node.issue).options(
                 selectinload(Issue.decision),
-                selectinload(Issue.probability),
+                selectinload(Issue.uncertainty),
             )
         ]
 

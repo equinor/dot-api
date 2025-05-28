@@ -3,7 +3,7 @@ from src.services.decision_service import DecisionService
 from src.services.project_service import ProjectService
 from src.services.objective_service import ObjectiveService
 from src.services.opportunity_service import OpportunityService
-from src.services.probability_service import ProbabilityService
+from src.services.uncertainty_service import UncertaintyService
 from src.services.scenario_service import ScenarioService
 from src.services.edge_service import EdgeService
 from src.services.node_service import NodeService
@@ -41,8 +41,8 @@ async def get_objective_service() -> ObjectiveService:
 async def get_opportunity_service() -> OpportunityService:
     return OpportunityService(await get_async_engine())
 
-async def get_probability_service() -> ProbabilityService:
-    return ProbabilityService(await get_async_engine())
+async def get_uncertainty_service() -> UncertaintyService:
+    return UncertaintyService(await get_async_engine())
 
 async def get_scenario_service() -> ScenarioService:
     return ScenarioService(await get_async_engine())

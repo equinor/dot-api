@@ -5,7 +5,7 @@ from src.models.node import (
 )
 from src.dtos.user_dtos import *
 from src.dtos.decision_dtos import *
-from src.dtos.probability_dtos import *
+from src.dtos.uncertainty_dtos import *
 from src.dtos.node_dtos import *
 
 if TYPE_CHECKING:

@@ -9,7 +9,7 @@ from src.models.base import Base
 from src.models.base_auditable_entity import BaseAuditableEntity
 from src.models.scenario import Scenario
 from src.models.decision import Decision
-from src.models.probability import Probability
+from src.models.uncertainty import Uncertainty
 from src.models.node import Node
 
 class Issue(Base, BaseAuditableEntity):
@@ -36,14 +36,14 @@ class Issue(Base, BaseAuditableEntity):
         cascade="all, delete-orphan",
         single_parent=True,
     )
-    probability: Mapped[Optional[Probability]] = relationship(
-        Probability, 
+    uncertainty: Mapped[Optional[Uncertainty]] = relationship(
+        Uncertainty, 
         back_populates="issue",
         cascade="all, delete-orphan",
         single_parent=True,
     )
 
-    def __init__(self, id: Optional[int], scenario_id: int, type: str, boundary: str, user_id: int, node: Node, decision: Optional[Decision] = None, probability: Optional[Probability] = None):
+    def __init__(self, id: Optional[int], scenario_id: int, type: str, boundary: str, user_id: int, node: Node, decision: Optional[Decision] = None, uncertainty: Optional[Uncertainty] = None):
         if id is not None:
             self.id = id
         else:
@@ -55,4 +55,4 @@ class Issue(Base, BaseAuditableEntity):
         self.updated_by_id = user_id
         self.Node = node
         self.decision = decision
-        self.probability = probability
+        self.uncertainty = uncertainty

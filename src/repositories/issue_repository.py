@@ -44,8 +44,8 @@ class IssueRepository:
             if entity.decision:
                 enity_to_update.decision=await self.session.merge(entity.decision)
 
-            if entity.probability:
-                enity_to_update.probability=await self.session.merge(entity.probability)
+            if entity.uncertainty:
+                enity_to_update.uncertainty=await self.session.merge(entity.uncertainty)
             
         await self.session.flush()
         return enities_to_update

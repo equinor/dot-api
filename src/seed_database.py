@@ -74,12 +74,12 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
                 )
                 entities.append(decision)
 
-                probability = Probability(
+                uncertainty = Uncertainty(
                     id=issue_node_id,
                     issue_id=issue_node_id,
                     probabilities="0.5,0.5"
                 )
-                entities.append(probability)
+                entities.append(uncertainty)
 
                 node = Node(
                     id=issue_node_id,

@@ -6,7 +6,7 @@ from tests.utils import (
 )
 from src.dtos.issue_dtos import IssueIncomingDto, IssueOutgoingDto
 from src.dtos.decision_dtos import DecisionIncomingDto
-from src.dtos.probability_dtos import ProbabilityIncomingDto
+from src.dtos.uncertainty_dtos import UncertaintyIncomingDto
 from src.dtos.node_dtos import NodeIncomingDto
 
 
@@ -28,13 +28,13 @@ async def test_get_issue(client: AsyncClient):
 async def test_update_issue(client: AsyncClient):
     issue_id=3
     example_issue=parse_response_to_dto_test(await client.get(f"/issues/{issue_id}"), IssueOutgoingDto)
-    if example_issue.decision is None or example_issue.probability is None:
+    if example_issue.decision is None or example_issue.uncertainty is None:
         raise Exception("example_issue.decision should not be None")
     node=NodeIncomingDto(scenario_id=example_issue.scenario_id, id=example_issue.node.id, issue_id=example_issue.id)
 
     new_options=["yes", "no", "this is testing issue update"]
     new_probabilities=[0.1, 0.3, 0.6]
-    new_type="probability"
+    new_type="uncertainty"
     new_boundary="in"
     payload=[IssueIncomingDto(
         id=example_issue.id, 
@@ -43,14 +43,14 @@ async def test_update_issue(client: AsyncClient):
         boundary=new_boundary,
         node=node,
         decision=DecisionIncomingDto(id=example_issue.decision.id, issue_id=example_issue.id, options=new_options),
-        probability=ProbabilityIncomingDto(id=example_issue.probability.id, issue_id=example_issue.id, probabilities=new_probabilities)
+        uncertainty=UncertaintyIncomingDto(id=example_issue.uncertainty.id, issue_id=example_issue.id, probabilities=new_probabilities)
     ).model_dump()]
 
     response=await client.put("/issues", json=payload)
     assert response.status_code == 200
 
     response_content=parse_response_to_dtos_test(response, IssueOutgoingDto)
-    assert response_content[0].probability is not None and response_content[0].probability.probabilities==new_probabilities
+    assert response_content[0].uncertainty is not None and response_content[0].uncertainty.probabilities==new_probabilities
     assert response_content[0].decision is not None and response_content[0].decision.options==new_options
     assert response_content[0].type==new_type
 

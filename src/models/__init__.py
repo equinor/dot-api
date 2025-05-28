@@ -7,6 +7,6 @@ from src.models.objective import Objective # type: ignore
 from src.models.scenario import Scenario # type: ignore
 from src.models.issue import Issue # type: ignore
 from src.models.decision import Decision # type: ignore
-from src.models.probability import Probability # type: ignore
+from src.models.uncertainty import Uncertainty # type: ignore
 from src.models.node import Node # type: ignore
 from src.models.edge import Edge # type: ignore
