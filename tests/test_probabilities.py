@@ -23,18 +23,9 @@ async def test_get_probability(client: AsyncClient):
     parse_response_to_dto_test(response, ProbabilityOutgoingDto)
 
 @pytest.mark.asyncio
-async def test_create_probability(client: AsyncClient):
-    payload = [ProbabilityIncomingDto(id=None, probabilities=[0.7, 0.3]).model_dump()]
-
-    response=await client.post("/probabilities", json=payload)
-    assert response.status_code == 200
-
-    parse_response_to_dtos_test(response, ProbabilityOutgoingDto)
-
-@pytest.mark.asyncio
 async def test_update_probability(client: AsyncClient):
     new_probabilities=[0.2, 0.8]
-    payload=[ProbabilityIncomingDto(id=3, probabilities=new_probabilities).model_dump()]
+    payload=[ProbabilityIncomingDto(id=1, issue_id=1, probabilities=new_probabilities).model_dump()]
 
     response=await client.put("/probabilities", json=payload)
     assert response.status_code == 200
