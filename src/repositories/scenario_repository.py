@@ -1,4 +1,5 @@
 from src.models.scenario import Scenario
+from src.repositories.query_extensions import QueryExtensions
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -12,13 +13,19 @@ class ScenarioRepository:
         return entities
 
     async def get(self, ids: list[int]) -> list[Scenario]:
+        query=select(Scenario).where(Scenario.id.in_(ids)).options(
+            *QueryExtensions.load_scenario_with_relationships()
+        )
         return list(
-            (await self.session.scalars(select(Scenario).where(Scenario.id.in_(ids)))).all()
+            (await self.session.scalars(query)).all()
         )
     
     async def get_all(self) -> list[Scenario]:
+        query=select(Scenario).options(
+            *QueryExtensions.load_scenario_with_relationships()
+        )
         return list(
-            (await self.session.scalars(select(Scenario))).all()
+            (await self.session.scalars(query)).all()
         )
     
     async def update(self, entities: list[Scenario]) -> list[Scenario]:
@@ -28,6 +35,8 @@ class ScenarioRepository:
             entity=entities[n]
             enity_to_update.name=entity.name
             enity_to_update.project_id=entity.project_id
+            enity_to_update.objectives=entity.objectives
+            enity_to_update.opportunities=entity.opportunities
             
         await self.session.flush()
         return enities_to_update

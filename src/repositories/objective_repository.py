@@ -27,7 +27,7 @@ class ObjectiveRepository:
         for n, enity_to_update in enumerate(enities_to_update):
             entity=entities[n]
             enity_to_update.name=entity.name
-            enity_to_update.project_id=entity.project_id
+            enity_to_update.scenario_id=entity.scenario_id
             enity_to_update.description=entity.description
 
         await self.session.flush()

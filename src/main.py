@@ -8,6 +8,7 @@ import src.routes.objective_routes as objective_routes
 import src.routes.opportunity_routes as opportunity_routes
 import src.routes.probability_routes as probability_routes
 import src.routes.project_routes as project_routes
+import src.routes.issue_routes as issue_routes
 
 app = FastAPI()
 
@@ -23,6 +24,7 @@ app.include_router(objective_routes.router)
 app.include_router(opportunity_routes.router)
 app.include_router(probability_routes.router)
 app.include_router(project_routes.router)
+app.include_router(issue_routes.router)
 
 if __name__ == "__main__":
     uvicorn.run("src.main:app", port=8080)

@@ -28,7 +28,7 @@ class OpportunityMapper:
     def via_project_to_entity(dto: OpportunityViaProjectDto, user_id: int, project_id: int) -> Opportunity:
         return Opportunity(
             id=None,
-            project_id=project_id,
+            scenario_id=project_id,
             name=dto.name,
             description=dto.description,
             user_id=user_id,
@@ -38,7 +38,7 @@ class OpportunityMapper:
     def to_outgoing_dto(entity: Opportunity) -> OpportunityOutgoingDto:
         return OpportunityOutgoingDto(
             id=entity.id,
-            project_id=entity.project_id,
+            project_id=entity.scenario_id,
             name=entity.name,
             description=entity.description
         )
@@ -47,7 +47,7 @@ class OpportunityMapper:
     def to_entity(dto: OpportunityIncomingDto, user_id: int) -> Opportunity:
         return Opportunity(
             id=dto.id,
-            project_id=dto.project_id,
+            scenario_id=dto.project_id,
             name=dto.name,
             description=dto.description,
             user_id=user_id,

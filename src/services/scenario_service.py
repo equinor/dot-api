@@ -2,27 +2,35 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.scenario import Scenario
-from src.dtos.scenario_dtos import (
-    ScenarioIncomingDto, 
-    ScenarioOutgoingDto, 
-    ScenarioMapper
-)
+from src.dtos.scenario_dtos import *
 from src.dtos.user_dtos import (
     UserIncomingDto,
     UserMapper,
 )
 from src.repositories.scenario_repository import ScenarioRepository
 from src.repositories.user_repository import UserRepository
+from src.repositories.objective_repository import ObjectiveRepository
+from src.repositories.opportunity_repository import OpportunityRepository
 
 class ScenarioService:
     def __init__(self, engine: AsyncEngine):
         self.engine=engine
 
-    async def create(self, dtos: list[ScenarioIncomingDto], user_dto: UserIncomingDto) -> list[ScenarioOutgoingDto]:
+    async def create(self, dtos: list[ScenarioCreateDto], user_dto: UserIncomingDto) -> list[ScenarioOutgoingDto]:
         async with AsyncSession(self.engine, autoflush=True, autocommit=False) as session:
             try:
                 user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
-                entities: list[Scenario] = await ScenarioRepository(session).create(ScenarioMapper.to_entities(dtos, user.id))
+                # create scenario
+                entities: list[Scenario] = await ScenarioRepository(session).create(ScenarioMapper.from_create_to_entities(dtos, user.id))
+
+                # create objectives/opportunities
+                for entity, dto in zip(entities, dtos):
+                    objectives=await ObjectiveRepository(session).create(ObjectiveMapper.via_scenario_to_entities(dto.Objectives, user.id, entity.id))
+                    opportunities=await OpportunityRepository(session).create(OpportunityMapper.via_project_to_entities(dto.Opportunities, user.id, entity.id))
+
+                    entity.objectives=objectives
+                    entity.opportunities=opportunities
+
                 # get the dtos while the entities are still connected to the session
                 result: list[ScenarioOutgoingDto] = ScenarioMapper.to_outgoing_dtos(entities)
                 await session.commit()

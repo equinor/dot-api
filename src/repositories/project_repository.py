@@ -1,7 +1,7 @@
 from src.models.project import Project
+from src.repositories.query_extensions import QueryExtensions
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 
 class ProjectRepository:
     def __init__(self, session: AsyncSession):
@@ -14,8 +14,7 @@ class ProjectRepository:
 
     async def get(self, ids: list[int]) -> list[Project]:
         query=select(Project).where(Project.id.in_(ids)).options(
-            selectinload(Project.opportunities),
-            selectinload(Project.objectives)
+            *QueryExtensions.load_project_with_relationships()
         )
         return list(
             (await self.session.scalars(query)).all()
@@ -23,8 +22,7 @@ class ProjectRepository:
     
     async def get_all(self) -> list[Project]:
         query=select(Project).options(
-            selectinload(Project.opportunities),
-            selectinload(Project.objectives)
+            *QueryExtensions.load_project_with_relationships()
         )
         return list(
             (await self.session.scalars(query)).all()
@@ -37,8 +35,7 @@ class ProjectRepository:
             entity=entities[n]
             enity_to_update.name=entity.name
             enity_to_update.description=entity.description
-            enity_to_update.objectives=entity.objectives
-            enity_to_update.opportunities=entity.opportunities
+            
         await self.session.flush()
         return enities_to_update
     

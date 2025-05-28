@@ -5,16 +5,6 @@ from src.dependencies import get_decision_service
 
 router = APIRouter(tags=["decisions"])
 
-@router.post("/decisions")
-async def create_decisions(
-    dtos: list[DecisionIncomingDto],
-    decision_service: DecisionService = Depends(get_decision_service)
-)-> list[DecisionOutgoingDto]:
-    try:
-        return list(await decision_service.create(dtos))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
 @router.get("/decisions/{id}")
 async def get_decision(
     id: int,

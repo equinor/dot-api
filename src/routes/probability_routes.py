@@ -5,16 +5,6 @@ from src.dependencies import get_probability_service
 
 router = APIRouter(tags=["probabilities"])
 
-@router.post("/probabilities")
-async def create_probabilities(
-    dtos: list[ProbabilityIncomingDto],
-    probability_service: ProbabilityService = Depends(get_probability_service)
-)-> list[ProbabilityOutgoingDto]:
-    try:
-        return list(await probability_service.create(dtos))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
 @router.get("/probabilities/{id}")
 async def get_probability(
     id: int,

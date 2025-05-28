@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from src.dtos.scenario_dtos import ScenarioIncomingDto, ScenarioOutgoingDto
+from src.dtos.scenario_dtos import ScenarioIncomingDto, ScenarioOutgoingDto, ScenarioCreateDto
 from src.services.scenario_service import ScenarioService
 from src.dependencies import get_scenario_service
 from src.services.user_service import get_temp_user
@@ -8,7 +8,7 @@ router = APIRouter(tags=["scenarios"])
 
 @router.post("/scenarios")
 async def create_scenarios(
-    dtos: list[ScenarioIncomingDto],
+    dtos: list[ScenarioCreateDto],
     scenario_service: ScenarioService = Depends(get_scenario_service)
 )-> list[ScenarioOutgoingDto]:
     try:
