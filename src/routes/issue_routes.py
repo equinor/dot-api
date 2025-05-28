@@ -12,6 +12,11 @@ async def create_issues(
     dtos: list[IssueIncomingDto],
     issue_service: IssueService = Depends(get_issue_service)
 )-> list[IssueOutgoingDto]:
+    """
+    Endpoint for creating Issues. 
+    If supplied with nodes/decisions/uncertainties they will be created after the issue with the appropriate Id.
+    If node is not supplied an empty node will be created
+    """
     try:
         user_dto=get_temp_user()
         return list(await issue_service.create(dtos, user_dto))

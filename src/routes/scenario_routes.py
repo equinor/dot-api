@@ -11,6 +11,10 @@ async def create_scenarios(
     dtos: list[ScenarioCreateDto],
     scenario_service: ScenarioService = Depends(get_scenario_service)
 )-> list[ScenarioOutgoingDto]:
+    """
+    Endpoint for creating Scenarios.
+    If Objectives/Opportunities are supplied with the Scenario, then they will be created after the Scenario with the appropriate Id.
+    """
     try:
         user_dto=get_temp_user()
         return list(await scenario_service.create(dtos, user_dto))

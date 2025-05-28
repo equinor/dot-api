@@ -27,6 +27,8 @@ class UncertaintyRepository:
         for n, enity_to_update in enumerate(enities_to_update):
             entity=entities[n]
             enity_to_update.probabilities=entity.probabilities
+            if entity.issue_id:
+                enity_to_update=entity.issue_id
             
         await self.session.flush()
         return enities_to_update
