@@ -34,8 +34,8 @@ class EdgeRepository:
         entities_to_update=await self.get([edge.id for edge in edges])
         for n, edge_to_update in enumerate(entities_to_update):
             edge=edges[n]
-            edge_to_update.lower_id=edge.lower_id
-            edge_to_update.higher_id=edge.higher_id
-            edge_to_update.graph_id=edge.graph_id
+            edge_to_update.tail_id=edge.tail_id
+            edge_to_update.head_id=edge.head_id
+            edge_to_update.scenario_id=edge.scenario_id
         await self.session.flush()
         return entities_to_update

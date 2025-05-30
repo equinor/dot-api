@@ -22,18 +22,9 @@ async def test_get_decision(client: AsyncClient):
     parse_response_to_dto_test(response, DecisionOutgoingDto)
 
 @pytest.mark.asyncio
-async def test_create_decision(client: AsyncClient):
-    payload = [DecisionIncomingDto(id=None, options=["yes", "no"]).model_dump()]
-
-    response=await client.post("/decisions", json=payload)
-    assert response.status_code == 200
-
-    parse_response_to_dtos_test(response, DecisionOutgoingDto)
-
-@pytest.mark.asyncio
 async def test_update_decision(client: AsyncClient):
     new_options=["yes", "no", "this is testing"]
-    payload=[DecisionIncomingDto(id=3, options=new_options).model_dump()]
+    payload=[DecisionIncomingDto(id=1, issue_id=1, options=new_options).model_dump()]
 
     response=await client.put("/decisions", json=payload)
     assert response.status_code == 200

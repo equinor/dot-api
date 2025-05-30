@@ -2,21 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.node_dtos import NodeIncomingDto, NodeOutgoingDto
 from src.services.node_service import NodeService
 from src.dependencies import get_node_service
-from src.services.user_service import get_temp_user
-
 
 router = APIRouter(tags=["nodes"])
-
-@router.post("/nodes")
-async def create_nodes(
-    dtos: list[NodeIncomingDto],
-    node_service: NodeService = Depends(get_node_service)
-)-> list[NodeOutgoingDto]:
-    try:
-        user_dto=get_temp_user()
-        return list(await node_service.create(dtos, user_dto))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/nodes/{id}")
 async def get_node(
@@ -59,8 +46,7 @@ async def update_nodes(
     node_service: NodeService = Depends(get_node_service)
 )-> list[NodeOutgoingDto]:
     try:
-        user_dto=get_temp_user()
-        return list(await node_service.update(dtos, user_dto))
+        return list(await node_service.update(dtos))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     

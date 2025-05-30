@@ -3,10 +3,11 @@ from src.services.decision_service import DecisionService
 from src.services.project_service import ProjectService
 from src.services.objective_service import ObjectiveService
 from src.services.opportunity_service import OpportunityService
-from src.services.probability_service import ProbabilityService
-from src.services.graph_service import GraphService
+from src.services.uncertainty_service import UncertaintyService
+from src.services.scenario_service import ScenarioService
 from src.services.edge_service import EdgeService
 from src.services.node_service import NodeService
+from src.services.issue_service import IssueService
 from src.database import connection_strings
 from src.models.base import Base
 from src.seed_database import seed_database
@@ -24,7 +25,7 @@ async def get_async_engine() -> AsyncEngine:
         if connection_string==connection_strings.sql_lite_memory.value:
             async with async_engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
-                await seed_database(conn, num_projects=10, num_graphs=10, num_nodes=50)
+                await seed_database(conn, num_projects=10, num_scenarios=10, num_nodes=50)
                 
     return async_engine
 
@@ -40,14 +41,17 @@ async def get_objective_service() -> ObjectiveService:
 async def get_opportunity_service() -> OpportunityService:
     return OpportunityService(await get_async_engine())
 
-async def get_probability_service() -> ProbabilityService:
-    return ProbabilityService(await get_async_engine())
+async def get_uncertainty_service() -> UncertaintyService:
+    return UncertaintyService(await get_async_engine())
 
-async def get_graph_service() -> GraphService:
-    return GraphService(await get_async_engine())
+async def get_scenario_service() -> ScenarioService:
+    return ScenarioService(await get_async_engine())
 
 async def get_edge_service() -> EdgeService:
     return EdgeService(await get_async_engine())
 
 async def get_node_service() -> NodeService:
     return NodeService(await get_async_engine())
+
+async def get_issue_service() -> IssueService:
+    return IssueService(await get_async_engine())

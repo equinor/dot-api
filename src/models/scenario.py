@@ -9,11 +9,14 @@ from src.models.base import Base
 if TYPE_CHECKING:
     from src.models.node import Node
     from src.models.edge import Edge
+    from src.models.objective import Objective
+    from src.models.opportunity import Opportunity
+    from src.models.issue import Issue
 from src.models.project import Project
 from src.models.base_auditable_entity import BaseAuditableEntity
 
-class Graph(Base, BaseAuditableEntity):
-    __tablename__ = "graph"
+class Scenario(Base, BaseAuditableEntity):
+    __tablename__ = "scenario"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     project_id: Mapped[int] = mapped_column(ForeignKey(Project.id), index=True)
@@ -22,9 +25,24 @@ class Graph(Base, BaseAuditableEntity):
 
     project: Mapped[Project] = relationship(Project, foreign_keys=[project_id])
 
+    opportunities: Mapped[list["Opportunity"]] = relationship(
+        "Opportunity",
+        cascade="all, delete-orphan",
+    )
+
+    objectives: Mapped[list["Objective"]] = relationship(
+        "Objective",
+        cascade="all, delete-orphan",
+    )
+
+    issues: Mapped[list["Issue"]] = relationship(
+        "Issue",
+        cascade="all, delete-orphan",
+    )
+
     nodes: Mapped[list["Node"]] = relationship(
         "Node", 
-        back_populates="graph", 
+        back_populates="scenario", 
         cascade="all, delete-orphan",
     )
 
@@ -33,7 +51,7 @@ class Graph(Base, BaseAuditableEntity):
         cascade="all, delete-orphan",
     )
 
-    def __init__(self, id: Optional[int], name: str, project_id: int, user_id: int):
+    def __init__(self, id: Optional[int], name: str, project_id: int, user_id: int, objectives: list["Objective"], opportunities: list["Opportunity"]):
         if id is not None:
             self.id = id
         else:
@@ -42,6 +60,8 @@ class Graph(Base, BaseAuditableEntity):
         self.name = name
         self.project_id = project_id
         self.updated_by_id = user_id
+        self.objectives = objectives
+        self.opportunities = opportunities
 
     def __repr__(self):
         return f"id: {self.id}, name: {self.name}"

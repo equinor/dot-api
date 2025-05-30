@@ -6,9 +6,9 @@ from typing import Optional
 
 # Edge DTOs
 class EdgeDto(BaseModel):
-    lower_id: int
-    higher_id: int
-    graph_id: int
+    tail_id: int
+    head_id: int
+    scenario_id: int
 
 class EdgeIncomingDto(EdgeDto):
     id: Optional[int]
@@ -21,18 +21,18 @@ class EdgeMapper:
     def to_outgoing_dto(entity: Edge) -> EdgeOutgoingDto:
         return EdgeOutgoingDto(
             id=entity.id,
-            lower_id=entity.lower_id,
-            higher_id=entity.higher_id,
-            graph_id=entity.graph_id
+            tail_id=entity.tail_id,
+            head_id=entity.head_id,
+            scenario_id=entity.scenario_id
         )
 
     @staticmethod
     def to_entity(dto: EdgeIncomingDto) -> Edge:
         return Edge(
             id=dto.id,
-            lower_node_id=dto.lower_id,
-            higher_node_id=dto.higher_id,
-            graph_id=dto.graph_id
+            tail_node_id=dto.tail_id,
+            head_node_id=dto.head_id,
+            scenario_id=dto.scenario_id
         )
     
     @staticmethod

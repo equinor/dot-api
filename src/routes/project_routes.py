@@ -11,6 +11,11 @@ async def create_projects(
     dtos: list[ProjectCreateDto],
     project_service: ProjectService = Depends(get_project_service)
 )-> list[ProjectOutgoingDto]:
+    """
+    Endpoint for creating Projects.
+    A Scenario must be supplied and will be created after the Project with the appropriate Id.
+    If Objectives/Opportunities are supplied with the Scenario, then they will be created after the Scenario with the appropriate Id.
+    """
     try:
         user_dto=get_temp_user()
         return list(await project_service.create(dtos, user_dto))

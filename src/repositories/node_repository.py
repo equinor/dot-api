@@ -1,7 +1,7 @@
 from src.models.node import Node
+from src.repositories.query_extensions import QueryExtensions
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 
 class NodeRepository:
     def __init__(self, session: AsyncSession):
@@ -13,39 +13,28 @@ class NodeRepository:
         return entities
 
     async def get(self, ids: list[int]) -> list[Node]:
-        query=select(Node).where(Node.id.in_(ids)).options(
-            selectinload(Node.decision), 
-            selectinload(Node.probability)
-        )
+        query=select(Node).where(Node.id.in_(ids)).options(*QueryExtensions.load_node_with_relationships())
         return list(
             (await self.session.scalars(query)).all()
         )
     
     async def get_all(self) -> list[Node]:
-        query=select(Node).options(
-            selectinload(Node.decision), 
-            selectinload(Node.probability)
-        )
+        query=select(Node).options(*QueryExtensions.load_node_with_relationships())
         return list(
             (await self.session.scalars(query)).all()
         )
     
     async def update(self, entities: list[Node]) -> list[Node]:
-        enities_to_update=await self.get([decision.id for decision in entities])
+        entities_to_update=await self.get([node.id for node in entities])
 
-        for n, enity_to_update in enumerate(enities_to_update):
+        for n, entity_to_update in enumerate(entities_to_update):
             entity=entities[n]
-            enity_to_update.graph_id=entity.graph_id
-            enity_to_update.type=entity.type
-
-            if (entity.decision is not None):
-                enity_to_update.decision=await self.session.merge(entity.decision)
-
-            if (entity.probability is not None):
-                enity_to_update.probability=await self.session.merge(entity.probability)
+            entity_to_update.scenario_id=entity.scenario_id
+            if entity.issue_id:
+                entity_to_update=entity.issue_id
             
         await self.session.flush()
-        return enities_to_update
+        return entities_to_update
     
     async def delete(self, ids: list[int]) -> None:
         entities=await self.get(ids)
