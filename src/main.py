@@ -9,6 +9,7 @@ import src.routes.objective_routes as objective_routes
 import src.routes.opportunity_routes as opportunity_routes
 import src.routes.uncertainty_routes as uncertainty_routes
 import src.routes.project_routes as project_routes
+import src.routes.issue_routes as issue_routes
 
 from src.config import Config
 
@@ -25,14 +26,15 @@ app = FastAPI(swagger_ui_init_oauth={
 async def root():
     return {"message": "Welcome to the DOT api"}
 
-app.include_router(decision_routes.router,dependencies=[Depends(verify_token)])
-app.include_router(edge_routes.router,dependencies=[Depends(verify_token)])
-app.include_router(graph_routes.router,dependencies=[Depends(verify_token)])
-app.include_router(node_routes.router,dependencies=[Depends(verify_token)])
-app.include_router(objective_routes.router,dependencies=[Depends(verify_token)])
-app.include_router(opportunity_routes.router,dependencies=[Depends(verify_token)])
-app.include_router(probability_routes.router,dependencies=[Depends(verify_token)])
-app.include_router(project_routes.router,dependencies=[Depends(verify_token)])
+app.include_router(decision_routes.router, dependencies=[Depends(verify_token)])
+app.include_router(edge_routes.router, dependencies=[Depends(verify_token)])
+app.include_router(scenario_routes.router, dependencies=[Depends(verify_token)])
+app.include_router(node_routes.router, dependencies=[Depends(verify_token)])
+app.include_router(objective_routes.router, dependencies=[Depends(verify_token)])
+app.include_router(opportunity_routes.router, dependencies=[Depends(verify_token)])
+app.include_router(uncertainty_routes.router, dependencies=[Depends(verify_token)])
+app.include_router(project_routes.router, dependencies=[Depends(verify_token)])
+app.include_router(issue_routes.router, dependencies=[Depends(verify_token)])
 
 if __name__ == "__main__":
     uvicorn.run("src.main:app", port=8080)
