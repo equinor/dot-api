@@ -25,8 +25,8 @@ class ScenarioService:
 
                 # create objectives/opportunities
                 for entity, dto in zip(entities, dtos):
-                    objectives=await ObjectiveRepository(session).create(ObjectiveMapper.via_scenario_to_entities(dto.Objectives, user.id, entity.id))
-                    opportunities=await OpportunityRepository(session).create(OpportunityMapper.via_project_to_entities(dto.Opportunities, user.id, entity.id))
+                    objectives=await ObjectiveRepository(session).create(ObjectiveMapper.via_scenario_to_entities(dto.objectives, user.id, entity.id))
+                    opportunities=await OpportunityRepository(session).create(OpportunityMapper.via_project_to_entities(dto.opportunities, user.id, entity.id))
 
                     entity.objectives=objectives
                     entity.opportunities=opportunities

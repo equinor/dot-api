@@ -35,14 +35,14 @@ async def test_create_project(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_create_project_with_objectives(client: AsyncClient):
     objectives=[ObjectiveViaScenarioDto(name=str(uuid4()), description=str(uuid4())), ObjectiveViaScenarioDto(name=str(uuid4()), description=str(uuid4()))]
-    scenarios=[ScenarioCreateViaProjectDto(name=str(uuid4()), project_id=None, Objectives=objectives, Opportunities=[])]
+    scenarios=[ScenarioCreateViaProjectDto(name=str(uuid4()), project_id=None, objectives=objectives, opportunities=[])]
     payload = [ProjectCreateDto(name=str(uuid4()), description=str(uuid4()),scenarios=scenarios).model_dump()]
 
     response=await client.post("/projects", json=payload)
     assert response.status_code == 200
 
     response_content=parse_response_to_dtos_test(response, ProjectOutgoingDto)
-    assert response_content[0].scenarios[0].Objectives.__len__() == 2
+    assert response_content[0].scenarios[0].objectives.__len__() == 2
 
 @pytest.mark.asyncio
 async def test_update_project(client: AsyncClient):

@@ -30,25 +30,25 @@ class IssueRepository:
         )
     
     async def update(self, entities: list[Issue]) -> list[Issue]:
-        enities_to_update=await self.get([decision.id for decision in entities])
+        entities_to_update=await self.get([decision.id for decision in entities])
 
-        for n, enity_to_update in enumerate(enities_to_update):
+        for n, entity_to_update in enumerate(entities_to_update):
             entity=entities[n]
-            enity_to_update.scenario_id=entity.scenario_id
-            enity_to_update.type=entity.type
-            enity_to_update.boundary=entity.boundary
+            entity_to_update.scenario_id=entity.scenario_id
+            entity_to_update.type=entity.type
+            entity_to_update.boundary=entity.boundary
 
             if entity.node:
-                enity_to_update.node=await self.session.merge(entity.node)
+                entity_to_update.node=await self.session.merge(entity.node)
 
             if entity.decision:
-                enity_to_update.decision=await self.session.merge(entity.decision)
+                entity_to_update.decision=await self.session.merge(entity.decision)
 
             if entity.uncertainty:
-                enity_to_update.uncertainty=await self.session.merge(entity.uncertainty)
+                entity_to_update.uncertainty=await self.session.merge(entity.uncertainty)
             
         await self.session.flush()
-        return enities_to_update
+        return entities_to_update
     
     async def delete(self, ids: list[int]) -> None:
         entities=await self.get(ids)

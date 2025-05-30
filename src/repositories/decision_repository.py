@@ -22,16 +22,16 @@ class DecisionRepository:
         )
     
     async def update(self, entities: list[Decision]) -> list[Decision]:
-        enities_to_update=await self.get([decision.id for decision in entities])
+        entities_to_update=await self.get([decision.id for decision in entities])
 
-        for n, enity_to_update in enumerate(enities_to_update):
+        for n, entity_to_update in enumerate(entities_to_update):
             entity=entities[n]
-            enity_to_update.options=entity.options
+            entity_to_update.options=entity.options
             if entity.issue_id:
-                enity_to_update=entity.issue_id
+                entity_to_update=entity.issue_id
 
         await self.session.flush()
-        return enities_to_update
+        return entities_to_update
     
     async def delete(self, ids: list[int]) -> None:
         entities=await self.get(ids)

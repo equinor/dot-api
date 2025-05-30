@@ -19,7 +19,7 @@ class ProjectService:
     async def _create_scenarios_for_project(self, session: AsyncSession, scenario_dtos: list[ScenarioCreateViaProjectDto], user: User, project_id: int):
         scenarios = await ScenarioRepository(session).create(ScenarioMapper.from_create_via_project_to_entities(scenario_dtos, user.id, project_id))
         for scenario_dto, scenario in zip(scenario_dtos, scenarios):
-            objectives, opportunities = await self._create_opportunities_and_objectives_for_scenario(session, scenario_dto.Objectives, scenario_dto.Opportunities, user, scenario.id)
+            objectives, opportunities = await self._create_opportunities_and_objectives_for_scenario(session, scenario_dto.objectives, scenario_dto.opportunities, user, scenario.id)
             scenario.objectives, scenario.opportunities = objectives, opportunities
         return scenarios
 

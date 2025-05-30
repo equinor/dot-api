@@ -25,16 +25,16 @@ class NodeRepository:
         )
     
     async def update(self, entities: list[Node]) -> list[Node]:
-        enities_to_update=await self.get([node.id for node in entities])
+        entities_to_update=await self.get([node.id for node in entities])
 
-        for n, enity_to_update in enumerate(enities_to_update):
+        for n, entity_to_update in enumerate(entities_to_update):
             entity=entities[n]
-            enity_to_update.scenario_id=entity.scenario_id
+            entity_to_update.scenario_id=entity.scenario_id
             if entity.issue_id:
-                enity_to_update=entity.issue_id
+                entity_to_update=entity.issue_id
             
         await self.session.flush()
-        return enities_to_update
+        return entities_to_update
     
     async def delete(self, ids: list[int]) -> None:
         entities=await self.get(ids)

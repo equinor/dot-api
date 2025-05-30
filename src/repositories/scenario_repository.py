@@ -29,17 +29,17 @@ class ScenarioRepository:
         )
     
     async def update(self, entities: list[Scenario]) -> list[Scenario]:
-        enities_to_update=await self.get([decision.id for decision in entities])
+        entities_to_update=await self.get([decision.id for decision in entities])
 
-        for n, enity_to_update in enumerate(enities_to_update):
+        for n, entity_to_update in enumerate(entities_to_update):
             entity=entities[n]
-            enity_to_update.name=entity.name
-            enity_to_update.project_id=entity.project_id
-            enity_to_update.objectives=entity.objectives
-            enity_to_update.opportunities=entity.opportunities
+            entity_to_update.name=entity.name
+            entity_to_update.project_id=entity.project_id
+            entity_to_update.objectives=entity.objectives
+            entity_to_update.opportunities=entity.opportunities
             
         await self.session.flush()
-        return enities_to_update
+        return entities_to_update
     
     async def delete(self, ids: list[int]) -> None:
         entities=await self.get(ids)

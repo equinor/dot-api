@@ -53,6 +53,6 @@ class Issue(Base, BaseAuditableEntity):
         self.type = type
         self.boundary = boundary
         self.updated_by_id = user_id
-        self.Node = node
+        self.node = node
         self.decision = decision
         self.uncertainty = uncertainty

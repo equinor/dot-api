@@ -37,15 +37,15 @@ class UserRepository:
         return (await self.session.scalars(select(User).where(User.azure_id==azure_id))).first()
     
     async def update(self, entities: list[User]) -> list[User]:
-        enities_to_update=await self.get([decision.id for decision in entities])
+        entities_to_update=await self.get([decision.id for decision in entities])
 
-        for n, enity_to_update in enumerate(enities_to_update):
+        for n, entity_to_update in enumerate(entities_to_update):
             entity=entities[n]
-            enity_to_update.name=entity.name
-            enity_to_update.azure_id=entity.azure_id
+            entity_to_update.name=entity.name
+            entity_to_update.azure_id=entity.azure_id
 
         await self.session.flush()
-        return enities_to_update
+        return entities_to_update
     
     async def delete(self, ids: list[int]) -> None:
         entities=await self.get(ids)

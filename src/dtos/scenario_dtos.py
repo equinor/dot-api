@@ -11,25 +11,25 @@ class ScenarioDto(BaseModel):
 
 class ScenarioCreateViaProjectDto(ScenarioDto):
     project_id: Optional[int]
-    Objectives: list[ObjectiveViaScenarioDto]
-    Opportunities: list[OpportunityViaProjectDto]
+    objectives: list[ObjectiveViaScenarioDto]
+    opportunities: list[OpportunityViaProjectDto]
 
 class ScenarioCreateDto(ScenarioDto):
     project_id: int
-    Objectives: list[ObjectiveViaScenarioDto]
-    Opportunities: list[OpportunityViaProjectDto]
+    objectives: list[ObjectiveViaScenarioDto]
+    opportunities: list[OpportunityViaProjectDto]
 
 class ScenarioIncomingDto(ScenarioDto):
     id: Optional[int]
     project_id: int
-    Objectives: list[ObjectiveIncomingDto]
-    Opportunities: list[OpportunityIncomingDto]
+    objectives: list[ObjectiveIncomingDto]
+    opportunities: list[OpportunityIncomingDto]
 
 class ScenarioOutgoingDto(ScenarioDto):
     id: int
     project_id: int
-    Objectives: list[ObjectiveOutgoingDto]
-    Opportunities: list[OpportunityOutgoingDto]
+    objectives: list[ObjectiveOutgoingDto]
+    opportunities: list[OpportunityOutgoingDto]
 
 class ScenarioMapper:
     @staticmethod
@@ -60,8 +60,8 @@ class ScenarioMapper:
             id=entity.id,
             project_id=entity.project_id,
             name=entity.name,
-            Objectives=ObjectiveMapper.to_outgoing_dtos(entity.objectives),
-            Opportunities=OpportunityMapper.to_outgoing_dtos(entity.opportunities),
+            objectives=ObjectiveMapper.to_outgoing_dtos(entity.objectives),
+            opportunities=OpportunityMapper.to_outgoing_dtos(entity.opportunities),
         )
 
     @staticmethod
@@ -71,8 +71,8 @@ class ScenarioMapper:
             name=dto.name,
             project_id=dto.project_id,
             user_id=user_id,
-            opportunities=OpportunityMapper.to_entities(dto.Opportunities, user_id),
-            objectives=ObjectiveMapper.to_entities(dto.Objectives, user_id),
+            opportunities=OpportunityMapper.to_entities(dto.opportunities, user_id),
+            objectives=ObjectiveMapper.to_entities(dto.objectives, user_id),
         )
 
     @staticmethod
