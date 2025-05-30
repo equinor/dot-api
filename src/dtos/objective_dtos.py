@@ -16,11 +16,11 @@ class ObjectiveViaScenarioDto(ObjectiveDto):
 
 class ObjectiveIncomingDto(ObjectiveDto):
     id: Optional[int]
-    project_id: int
+    scenario_id: int
 
 class ObjectiveOutgoingDto(ObjectiveDto):
     id: int
-    project_id: int
+    scenario_id: int
 
 class ObjectiveMapper:
     @staticmethod
@@ -37,7 +37,7 @@ class ObjectiveMapper:
     def to_outgoing_dto(entity: Objective) -> ObjectiveOutgoingDto:
         return ObjectiveOutgoingDto(
             id=entity.id,
-            project_id=entity.scenario_id,
+            scenario_id=entity.scenario_id,
             name=entity.name,
             description=entity.description
         )
@@ -46,7 +46,7 @@ class ObjectiveMapper:
     def to_entity(dto: ObjectiveIncomingDto, user_id: int) -> Objective:
         return Objective(
             id=dto.id,
-            scenario_id=dto.project_id,
+            scenario_id=dto.scenario_id,
             name=dto.name,
             description=dto.description,
             user_id=user_id,
