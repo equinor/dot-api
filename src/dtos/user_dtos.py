@@ -1,12 +1,13 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, Field
+from typing import Optional, Annotated
 from src.models.user import (
     User
 )
+from src.constants import DatabaseConstants
 
 class UserDto(BaseModel):
-    name: str
-    azure_id: str
+    name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)]
+    azure_id: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)]
 
 class UserIncomingDto(UserDto):
     id: Optional[int]

@@ -1,6 +1,17 @@
 from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
-from src.models import *
+from src.models import (
+    User,
+    Project,
+    Scenario,
+    Issue,
+    Node,
+    Objective,
+    Opportunity,
+    Uncertainty,
+    Decision,
+    Edge,
+)
 from typing import Protocol, TypeVar, Any
 
 class AuditableEntityProtocol(Protocol):

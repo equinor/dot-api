@@ -1,12 +1,9 @@
 from pydantic import BaseModel, Field
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, Annotated, TYPE_CHECKING
 from src.models.node import (
     Node
 )
-from src.dtos.user_dtos import *
-from src.dtos.decision_dtos import *
-from src.dtos.uncertainty_dtos import *
-from src.dtos.node_dtos import *
+from src.constants import DatabaseConstants
 
 if TYPE_CHECKING:
     from src.dtos.issue_dtos import (
@@ -16,7 +13,7 @@ if TYPE_CHECKING:
 class NodeDto(BaseModel):
     scenario_id: int
     issue_id: int
-    name: str = Field(default="")
+    name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
 
 class NodeIncomingDto(NodeDto):
     id: Optional[int]    

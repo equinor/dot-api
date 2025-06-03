@@ -1,13 +1,24 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, Field
+from typing import Optional, Annotated
 from src.models.scenario import (
     Scenario
 )
-from src.dtos.opportunity_dtos import *
-from src.dtos.objective_dtos import *
+from src.dtos.opportunity_dtos import (
+    OpportunityMapper,
+    OpportunityViaProjectDto,
+    OpportunityIncomingDto,
+    OpportunityOutgoingDto,
+)
+from src.dtos.objective_dtos import (
+    ObjectiveMapper,
+    ObjectiveViaScenarioDto,
+    ObjectiveIncomingDto,
+    ObjectiveOutgoingDto,
+)
+from src.constants import DatabaseConstants
 
 class ScenarioDto(BaseModel):
-    name: str
+    name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
 
 class ScenarioCreateViaProjectDto(ScenarioDto):
     project_id: Optional[int]

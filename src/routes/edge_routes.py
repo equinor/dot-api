@@ -1,5 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
-from src.dtos.edge_dtos import *
+from src.dtos.edge_dtos import (
+    EdgeIncomingDto,
+    EdgeOutgoingDto,
+)
 from src.services.edge_service import EdgeService
 from src.dependencies import get_edge_service
 

@@ -1,18 +1,19 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional, List, Annotated
 from src.models.decision import (
     Decision
 )
+from src.constants import DatabaseConstants
 
 class DecisionDto(BaseModel):
-    options: List[str] = Field(default=[""])
+    options: List[Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)]] = [""]
 
 class DecisionIncomingDto(DecisionDto):
     id: Optional[int] = Field(default=None, gt=0)
     issue_id: Optional[int]
 
 class DecisionOutgoingDto(DecisionDto):
-    id: int = Field(gt=0)
+    id: int
     issue_id: int
 
 

@@ -1,11 +1,32 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from src.models.project import Project
-from src.dtos.project_dtos import *
-from src.dtos.user_dtos import *
-from src.dtos.objective_dtos import *
-from src.dtos.opportunity_dtos import *
+from src.models import (
+    Project,
+    User,
+)
+from src.dtos.project_dtos import (
+    ProjectMapper,
+    ProjectIncomingDto,
+    ProjectOutgoingDto,
+    ProjectCreateDto,
+)
+from src.dtos.user_dtos import (
+    UserMapper,
+    UserIncomingDto,
+)
+from src.dtos.objective_dtos import (
+    ObjectiveMapper,
+    ObjectiveViaScenarioDto
+)
+from src.dtos.opportunity_dtos import (
+    OpportunityMapper,
+    OpportunityViaProjectDto,
+)
+from src.dtos.scenario_dtos import (
+    ScenarioMapper,
+    ScenarioCreateViaProjectDto,
+)
 from src.repositories.project_repository import ProjectRepository
 from src.repositories.user_repository import UserRepository
 from src.repositories.scenario_repository import ScenarioRepository

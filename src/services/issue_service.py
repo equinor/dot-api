@@ -1,10 +1,24 @@
 from sqlalchemy.ext.asyncio import AsyncEngine
+from typing import Optional
 
 from src.models.issue import Issue
-from src.dtos.issue_dtos import *
-from src.dtos.node_dtos import *
-from src.dtos.decision_dtos import *
-from src.dtos.uncertainty_dtos import *
+from src.dtos.issue_dtos import (
+    IssueMapper,
+    IssueOutgoingDto,
+    IssueIncomingDto,
+)
+from src.dtos.node_dtos import (
+    NodeMapper,
+    NodeIncomingDto,
+)
+from src.dtos.decision_dtos import (
+    DecisionMapper,
+    DecisionIncomingDto,
+)
+from src.dtos.uncertainty_dtos import (
+    UncertaintyMapper,
+    UncertaintyIncomingDto,
+)
 from src.dtos.user_dtos import (
     UserIncomingDto,
     UserMapper,

@@ -1,32 +1,54 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
+from src.constants import (
+    Type, 
+    Boundary
+)
 from src.models.issue import (
     Issue
 )
-from src.dtos.user_dtos import *
-from src.dtos.decision_dtos import *
-from src.dtos.uncertainty_dtos import *
-from src.dtos.node_dtos import *
+from src.dtos.decision_dtos import (
+    DecisionMapper,
+    DecisionIncomingDto,
+    DecisionOutgoingDto,
+)
+from src.dtos.uncertainty_dtos import (
+    UncertaintyMapper,
+    UncertaintyIncomingDto,
+    UncertaintyOutgoingDto,
+)
+from src.dtos.node_dtos import (
+    NodeMapper,
+    NodeIncomingDto,
+    NodeOutgoingDto,
+    NodeViaIssueOutgoingDto,
+)
 
 class IssueDto(BaseModel):
     scenario_id: int
-    type: str
-    boundary: str
 
 class IssueIncomingDto(IssueDto):
+    model_config=ConfigDict(use_enum_values=True)
+
     id: Optional[int]
+    type: Type = Type.UNDECIDED
+    boundary: Boundary = Boundary.OUT
     node: Optional[NodeIncomingDto]
     decision: Optional[DecisionIncomingDto]
     uncertainty: Optional[UncertaintyIncomingDto]
 
 class IssueOutgoingDto(IssueDto):
     id: int
+    type: str
+    boundary: str
     node: NodeViaIssueOutgoingDto
     decision: Optional[DecisionOutgoingDto]
     uncertainty: Optional[UncertaintyOutgoingDto]
 
 class IssueViaNodeOutgoingDto(IssueDto):
     id: int
+    type: str
+    boundary: str
     decision: Optional[DecisionOutgoingDto]
     uncertainty: Optional[UncertaintyOutgoingDto]
 
