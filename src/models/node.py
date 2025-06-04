@@ -7,6 +7,7 @@ from sqlalchemy.orm import (
 )
 from src.models.base import Base
 from src.models.scenario import Scenario
+from src.constants import DatabaseConstants
 if TYPE_CHECKING:
     from src.models.edge import Edge
     from src.models.issue import Issue
@@ -18,7 +19,7 @@ class Node(Base):
     scenario_id: Mapped[int] = mapped_column(ForeignKey(Scenario.id))
     issue_id: Mapped[int] = mapped_column(ForeignKey("issue.id"))
 
-    name: Mapped[str] = mapped_column(String(60), index=True)
+    name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True)
 
     scenario: Mapped[Scenario] = relationship(Scenario, foreign_keys=[scenario_id], back_populates="nodes")
     issue: Mapped["Issue"] = relationship("Issue", back_populates="node")

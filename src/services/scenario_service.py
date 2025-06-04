@@ -1,7 +1,18 @@
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.scenario import Scenario
-from src.dtos.scenario_dtos import *
+from src.dtos.scenario_dtos import (
+    ScenarioMapper,
+    ScenarioOutgoingDto,
+    ScenarioIncomingDto,
+    ScenarioCreateDto,
+)
+from src.dtos.objective_dtos import (
+    ObjectiveMapper,
+)
+from src.dtos.opportunity_dtos import (
+    OpportunityMapper
+)
 from src.dtos.user_dtos import (
     UserIncomingDto,
     UserMapper,

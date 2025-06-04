@@ -8,6 +8,7 @@ from sqlalchemy.orm import (
 from src.models.base import Base
 from src.models.base_auditable_entity import BaseAuditableEntity
 from src.models.scenario import Scenario
+from src.constants import DatabaseConstants
 
 class Opportunity(Base, BaseAuditableEntity):
     __tablename__ = "opportunity"
@@ -15,8 +16,8 @@ class Opportunity(Base, BaseAuditableEntity):
     id: Mapped[int] = mapped_column(primary_key=True)
     scenario_id: Mapped[int] = mapped_column(ForeignKey(Scenario.id), index=True)
 
-    name: Mapped[str] = mapped_column(String(60), index=True, default="")
-    description: Mapped[str] = mapped_column(String(600), default="")
+    name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True, default="")
+    description: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value), default="")
 
     scenario: Mapped[Scenario] = relationship(
         Scenario, 

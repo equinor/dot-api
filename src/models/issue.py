@@ -11,6 +11,7 @@ from src.models.scenario import Scenario
 from src.models.decision import Decision
 from src.models.uncertainty import Uncertainty
 from src.models.node import Node
+from src.constants import DatabaseConstants
 
 class Issue(Base, BaseAuditableEntity):
     __tablename__ = "issue"
@@ -18,8 +19,8 @@ class Issue(Base, BaseAuditableEntity):
     id: Mapped[int] = mapped_column(primary_key=True)
     scenario_id: Mapped[int] = mapped_column(ForeignKey(Scenario.id))
 
-    type: Mapped[str] = mapped_column(String(30), default="Undecided")
-    boundary: Mapped[str] = mapped_column(String(30), default="out")
+    type: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="Undecided")
+    boundary: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="out")
 
     scenario: Mapped[Scenario] = relationship(Scenario, foreign_keys=[scenario_id], back_populates="issues")
 

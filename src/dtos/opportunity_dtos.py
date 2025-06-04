@@ -1,12 +1,13 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, Field
+from typing import Optional, Annotated
 from src.models.opportunity import (
     Opportunity
 )
+from src.constants import DatabaseConstants
 
 class OpportunityDto(BaseModel):
-    name: str
-    description: str
+    name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
+    description: Annotated[str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)] = ""
 
 class OpportunityViaProjectDto(OpportunityDto):
     """

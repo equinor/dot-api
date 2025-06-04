@@ -5,6 +5,7 @@ from src.models.base import Base
 from src.models.base_auditable_entity import BaseAuditableEntity
 from src.models.base import Base
 from src.models.base_auditable_entity import BaseAuditableEntity
+from src.constants import DatabaseConstants
 if TYPE_CHECKING:
     from models.scenario import Scenario
 
@@ -12,8 +13,8 @@ class Project(Base, BaseAuditableEntity):
     __tablename__ = "project"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(60), index=True)
-    description: Mapped[str] = mapped_column(String(600))
+    name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True)
+    description: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value))
 
     scenarios: Mapped[list["Scenario"]] = relationship(
         "Scenario", 

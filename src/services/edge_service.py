@@ -1,7 +1,11 @@
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.edge import Edge
-from src.dtos.edge_dtos import *
+from src.dtos.edge_dtos import (
+    EdgeMapper,
+    EdgeIncomingDto,
+    EdgeOutgoingDto,
+)
 from src.repositories.edge_repository import EdgeRepository
 from src.services.session_handler import session_handler
 

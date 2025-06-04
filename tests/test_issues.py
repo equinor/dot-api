@@ -34,7 +34,7 @@ async def test_update_issue(client: AsyncClient):
 
     new_options=["yes", "no", "this is testing issue update"]
     new_probabilities=[0.1, 0.3, 0.6]
-    new_type="uncertainty"
+    new_type="Uncertainty"
     new_boundary="in"
     payload=[IssueIncomingDto(
         id=example_issue.id, 

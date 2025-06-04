@@ -1,6 +1,11 @@
 from sqlalchemy.orm.strategy_options import _AbstractLoad # type: ignore
 from sqlalchemy.orm import selectinload
-from src.models import *
+from src.models import (
+    Issue,
+    Node,
+    Project,
+    Scenario,
+)
 
 class QueryExtensions:
     @staticmethod

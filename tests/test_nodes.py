@@ -5,7 +5,6 @@ from tests.utils import (
     parse_response_to_dtos_test,
 )
 from src.dtos.node_dtos import NodeIncomingDto, NodeOutgoingDto
-from src.dtos.issue_dtos import *
 
 
 @pytest.mark.asyncio
