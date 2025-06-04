@@ -4,6 +4,8 @@ from src.services.project_service import ProjectService
 from src.services.objective_service import ObjectiveService
 from src.services.opportunity_service import OpportunityService
 from src.services.uncertainty_service import UncertaintyService
+from src.services.utility_service import UtilityService
+from src.services.value_metric_service import ValueMetricService
 from src.services.scenario_service import ScenarioService
 from src.services.edge_service import EdgeService
 from src.services.node_service import NodeService
@@ -43,6 +45,12 @@ async def get_opportunity_service() -> OpportunityService:
 
 async def get_uncertainty_service() -> UncertaintyService:
     return UncertaintyService(await get_async_engine())
+
+async def get_utility_service() -> UtilityService:
+    return UtilityService(await get_async_engine())
+
+async def get_value_metric_service() -> ValueMetricService:
+    return ValueMetricService(await get_async_engine())
 
 async def get_scenario_service() -> ScenarioService:
     return ScenarioService(await get_async_engine())

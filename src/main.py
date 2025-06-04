@@ -8,6 +8,8 @@ import src.routes.node_routes as node_routes
 import src.routes.objective_routes as objective_routes
 import src.routes.opportunity_routes as opportunity_routes
 import src.routes.uncertainty_routes as uncertainty_routes
+import src.routes.utility_routes as utility_routes
+import src.routes.value_metric_routes as value_metric_routes
 import src.routes.project_routes as project_routes
 import src.routes.issue_routes as issue_routes
 
@@ -33,6 +35,8 @@ app.include_router(node_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(objective_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(opportunity_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(uncertainty_routes.router, dependencies=[Depends(verify_token)])
+app.include_router(utility_routes.router, dependencies=[Depends(verify_token)])
+app.include_router(value_metric_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(project_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(issue_routes.router, dependencies=[Depends(verify_token)])
 

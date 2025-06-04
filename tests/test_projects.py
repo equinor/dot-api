@@ -5,7 +5,12 @@ from tests.utils import (
     parse_response_to_dto_test,
     parse_response_to_dtos_test,
 )
-from src.dtos.project_dtos import ProjectIncomingDto, ProjectOutgoingDto, ProjectCreateDto
+from src.dtos.project_dtos import (
+    ProjectIncomingDto, 
+    ProjectOutgoingDto, 
+    ProjectCreateDto,
+    PopulatedProjectDto,
+)
 from src.dtos.objective_dtos import ObjectiveViaScenarioDto
 from src.dtos.scenario_dtos import ScenarioCreateViaProjectDto
 
@@ -22,6 +27,13 @@ async def test_get_project(client: AsyncClient):
     assert response.status_code == 200
 
     parse_response_to_dto_test(response, ProjectOutgoingDto)
+
+@pytest.mark.asyncio
+async def test_get_project_populated(client: AsyncClient):
+    response = await client.get("/projects-populated/10")
+    assert response.status_code == 200
+
+    parse_response_to_dto_test(response, PopulatedProjectDto)
 
 @pytest.mark.asyncio
 async def test_create_project(client: AsyncClient):

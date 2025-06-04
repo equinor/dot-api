@@ -8,6 +8,7 @@ from src.dtos.scenario_dtos import (
     ScenarioCreateViaProjectDto,
     ScenarioIncomingDto,
     ScenarioOutgoingDto,
+    PopulatedScenarioDto,
 )
 from src.constants import DatabaseConstants
 
@@ -25,6 +26,10 @@ class ProjectIncomingDto(ProjectDto):
 class ProjectOutgoingDto(ProjectDto):
     id: int
     scenarios: list[ScenarioOutgoingDto]
+
+class PopulatedProjectDto(ProjectDto):
+    id: int
+    scenarios: list[PopulatedScenarioDto]
 
 class ProjectMapper:
     @staticmethod
@@ -45,6 +50,15 @@ class ProjectMapper:
             description=entity.description,
             scenarios=ScenarioMapper.to_outgoing_dtos(entity.scenarios),
         )
+    
+    @staticmethod
+    def to_populated_dto(entity: Project) -> PopulatedProjectDto:
+        return PopulatedProjectDto(
+            id=entity.id,
+            name=entity.name,
+            description=entity.name,
+            scenarios=ScenarioMapper.to_populated_dtos(entity.scenarios),
+        )
 
     @staticmethod
     def to_entity(dto: ProjectIncomingDto, user_id: int) -> Project:
@@ -63,6 +77,10 @@ class ProjectMapper:
     @staticmethod
     def to_outgoing_dtos(entities: list[Project]) -> list[ProjectOutgoingDto]:
         return [ProjectMapper.to_outgoing_dto(entity) for entity in entities]
+    
+    @staticmethod
+    def to_populated_dtos(entities: list[Project]) -> list[PopulatedProjectDto]:
+        return [ProjectMapper.to_populated_dto(entity) for entity in entities]
     
     @staticmethod
     def to_entities(dtos: list[ProjectIncomingDto], user_id: int) -> list[Project]:

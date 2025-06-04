@@ -5,7 +5,12 @@ from tests.utils import (
     parse_response_to_dto_test,
     parse_response_to_dtos_test,
 )
-from src.dtos.scenario_dtos import ScenarioCreateDto, ScenarioIncomingDto, ScenarioOutgoingDto
+from src.dtos.scenario_dtos import (
+    ScenarioCreateDto, 
+    ScenarioIncomingDto, 
+    ScenarioOutgoingDto,
+    PopulatedScenarioDto,
+)
 from src.dtos.objective_dtos import ObjectiveViaScenarioDto, ObjectiveIncomingDto
 
 @pytest.mark.asyncio
@@ -21,6 +26,13 @@ async def test_get_scenario(client: AsyncClient):
     assert response.status_code == 200
     
     parse_response_to_dto_test(response, ScenarioOutgoingDto)
+
+@pytest.mark.asyncio
+async def test_get_scenario_populated(client: AsyncClient):
+    response = await client.get("/scenarios-populated/10")
+    assert response.status_code == 200
+    
+    parse_response_to_dto_test(response, PopulatedScenarioDto)
 
 @pytest.mark.asyncio
 async def test_create_scenario(client: AsyncClient):

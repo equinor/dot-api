@@ -1,5 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
-from src.dtos.project_dtos import ProjectIncomingDto, ProjectOutgoingDto, ProjectCreateDto
+from src.dtos.project_dtos import (
+    ProjectIncomingDto, 
+    ProjectOutgoingDto, 
+    ProjectCreateDto,
+    PopulatedProjectDto,
+)
 from src.services.project_service import ProjectService
 from src.dependencies import get_project_service
 from src.services.user_service import get_temp_user
@@ -25,10 +30,25 @@ async def create_projects(
 @router.get("/projects/{id}")
 async def get_project(
     id: int,
-    project_service: ProjectService = Depends(get_project_service)
+    project_service: ProjectService = Depends(get_project_service),
 ) -> ProjectOutgoingDto:
     try:
         projects: list[ProjectOutgoingDto] = await project_service.get([id])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+        
+    if len(projects) > 0:
+        return projects[0]
+    else:
+        raise HTTPException(status_code=404)
+    
+@router.get("/projects-populated/{id}")
+async def get_populated_project(
+    id: int,
+    project_service: ProjectService = Depends(get_project_service),
+) -> PopulatedProjectDto:
+    try:
+        projects: list[PopulatedProjectDto] = await project_service.get_populated_projects([id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
