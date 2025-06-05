@@ -15,6 +15,14 @@ from src.dtos.objective_dtos import (
     ObjectiveIncomingDto,
     ObjectiveOutgoingDto,
 )
+from src.dtos.issue_dtos import (
+    IssueMapper,
+    IssueOutgoingDto,
+)
+from src.dtos.edge_dtos import (
+    EdgeMapper,
+    EdgeOutgoingDto,
+)
 from src.constants import DatabaseConstants
 
 class ScenarioDto(BaseModel):
@@ -41,6 +49,10 @@ class ScenarioOutgoingDto(ScenarioDto):
     project_id: int
     objectives: list[ObjectiveOutgoingDto]
     opportunities: list[OpportunityOutgoingDto]
+
+class PopulatedScenarioDto(ScenarioOutgoingDto):
+    edges: list[EdgeOutgoingDto]
+    issues: list[IssueOutgoingDto]
 
 class ScenarioMapper:
     @staticmethod
@@ -74,6 +86,18 @@ class ScenarioMapper:
             objectives=ObjectiveMapper.to_outgoing_dtos(entity.objectives),
             opportunities=OpportunityMapper.to_outgoing_dtos(entity.opportunities),
         )
+    
+    @staticmethod
+    def to_populated_dto(entity: Scenario) -> PopulatedScenarioDto:
+        return PopulatedScenarioDto(
+            id=entity.id,
+            project_id=entity.project_id,
+            name=entity.name,
+            objectives=ObjectiveMapper.to_outgoing_dtos(entity.objectives),
+            opportunities=OpportunityMapper.to_outgoing_dtos(entity.opportunities),
+            issues=IssueMapper.to_outgoing_dtos(entity.issues),
+            edges=EdgeMapper.to_outgoing_dtos(entity.edges),
+        )
 
     @staticmethod
     def to_entity(dto: ScenarioIncomingDto, user_id: int) -> Scenario:
@@ -97,6 +121,10 @@ class ScenarioMapper:
     @staticmethod
     def to_outgoing_dtos(entities: list[Scenario]) -> list[ScenarioOutgoingDto]:
         return [ScenarioMapper.to_outgoing_dto(entity) for entity in entities]
+
+    @staticmethod
+    def to_populated_dtos(entities: list[Scenario]) -> list[PopulatedScenarioDto]:
+        return [ScenarioMapper.to_populated_dto(entity) for entity in entities]
     
     @staticmethod
     def to_entities(dtos: list[ScenarioIncomingDto], user_id: int) -> list[Scenario]:

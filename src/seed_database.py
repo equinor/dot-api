@@ -9,6 +9,8 @@ from src.models import (
     Objective,
     Opportunity,
     Uncertainty,
+    Utility,
+    ValueMetric,
     Decision,
     Edge,
 )
@@ -81,7 +83,7 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
                 decision = Decision(
                     id=issue_node_id,
                     issue_id=issue_node_id,
-                    options="yes,no"
+                    alternatives="yes,no"
                 )
                 entities.append(decision)
 
@@ -91,6 +93,20 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
                     probabilities="0.5,0.5"
                 )
                 entities.append(uncertainty)
+
+                utility=Utility(
+                    id=issue_node_id,
+                    issue_id=issue_node_id,
+                    values="200,150"
+                )
+                entities.append(utility)
+
+                value_metric=ValueMetric(
+                    id=issue_node_id,
+                    issue_id=issue_node_id,
+                    name=str(uuid4())
+                )
+                entities.append(value_metric)
 
                 node = Node(
                     id=issue_node_id,
@@ -105,6 +121,7 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
                     node=node,
                     type="Decision",
                     boundary="out",
+                    order=0,
                     user_id=scenario.created_by_id,
                 )
 

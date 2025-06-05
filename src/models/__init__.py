@@ -8,5 +8,7 @@ from src.models.scenario import Scenario # type: ignore
 from src.models.issue import Issue # type: ignore
 from src.models.decision import Decision # type: ignore
 from src.models.uncertainty import Uncertainty # type: ignore
+from src.models.utility import Utility # type: ignore
+from src.models.value_metric import ValueMetric # type: ignore
 from src.models.node import Node # type: ignore
 from src.models.edge import Edge # type: ignore

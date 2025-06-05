@@ -4,6 +4,10 @@ from tests.utils import (
     parse_response_to_dto_test,
     parse_response_to_dtos_test,
 )
+from src.constants import (
+    Type,
+    Boundary,
+)
 from src.dtos.issue_dtos import IssueIncomingDto, IssueOutgoingDto
 from src.dtos.decision_dtos import DecisionIncomingDto
 from src.dtos.uncertainty_dtos import UncertaintyIncomingDto
@@ -34,16 +38,19 @@ async def test_update_issue(client: AsyncClient):
 
     new_options=["yes", "no", "this is testing issue update"]
     new_probabilities=[0.1, 0.3, 0.6]
-    new_type="Uncertainty"
-    new_boundary="in"
+    new_type=Type.UNCERTAINTY
+    new_boundary=Boundary.IN
     payload=[IssueIncomingDto(
         id=example_issue.id, 
         scenario_id=example_issue.scenario_id, 
         type=new_type,
         boundary=new_boundary,
+        order=0,
         node=node,
-        decision=DecisionIncomingDto(id=example_issue.decision.id, issue_id=example_issue.id, options=new_options),
-        uncertainty=UncertaintyIncomingDto(id=example_issue.uncertainty.id, issue_id=example_issue.id, probabilities=new_probabilities)
+        decision=DecisionIncomingDto(id=example_issue.decision.id, issue_id=example_issue.id, alternatives=new_options),
+        uncertainty=UncertaintyIncomingDto(id=example_issue.uncertainty.id, issue_id=example_issue.id, probabilities=new_probabilities),
+        utility=None,
+        value_metric=None,
     ).model_dump()]
 
     response=await client.put("/issues", json=payload)
@@ -51,7 +58,7 @@ async def test_update_issue(client: AsyncClient):
 
     response_content=parse_response_to_dtos_test(response, IssueOutgoingDto)
     assert response_content[0].uncertainty is not None and response_content[0].uncertainty.probabilities==new_probabilities
-    assert response_content[0].decision is not None and response_content[0].decision.options==new_options
+    assert response_content[0].decision is not None and response_content[0].decision.alternatives==new_options
     assert response_content[0].type==new_type
 
 @pytest.mark.asyncio

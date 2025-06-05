@@ -6,7 +6,7 @@ from src.models.decision import (
 from src.constants import DatabaseConstants
 
 class DecisionDto(BaseModel):
-    options: List[Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)]] = [""]
+    alternatives: List[Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)]] = [""]
 
 class DecisionIncomingDto(DecisionDto):
     id: Optional[int] = Field(default=None, gt=0)
@@ -23,7 +23,7 @@ class DecisionMapper:
         return DecisionOutgoingDto(
             id=entity.id,
             issue_id=entity.issue_id,
-            options=entity.options.split(",")
+            alternatives=entity.alternatives.split(",")
         )
     
     @staticmethod
@@ -31,7 +31,7 @@ class DecisionMapper:
         return Decision(
             id=dto.id,
             issue_id=dto.issue_id if dto.issue_id else None,
-            options=",".join(dto.options)
+            alternatives=",".join(dto.alternatives)
         )
 
     @staticmethod

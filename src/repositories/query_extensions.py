@@ -13,6 +13,8 @@ class QueryExtensions:
         return [
             selectinload(Issue.decision),
             selectinload(Issue.uncertainty),
+            selectinload(Issue.utility),
+            selectinload(Issue.value_metric),
             selectinload(Issue.node),
         ]
     
@@ -22,6 +24,8 @@ class QueryExtensions:
             selectinload(Node.issue).options(
                 selectinload(Issue.decision),
                 selectinload(Issue.uncertainty),
+                selectinload(Issue.utility),
+                selectinload(Issue.value_metric),
             )
         ]
 

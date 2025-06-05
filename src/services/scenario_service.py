@@ -6,6 +6,7 @@ from src.dtos.scenario_dtos import (
     ScenarioOutgoingDto,
     ScenarioIncomingDto,
     ScenarioCreateDto,
+    PopulatedScenarioDto,
 )
 from src.dtos.objective_dtos import (
     ObjectiveMapper,
@@ -61,6 +62,12 @@ class ScenarioService:
         async with session_handler(self.engine) as session:
             scenarios: list[Scenario] = await ScenarioRepository(session).get(ids)
             result=ScenarioMapper.to_outgoing_dtos(scenarios)
+        return result
+    
+    async def get_populated(self, ids: list[int]) -> list[PopulatedScenarioDto]:
+        async with session_handler(self.engine) as session:
+            scenarios: list[Scenario] = await ScenarioRepository(session).get(ids)
+            result=ScenarioMapper.to_populated_dtos(scenarios)
         return result
     
     async def get_all(self) -> list[ScenarioOutgoingDto]:

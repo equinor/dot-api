@@ -1,5 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
-from src.dtos.scenario_dtos import ScenarioIncomingDto, ScenarioOutgoingDto, ScenarioCreateDto
+from src.dtos.scenario_dtos import (
+    ScenarioIncomingDto, 
+    ScenarioOutgoingDto,
+    ScenarioCreateDto,
+    PopulatedScenarioDto,
+)
 from src.services.scenario_service import ScenarioService
 from src.dependencies import get_scenario_service
 from src.services.user_service import get_temp_user
@@ -28,6 +33,21 @@ async def get_scenario(
 ) -> ScenarioOutgoingDto:
     try:
         scenarios: list[ScenarioOutgoingDto] = await scenario_service.get([id])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+        
+    if len(scenarios) > 0:
+        return scenarios[0]
+    else:
+        raise HTTPException(status_code=404)
+    
+@router.get("/scenarios-populated/{id}")
+async def get_scenario_populated(
+    id: int,
+    scenario_service: ScenarioService = Depends(get_scenario_service)
+) -> PopulatedScenarioDto:
+    try:
+        scenarios: list[PopulatedScenarioDto] = await scenario_service.get_populated([id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
