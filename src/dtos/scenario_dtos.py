@@ -52,7 +52,7 @@ class ScenarioOutgoingDto(ScenarioDto):
 
 class PopulatedScenarioDto(ScenarioOutgoingDto):
     edges: list[EdgeOutgoingDto]
-    Issues: list[IssueOutgoingDto]
+    issues: list[IssueOutgoingDto]
 
 class ScenarioMapper:
     @staticmethod
@@ -95,7 +95,7 @@ class ScenarioMapper:
             name=entity.name,
             objectives=ObjectiveMapper.to_outgoing_dtos(entity.objectives),
             opportunities=OpportunityMapper.to_outgoing_dtos(entity.opportunities),
-            Issues=IssueMapper.to_outgoing_dtos(entity.issues),
+            issues=IssueMapper.to_outgoing_dtos(entity.issues),
             edges=EdgeMapper.to_outgoing_dtos(entity.edges),
         )
 
