@@ -33,12 +33,12 @@ class UtilityService:
     
     async def get(self, ids: list[int]) -> list[UtilityOutgoingDto]:
         async with session_handler(self.engine) as session:
-            decisions: list[Utility] = await UtilityRepository(session).get(ids)
-            result=UtilityMapper.to_outgoing_dtos(decisions)
+            entities: list[Utility] = await UtilityRepository(session).get(ids)
+            result=UtilityMapper.to_outgoing_dtos(entities)
         return result
     
     async def get_all(self) -> list[UtilityOutgoingDto]:
         async with session_handler(self.engine) as session:
-            decisions: list[Utility] = await UtilityRepository(session).get_all()
-            result=UtilityMapper.to_outgoing_dtos(decisions)
+            entities: list[Utility] = await UtilityRepository(session).get_all()
+            result=UtilityMapper.to_outgoing_dtos(entities)
         return result

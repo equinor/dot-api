@@ -33,12 +33,12 @@ class ValueMetricService:
     
     async def get(self, ids: list[int]) -> list[ValueMetricOutgoingDto]:
         async with session_handler(self.engine) as session:
-            decisions: list[ValueMetric] = await ValueMetricRepository(session).get(ids)
-            result=ValueMetricMapper.to_outgoing_dtos(decisions)
+            entities: list[ValueMetric] = await ValueMetricRepository(session).get(ids)
+            result=ValueMetricMapper.to_outgoing_dtos(entities)
         return result
     
     async def get_all(self) -> list[ValueMetricOutgoingDto]:
         async with session_handler(self.engine) as session:
-            decisions: list[ValueMetric] = await ValueMetricRepository(session).get_all()
-            result=ValueMetricMapper.to_outgoing_dtos(decisions)
+            entities: list[ValueMetric] = await ValueMetricRepository(session).get_all()
+            result=ValueMetricMapper.to_outgoing_dtos(entities)
         return result

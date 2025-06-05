@@ -48,7 +48,7 @@ class IssueRepository:
                 entity_to_update.uncertainty=await self.session.merge(entity.uncertainty)
 
             if entity.utility:
-                entity_to_update=await self.session.merge(entity.utility)
+                entity_to_update.utility=await self.session.merge(entity.utility)
                 
             if entity.value_metric:
                 entity_to_update.value_metric=await self.session.merge(entity.value_metric)
