@@ -1,5 +1,5 @@
-from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from pydantic import BaseModel, ConfigDict, Field
+from typing import Optional, Annotated
 from src.constants import (
     Type, 
     Boundary
@@ -33,9 +33,12 @@ from src.dtos.node_dtos import (
     NodeOutgoingDto,
     NodeViaIssueOutgoingDto,
 )
+from src.constants import DatabaseConstants
 
 class IssueDto(BaseModel):
     scenario_id: int
+    name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
+    description: Annotated[str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)] = ""
     order: int
 
 class IssueIncomingDto(IssueDto):
@@ -77,6 +80,8 @@ class IssueMapper:
             scenario_id=entity.scenario_id,
             type=entity.type,
             boundary=entity.boundary,
+            name=entity.name,
+            description=entity.description,
             order=entity.order,
             node=NodeMapper.to_outgoing_dto_via_issue(entity.node),
             decision=DecisionMapper.to_outgoing_dto(entity.decision) if entity.decision else None,
@@ -92,6 +97,8 @@ class IssueMapper:
             scenario_id=entity.scenario_id,
             type=entity.type,
             boundary=entity.boundary,
+            name=entity.name,
+            description=entity.description,
             order=entity.order,
             decision=DecisionMapper.to_outgoing_dto(entity.decision) if entity.decision else None,
             uncertainty=UncertaintyMapper.to_outgoing_dto(entity.uncertainty) if entity.uncertainty else None,
@@ -108,6 +115,8 @@ class IssueMapper:
             type=dto.type,
             boundary=dto.boundary,
             order=dto.order,
+            name=dto.name,
+            description=dto.description,
             user_id=user_id,
             node=NodeMapper.to_entity(dto.node) if dto.node else None,
             decision=DecisionMapper.to_entity(dto.decision) if dto.decision else None,

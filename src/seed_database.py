@@ -118,6 +118,8 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
                 issue = Issue(
                     id=issue_node_id,
                     scenario_id=scenario.id,
+                    name=str(uuid4()),
+                    description=str(uuid4()),
                     node=node,
                     type="Decision",
                     boundary="out",
