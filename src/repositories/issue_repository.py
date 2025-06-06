@@ -16,6 +16,9 @@ class IssueRepository(BaseRepository[Issue]):
             entity_to_update.scenario_id=entity.scenario_id
             entity_to_update.type=entity.type
             entity_to_update.boundary=entity.boundary
+            entity_to_update.name=entity.name
+            entity_to_update.description=entity.description
+            entity_to_update.order=entity.order
 
             if entity.node:
                 entity_to_update.node=await self.session.merge(entity.node)
