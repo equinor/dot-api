@@ -49,3 +49,10 @@ class QueryExtensions:
                 *QueryExtensions.load_scenario_with_relationships()
             )
         ]
+
+    @staticmethod
+    def empty_load() -> list[_AbstractLoad]:
+        """
+        To be used as input for generic repositories when there are no relationships to be loaded.
+        """
+        return []

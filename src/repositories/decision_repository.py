@@ -1,26 +1,12 @@
 from src.models.decision import Decision
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from src.repositories.base_repository import BaseRepository
+from src.repositories.query_extensions import QueryExtensions
 
-class DecisionRepository:
+class DecisionRepository(BaseRepository[Decision]):
     def __init__(self, session: AsyncSession):
-        self.session = session
+        super().__init__(session, Decision, query_extension_method=QueryExtensions.empty_load)
 
-    async def create(self, entities: list[Decision]) -> list[Decision]:
-        self.session.add_all(entities)
-        await self.session.flush()
-        return entities
-
-    async def get(self, ids: list[int]) -> list[Decision]:
-        return list(
-            (await self.session.scalars(select(Decision).where(Decision.id.in_(ids)))).all()
-        )
-    
-    async def get_all(self) -> list[Decision]:
-        return list(
-            (await self.session.scalars(select(Decision))).all()
-        )
-    
     async def update(self, entities: list[Decision]) -> list[Decision]:
         entities_to_update=await self.get([decision.id for decision in entities])
 
@@ -33,8 +19,3 @@ class DecisionRepository:
         await self.session.flush()
         return entities_to_update
     
-    async def delete(self, ids: list[int]) -> None:
-        entities=await self.get(ids)
-        for entity in entities:
-            await self.session.delete(entity)
-        await self.session.flush()
