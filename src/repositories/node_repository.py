@@ -1,29 +1,13 @@
 from src.models.node import Node
 from src.repositories.query_extensions import QueryExtensions
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from src.repositories.base_repository import BaseRepository
+from src.repositories.query_extensions import QueryExtensions
 
-class NodeRepository:
+class NodeRepository(BaseRepository[Node]):
     def __init__(self, session: AsyncSession):
-        self.session = session
+        super().__init__(session, Node, query_extension_method=QueryExtensions.load_node_with_relationships)
 
-    async def create(self, entities: list[Node]) -> list[Node]:
-        self.session.add_all(entities)
-        await self.session.flush()
-        return entities
-
-    async def get(self, ids: list[int]) -> list[Node]:
-        query=select(Node).where(Node.id.in_(ids)).options(*QueryExtensions.load_node_with_relationships())
-        return list(
-            (await self.session.scalars(query)).all()
-        )
-    
-    async def get_all(self) -> list[Node]:
-        query=select(Node).options(*QueryExtensions.load_node_with_relationships())
-        return list(
-            (await self.session.scalars(query)).all()
-        )
-    
     async def update(self, entities: list[Node]) -> list[Node]:
         entities_to_update=await self.get([node.id for node in entities])
 
@@ -35,9 +19,3 @@ class NodeRepository:
             
         await self.session.flush()
         return entities_to_update
-    
-    async def delete(self, ids: list[int]) -> None:
-        entities=await self.get(ids)
-        for entity in entities:
-            await self.session.delete(entity)
-        await self.session.flush()

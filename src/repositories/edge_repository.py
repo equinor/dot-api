@@ -1,39 +1,16 @@
 from src.models.edge import Edge
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from src.repositories.base_repository import BaseRepository
+from src.repositories.query_extensions import QueryExtensions
 
-class EdgeRepository:
+class EdgeRepository(BaseRepository[Edge]):
     def __init__(self, session: AsyncSession):
-        self.session = session
+        super().__init__(session, Edge, query_extension_method=QueryExtensions.empty_load)
 
-    async def create(self, entities: list[Edge]) -> list[Edge]:
-        self.session.add_all(entities)
-        await self.session.flush()
-        return entities
-
-    async def get(self, ids: list[int]) -> list[Edge]:
-        """
-        No idea if this actually works
-        """
-        query = select(Edge).where(Edge.id.in_(ids))
-        result = await self.session.scalars(query)
-        return list(result.all())
-    
-    async def get_all(self) -> list[Edge]:
-        return list(
-            (await self.session.scalars(select(Edge))).all()
-        )
-    
-    async def delete(self, ids: list[int]) -> None:
-        entities = await self.get(ids)
-        for entity in entities:
-            await self.session.delete(entity)
-        await self.session.flush()
-
-    async def update(self, edges: list[Edge]) -> list[Edge]:
-        entities_to_update=await self.get([edge.id for edge in edges])
+    async def update(self, entities: list[Edge]) -> list[Edge]:
+        entities_to_update=await self.get([edge.id for edge in entities])
         for n, edge_to_update in enumerate(entities_to_update):
-            edge=edges[n]
+            edge=entities[n]
             edge_to_update.tail_id=edge.tail_id
             edge_to_update.head_id=edge.head_id
             edge_to_update.scenario_id=edge.scenario_id
