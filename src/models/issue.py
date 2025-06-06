@@ -24,6 +24,8 @@ class Issue(Base, BaseAuditableEntity):
     type: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="Undecided")
     boundary: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="out")
 
+    name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True)
+    description: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value), default="")
     order: Mapped[int] = mapped_column(INT, default=0)
 
     scenario: Mapped[Scenario] = relationship(Scenario, foreign_keys=[scenario_id], back_populates="issues")
@@ -67,6 +69,8 @@ class Issue(Base, BaseAuditableEntity):
             id: Optional[int], 
             scenario_id: int, 
             type: str, 
+            name: str,
+            description: str,
             boundary: str, 
             order: int, 
             user_id: int, 
@@ -83,6 +87,8 @@ class Issue(Base, BaseAuditableEntity):
 
         self.scenario_id = scenario_id
         self.type = type
+        self.name = name
+        self.description = description
         self.boundary = boundary
         self.order = order
         self.updated_by_id = user_id

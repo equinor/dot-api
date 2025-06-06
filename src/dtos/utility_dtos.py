@@ -13,13 +13,15 @@ class UtilityIncomingDto(UtilityDto):
 
 class UtilityOutgoingDto(UtilityDto):
     id: int
+    issue_id: int
 
 class UtilityMapper:
     @staticmethod
     def to_outgoing_dto(entity: Utility) -> UtilityOutgoingDto:
         return UtilityOutgoingDto(
             id=entity.id,
-            values=[float(p) for p in entity.values.split(",")]
+            values=[float(p) for p in entity.values.split(",")],
+            issue_id=entity.issue_id
         )
 
     @staticmethod

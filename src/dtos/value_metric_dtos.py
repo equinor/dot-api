@@ -13,6 +13,7 @@ class ValueMetricIncomingDto(ValueMetricDto):
 
 class ValueMetricOutgoingDto(ValueMetricDto):
     id: int
+    issue_id: int
 
 class ValueMetricMapper:
     @staticmethod
@@ -20,6 +21,7 @@ class ValueMetricMapper:
         return ValueMetricOutgoingDto(
             id=entity.id,
             name=entity.name,
+            issue_id=entity.issue_id
         )
 
     @staticmethod

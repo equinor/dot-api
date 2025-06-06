@@ -13,13 +13,15 @@ class UncertaintyIncomingDto(UncertaintyDto):
 
 class UncertaintyOutgoingDto(UncertaintyDto):
     id: int
+    issue_id: int
 
 class UncertaintyMapper:
     @staticmethod
     def to_outgoing_dto(entity: Uncertainty) -> UncertaintyOutgoingDto:
         return UncertaintyOutgoingDto(
             id=entity.id,
-            probabilities=[float(p) for p in entity.probabilities.split(",")]
+            probabilities=[float(p) for p in entity.probabilities.split(",")],
+            issue_id=entity.issue_id,
         )
 
     @staticmethod
