@@ -1,0 +1,61 @@
+apiVersion: radix.equinor.com/v1
+kind: RadixApplication
+metadata:
+  name: dot-api
+spec:
+  environments:
+    - name: prod
+    - name: test
+      build:
+        from: v0*
+    - name: dev
+      build:
+        from: main|dev-deploy*
+  components:
+    - name: api
+      src: .
+      dockerfile: .
+      ports:
+        - name: http
+          port: 8000
+      publicPort: http
+      resources:
+        requests:
+          memory: '900Mi'
+          cpu: '40m'
+        limits:
+          memory: '1000Mi'
+          cpu: '60m'
+        horizontalScaling:
+          resources:
+            memory:
+              averageUtilization: 75
+            cpu:
+              averageUtilization: 85
+          minReplicas: 1
+          maxReplicas: 3
+      environmentConfig:
+
+        - environment: prod
+          replicas: 1
+          variables:
+            CLIENT_ID: '4251833c-b9c3-4013-afda-cbfd2cc50f3f'
+            REDIRECT_URL: 'Production'
+            AUDIENCE: "api://4251833c-b9c3-4013-afda-cbfd2cc50f3f/"
+            APP_ENV: 'production'
+
+        - environment: test
+          replicas: 1
+          variables:
+            CLIENT_ID: '945882c1-69f4-41cd-a42a-22516ca01868'
+            REDIRECT_URL: 'Production'
+            AUDIENCE: "api://945882c1-69f4-41cd-a42a-22516ca01868/"
+            APP_ENV: 'test'
+
+        - environment: dev  
+          replicas: 1
+          variables:
+            CLIENT_ID: '4251833c-b9c3-4013-afda-cbfd2cc50f3f'
+            REDIRECT_URL: 'Production'
+            AUDIENCE: "api://4251833c-b9c3-4013-afda-cbfd2cc50f3f/"
+            APP_ENV: 'dev'

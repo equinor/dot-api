@@ -6,6 +6,7 @@ class Config(BaseSettings):
     CLIENT_ID: str = Field(
         default=os.getenv("CLIENT_ID", "4251833c-b9c3-4013-afda-cbfd2cc50f3f")
     )
+ 
     REDIRECT_URL: str = Field(
         default=os.getenv("REDIRECT_URL", "http://localhost:8000/docs/oauth2-redirect")
     )
@@ -22,3 +23,9 @@ class Config(BaseSettings):
         f"https://login.microsoftonline.com/{TENANT_ID}/discovery/v2.0/keys"
     )
     ISSUER: str = f"https://sts.windows.net/{TENANT_ID}/"
+    APP_ENV: str = Field(
+        default=os.getenv("APP_ENV", "local")
+    )
+    DATABASE_URL: str = Field(
+        default=os.getenv("DATABASE_URL", "devurl")
+    )
