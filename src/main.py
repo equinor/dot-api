@@ -12,7 +12,6 @@ import src.routes.utility_routes as utility_routes
 import src.routes.value_metric_routes as value_metric_routes
 import src.routes.project_routes as project_routes
 import src.routes.issue_routes as issue_routes
-
 from src.config import Config
 
 config = Config()

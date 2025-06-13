@@ -14,10 +14,15 @@ from src.services.issue_service import IssueService
 from src.database import connection_strings
 from src.models.base import Base
 from src.seed_database import seed_database
+from src.config import Config
 
+config = Config()
 # use adapter to change based on environment
 connection_string = connection_strings.sql_lite_memory.value
-
+if(config.APP_ENV == "local"):
+    connection_string = connection_strings.sql_lite_memory.value
+else:
+    connection_string = config.DATABASE_URL
 async_engine: AsyncEngine|None = None
 async def get_async_engine() -> AsyncEngine:
     global async_engine
