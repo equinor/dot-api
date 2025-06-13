@@ -41,7 +41,7 @@ spec:
           variables:
             CLIENT_ID: '4251833c-b9c3-4013-afda-cbfd2cc50f3f'
             REDIRECT_URL: 'https://api-dot-api-prod.radix.equinor.com/docs/oauth2-redirect'
-            AUDIENCE: "api://4251833c-b9c3-4013-afda-cbfd2cc50f3f/"
+            AUDIENCE: "api://4251833c-b9c3-4013-afda-cbfd2cc50f3f"
             APP_ENV: 'production'
 
         - environment: test
@@ -49,7 +49,7 @@ spec:
           variables:
             CLIENT_ID: '945882c1-69f4-41cd-a42a-22516ca01868'
             REDIRECT_URL: 'https://api-dot-api-test.radix.equinor.com/docs/oauth2-redirect'
-            AUDIENCE: "api://945882c1-69f4-41cd-a42a-22516ca01868/"
+            AUDIENCE: "api://945882c1-69f4-41cd-a42a-22516ca01868"
             APP_ENV: 'test'
 
         - environment: dev  
@@ -57,5 +57,5 @@ spec:
           variables:
             CLIENT_ID: '4251833c-b9c3-4013-afda-cbfd2cc50f3f'
             REDIRECT_URL: 'https://api-dot-api-dev.radix.equinor.com/docs/oauth2-redirect'
-            AUDIENCE: "api://4251833c-b9c3-4013-afda-cbfd2cc50f3f/"
+            AUDIENCE: "api://4251833c-b9c3-4013-afda-cbfd2cc50f3f"
             APP_ENV: 'dev'
