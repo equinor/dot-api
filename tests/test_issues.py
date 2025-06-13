@@ -53,9 +53,10 @@ async def test_create_issue(client: AsyncClient):
     response=await client.post("/issues", json=payload)
     assert response.status_code == 200
     response_content=parse_response_to_dtos_test(response, IssueOutgoingDto)
+    r=response_content[0]
 
-    assert response_content[0].decision is not None and response_content[0].decision.alternatives==alternatives
-    assert response_content[0].node is not None and response_content[0].node.node_style is not None and response_content[0].node.node_style.x_position==x_position
+    assert r.decision is not None and r.decision.alternatives==alternatives
+    assert r.node is not None and r.node.node_style is not None and r.node.node_style.x_position==x_position
 
 
 @pytest.mark.asyncio
@@ -87,9 +88,11 @@ async def test_update_issue(client: AsyncClient):
     assert response.status_code == 200
 
     response_content=parse_response_to_dtos_test(response, IssueOutgoingDto)
-    assert response_content[0].uncertainty is not None and response_content[0].uncertainty.probabilities==new_probabilities
-    assert response_content[0].decision is not None and response_content[0].decision.alternatives==new_options
-    assert response_content[0].type==new_type
+    r=response_content[0]
+    
+    assert r.uncertainty is not None and r.uncertainty.probabilities==new_probabilities
+    assert r.decision is not None and r.decision.alternatives==new_options
+    assert r.type==new_type
 
 @pytest.mark.asyncio
 async def test_delete_issue(client: AsyncClient):
