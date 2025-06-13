@@ -6,6 +6,7 @@ from src.models import (
     Scenario,
     Issue,
     Node,
+    NodeStyle,
     Objective,
     Opportunity,
     Uncertainty,
@@ -113,6 +114,14 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
                     scenario_id=scenario.id,
                     issue_id=issue_node_id,
                     name=str(uuid4()),
+                    node_style=None,
+                )
+
+                node_style = NodeStyle(
+                    id=issue_node_id,
+                    node_id=node.id,
+                    x_position=40,
+                    y_position=50,
                 )
 
                 issue = Issue(
@@ -129,6 +138,7 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
 
                 issue = add_auditable_fields(issue, user)
                 entities.append(node)
+                entities.append(node_style)
                 entities.append(issue)
 
                 if issue_node_index > 0 and former_node_id is not None:

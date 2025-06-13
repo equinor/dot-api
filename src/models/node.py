@@ -9,8 +9,9 @@ from src.models.base import Base
 from src.models.scenario import Scenario
 from src.constants import DatabaseConstants
 if TYPE_CHECKING:
-    from src.models.edge import Edge
-    from src.models.issue import Issue
+    from src.models import Edge
+    from src.models import Issue
+    from src.models import NodeStyle
 
 class Node(Base):
     __tablename__ = "node"
@@ -37,13 +38,25 @@ class Node(Base):
         cascade="all, delete-orphan",
     )
 
-    def __init__(self, id: Optional[int], scenario_id: int, name: str, issue_id: int):
+    node_style: Mapped["NodeStyle"] = relationship(
+        "NodeStyle",
+        back_populates="node",
+        cascade="all, delete-orphan",
+        single_parent=True,
+    )
+
+    def __init__(self, id: Optional[int], scenario_id: int, name: str, issue_id: Optional[int], node_style: Optional["NodeStyle"]):
         if id is not None:
             self.id = id
         
         self.scenario_id = scenario_id
-        self.issue_id=issue_id
         self.name = name
+        
+        if issue_id:
+            self.issue_id=issue_id
+
+        if node_style:
+            self.node_style=node_style
 
     def head_neighbors(self) -> list["Node"]:
         try:

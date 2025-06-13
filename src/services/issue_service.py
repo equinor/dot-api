@@ -11,6 +11,9 @@ from src.dtos.node_dtos import (
     NodeMapper,
     NodeIncomingDto,
 )
+from src.dtos.node_style_dtos import (
+    NodeStyleIncomingDto,
+)
 from src.dtos.decision_dtos import (
     DecisionMapper,
     DecisionIncomingDto,
@@ -55,7 +58,7 @@ class IssueService:
                 nodes.append(dto.node)
             else:
                 # issue id is set later
-                nodes.append(NodeIncomingDto(scenario_id=dto.scenario_id, issue_id=0, id=None))
+                nodes.append(NodeIncomingDto(scenario_id=dto.scenario_id, issue_id=None, id=None, node_style=NodeStyleIncomingDto()))
 
             decisions.append(dto.decision)
             uncertainties.append(dto.uncertainty)
@@ -73,15 +76,19 @@ class IssueService:
         node=(await NodeRepository(session).create_single(NodeMapper.to_entity(node_dto)))
         entity.node=node
         if decision_dto:
+            decision_dto.issue_id=entity.id
             decision=(await DecisionRepository(session).create_single(DecisionMapper.to_entity(decision_dto)))
             entity.decision=decision
         if uncertainty_dto:
+            uncertainty_dto.issue_id=entity.id
             uncertainty=(await UncertaintyRepository(session).create_single(UncertaintyMapper.to_entity(uncertainty_dto)))
             entity.uncertainty=uncertainty
         if utility_dto:
+            utility_dto.issue_id=entity.id
             utility=(await UtilityRepository(session).create_single(UtilityMapper.to_entity(utility_dto)))
             entity.utility=utility
         if value_metric_dto:
+            value_metric_dto.issue_id=entity.id
             value_metric=(await ValueMetricRepository(session).create_single(ValueMetricMapper.to_entity(value_metric_dto)))
             entity.value_metric=value_metric
         return entity

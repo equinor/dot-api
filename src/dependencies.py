@@ -9,6 +9,7 @@ from src.services.value_metric_service import ValueMetricService
 from src.services.scenario_service import ScenarioService
 from src.services.edge_service import EdgeService
 from src.services.node_service import NodeService
+from src.services.node_style_service import NodeStyleService
 from src.services.issue_service import IssueService
 from src.database import connection_strings
 from src.models.base import Base
@@ -60,6 +61,9 @@ async def get_edge_service() -> EdgeService:
 
 async def get_node_service() -> NodeService:
     return NodeService(await get_async_engine())
+
+async def get_node_style_service() -> NodeStyleService:
+    return NodeStyleService(await get_async_engine())
 
 async def get_issue_service() -> IssueService:
     return IssueService(await get_async_engine())
