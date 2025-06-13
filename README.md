@@ -15,7 +15,7 @@ This API follows a service/repositories pattern. The main components are entitie
 
 ### Usefull commands
 
-- create migration: ``alembic revision --autogenerate -m "Create a baseline migrations"``
+- Create migration: ``alembic revision --autogenerate -m "Create a baseline migrations"``
 - Display the current revision for a database: ``alembic current``
 - View migrations history: ``alembic history --verbose``
 - Revert all migrations: ``alembic downgrade base``
