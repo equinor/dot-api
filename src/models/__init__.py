@@ -12,3 +12,4 @@ from src.models.utility import Utility # type: ignore
 from src.models.value_metric import ValueMetric # type: ignore
 from src.models.node import Node # type: ignore
 from src.models.edge import Edge # type: ignore
+from src.models.node_style import NodeStyle # type: ignore

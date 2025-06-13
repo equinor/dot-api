@@ -12,6 +12,8 @@ from src.dtos.issue_dtos import IssueIncomingDto, IssueOutgoingDto
 from src.dtos.decision_dtos import DecisionIncomingDto
 from src.dtos.uncertainty_dtos import UncertaintyIncomingDto
 from src.dtos.node_dtos import NodeIncomingDto
+from src.dtos.node_style_dtos import NodeStyleIncomingDto
+from src.dtos.decision_dtos import DecisionIncomingDto
 
 
 @pytest.mark.asyncio
@@ -29,12 +31,41 @@ async def test_get_issue(client: AsyncClient):
     parse_response_to_dto_test(response, IssueOutgoingDto)
 
 @pytest.mark.asyncio
+async def test_create_issue(client: AsyncClient):
+    scenario_id=4
+    alternatives=["alt1", "alt2"]
+    x_position=600
+    node=NodeIncomingDto(scenario_id=scenario_id, id=None, issue_id=None, node_style=NodeStyleIncomingDto(x_position=x_position))
+    
+    payload=[IssueIncomingDto(
+        id=None,
+        decision=DecisionIncomingDto(id=None, issue_id=None, alternatives=alternatives),
+        scenario_id=4,
+        type=Type.DECISION,
+        boundary=Boundary.OUT,
+        order=2,
+        node=node,
+        uncertainty=None,
+        utility=None,
+        value_metric=None,
+    ).model_dump()]
+
+    response=await client.post("/issues", json=payload)
+    assert response.status_code == 200
+    response_content=parse_response_to_dtos_test(response, IssueOutgoingDto)
+    r=response_content[0]
+
+    assert r.decision is not None and r.decision.alternatives==alternatives
+    assert r.node is not None and r.node.node_style is not None and r.node.node_style.x_position==x_position
+
+
+@pytest.mark.asyncio
 async def test_update_issue(client: AsyncClient):
     issue_id=3
     example_issue=parse_response_to_dto_test(await client.get(f"/issues/{issue_id}"), IssueOutgoingDto)
     if example_issue.decision is None or example_issue.uncertainty is None:
         raise Exception("example_issue.decision should not be None")
-    node=NodeIncomingDto(scenario_id=example_issue.scenario_id, id=example_issue.node.id, issue_id=example_issue.id)
+    node=NodeIncomingDto(scenario_id=example_issue.scenario_id, id=example_issue.node.id, issue_id=example_issue.id, node_style=None)
 
     new_options=["yes", "no", "this is testing issue update"]
     new_probabilities=[0.1, 0.3, 0.6]
@@ -57,9 +88,11 @@ async def test_update_issue(client: AsyncClient):
     assert response.status_code == 200
 
     response_content=parse_response_to_dtos_test(response, IssueOutgoingDto)
-    assert response_content[0].uncertainty is not None and response_content[0].uncertainty.probabilities==new_probabilities
-    assert response_content[0].decision is not None and response_content[0].decision.alternatives==new_options
-    assert response_content[0].type==new_type
+    r=response_content[0]
+    
+    assert r.uncertainty is not None and r.uncertainty.probabilities==new_probabilities
+    assert r.decision is not None and r.decision.alternatives==new_options
+    assert r.type==new_type
 
 @pytest.mark.asyncio
 async def test_delete_issue(client: AsyncClient):

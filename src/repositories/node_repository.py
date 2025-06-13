@@ -1,4 +1,4 @@
-from src.models.node import Node
+from src.models import Node
 from src.repositories.query_extensions import QueryExtensions
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.base_repository import BaseRepository
@@ -15,7 +15,9 @@ class NodeRepository(BaseRepository[Node]):
             entity=entities[n]
             entity_to_update.scenario_id=entity.scenario_id
             if entity.issue_id:
-                entity_to_update=entity.issue_id
+                entity_to_update.issue_id=entity.issue_id
+            if entity.node_style:
+                entity_to_update.node_style=await self.session.merge(entity.node_style)
             
         await self.session.flush()
         return entities_to_update

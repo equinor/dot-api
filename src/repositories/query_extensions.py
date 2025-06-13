@@ -15,7 +15,9 @@ class QueryExtensions:
             selectinload(Issue.uncertainty),
             selectinload(Issue.utility),
             selectinload(Issue.value_metric),
-            selectinload(Issue.node),
+            selectinload(Issue.node).options(
+                selectinload(Node.node_style)
+            ),
         ]
     
     @staticmethod
@@ -26,7 +28,8 @@ class QueryExtensions:
                 selectinload(Issue.uncertainty),
                 selectinload(Issue.utility),
                 selectinload(Issue.value_metric),
-            )
+            ),
+            selectinload(Node.node_style)
         ]
 
     @staticmethod
