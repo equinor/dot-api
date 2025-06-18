@@ -19,7 +19,6 @@ class ObjectiveViaScenarioDto(ObjectiveDto):
 
 class ObjectiveIncomingDto(ObjectiveDto):
     scenario_id: uuid.UUID
-    pass
 
 class ObjectiveOutgoingDto(ObjectiveDto):
     scenario_id: uuid.UUID
