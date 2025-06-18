@@ -1,5 +1,6 @@
+import uuid
 from pydantic import BaseModel, Field
-from typing import Optional, Annotated
+from typing import Annotated
 from src.models.project import (
     Project
 )
@@ -13,6 +14,7 @@ from src.dtos.scenario_dtos import (
 from src.constants import DatabaseConstants
 
 class ProjectDto(BaseModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
     name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
     description: Annotated[str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)] = ""
 
@@ -20,22 +22,19 @@ class ProjectCreateDto(ProjectDto):
     scenarios: list[ScenarioCreateViaProjectDto]
 
 class ProjectIncomingDto(ProjectDto):
-    id: Optional[int]
     scenarios: list[ScenarioIncomingDto]
 
 class ProjectOutgoingDto(ProjectDto):
-    id: int
     scenarios: list[ScenarioOutgoingDto]
 
 class PopulatedProjectDto(ProjectDto):
-    id: int
     scenarios: list[PopulatedScenarioDto]
 
 class ProjectMapper:
     @staticmethod
     def from_create_to_entity(dto: ProjectCreateDto, user_id: int) -> Project:
         return Project(
-            id=None,
+            id=dto.id,
             name=dto.name,
             description=dto.description,
             user_id=user_id,

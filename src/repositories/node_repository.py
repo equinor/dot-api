@@ -1,10 +1,11 @@
+import uuid
 from src.models import Node
 from src.repositories.query_extensions import QueryExtensions
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.base_repository import BaseRepository
 from src.repositories.query_extensions import QueryExtensions
 
-class NodeRepository(BaseRepository[Node]):
+class NodeRepository(BaseRepository[Node, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Node, query_extension_method=QueryExtensions.load_node_with_relationships)
 

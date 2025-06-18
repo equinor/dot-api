@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.node_dtos import NodeIncomingDto, NodeOutgoingDto
 from src.services.node_service import NodeService
@@ -7,7 +8,7 @@ router = APIRouter(tags=["nodes"])
 
 @router.get("/nodes/{id}")
 async def get_node(
-    id: int,
+    id: uuid.UUID,
     node_service: NodeService = Depends(get_node_service)
 ) -> NodeOutgoingDto:
     try:
@@ -32,7 +33,7 @@ async def get_all_node(
 
 @router.delete("/nodes/{id}")
 async def delete_node(
-    id: int,
+    id: uuid.UUID,
     node_service: NodeService = Depends(get_node_service)
 ):
     try:

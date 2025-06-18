@@ -1,3 +1,4 @@
+import uuid
 from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 from src.models import (
@@ -28,6 +29,14 @@ def add_auditable_fields(entity: T, user: User) -> T:
     entity.updated_by_id = user.id
     return entity
 
+class GenerateUuid:
+    @staticmethod
+    def as_string(index: int) -> str: 
+        return str(uuid.uuid5(uuid.NAMESPACE_DNS, f"{index}"))
+    @staticmethod
+    def as_uuid(index: int) -> uuid.UUID:
+        return uuid.uuid5(uuid.NAMESPACE_DNS, f"{index}")
+
 async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios: int, num_nodes: int):
     user1 = User(id=1, name=str(uuid4()), azure_id=str(uuid4()))
     user2 = User(id=2, name=str(uuid4()), azure_id=str(uuid4()))
@@ -36,8 +45,9 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
     for project_index in range(num_projects):
         user = user1 if project_index % 2 == 0 else user2
         # Create a project with a UUID name and description
+        project_id=GenerateUuid.as_uuid(project_index)
         project = Project(
-            id=project_index + 1,
+            id=project_id,
             name=str(uuid4()),
             description=str(uuid4()),
             user_id=user.id,
@@ -47,8 +57,8 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
         entities.append(project)
 
         objective=Objective(
-            id=project_index + 1,
-            scenario_id=project.id,
+            id=project_id,
+            scenario_id=project_id,
             description=str(uuid4()),
             name=str(uuid4()),
             user_id=project.created_by_id
@@ -57,8 +67,8 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
         entities.append(objective)
 
         opportunity=Opportunity(
-            id=project_index + 1,
-            scenario_id=project.id,
+            id=project_id,
+            scenario_id=project_id,
             description=str(uuid4()),
             name=str(uuid4()),
             user_id=project.created_by_id
@@ -67,7 +77,7 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
         entities.append(opportunity)
         former_node_id=None
         for scenario_index in range(num_scenarios):
-            scenario_id=project_index * num_scenarios + scenario_index + 1
+            scenario_id=GenerateUuid.as_uuid(project_index * num_scenarios + scenario_index + 1)
             scenario = Scenario(
                 id=scenario_id,
                 name=str(uuid4()),
@@ -80,7 +90,7 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
             entities.append(scenario)
 
             for issue_node_index in range(num_nodes):
-                issue_node_id=project_index * num_scenarios*num_nodes + scenario_index * num_nodes + issue_node_index + 1
+                issue_node_id=GenerateUuid.as_uuid(project_index * num_scenarios*num_nodes + scenario_index * num_nodes + issue_node_index + 1)
                 decision = Decision(
                     id=issue_node_id,
                     issue_id=issue_node_id,
@@ -143,7 +153,7 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
 
                 if issue_node_index > 0 and former_node_id is not None:
                     edge=Edge(
-                        id=issue_node_id-1, 
+                        id=issue_node_id, 
                         tail_node_id=former_node_id, 
                         head_node_id=issue_node_id, 
                         scenario_id=scenario.id

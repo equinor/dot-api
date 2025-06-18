@@ -1,6 +1,6 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
-
 from src.models import (
     Project,
     User,
@@ -39,16 +39,16 @@ class ProjectService:
     def __init__(self, engine: AsyncEngine):
         self.engine=engine
 
-    async def _create_scenarios_for_project(self, session: AsyncSession, scenario_dtos: list[ScenarioCreateViaProjectDto], user: User, project_id: int):
+    async def _create_scenarios_for_project(self, session: AsyncSession, scenario_dtos: list[ScenarioCreateViaProjectDto], user: User, project_id: uuid.UUID):
         scenarios = await ScenarioRepository(session).create(ScenarioMapper.from_create_via_project_to_entities(scenario_dtos, user.id, project_id))
         for scenario_dto, scenario in zip(scenario_dtos, scenarios):
             objectives, opportunities = await self._create_opportunities_and_objectives_for_scenario(session, scenario_dto.objectives, scenario_dto.opportunities, user, scenario.id)
             scenario.objectives, scenario.opportunities = objectives, opportunities
         return scenarios
 
-    async def _create_opportunities_and_objectives_for_scenario(self, session: AsyncSession, objective_dtos: list[ObjectiveViaScenarioDto], opportunities_dtos: list[OpportunityViaProjectDto], user: User, scenario_id: int):
+    async def _create_opportunities_and_objectives_for_scenario(self, session: AsyncSession, objective_dtos: list[ObjectiveViaScenarioDto], opportunities_dtos: list[OpportunityViaProjectDto], user: User, scenario_id: uuid.UUID):
         objectives=await ObjectiveRepository(session).create(ObjectiveMapper.via_scenario_to_entities(objective_dtos, user.id, scenario_id))
-        opportunities=await OpportunityRepository(session).create(OpportunityMapper.via_project_to_entities(opportunities_dtos, user.id, scenario_id))
+        opportunities=await OpportunityRepository(session).create(OpportunityMapper.via_scenario_to_entities(opportunities_dtos, user.id, scenario_id))
         return objectives, opportunities
 
     async def create(self, dtos: list[ProjectCreateDto], user_dto: UserIncomingDto) -> list[ProjectOutgoingDto]:
@@ -72,11 +72,11 @@ class ProjectService:
             result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[int]):
+    async def delete(self, ids: list[uuid.UUID]):
         async with session_handler(self.engine) as session:
             await ProjectRepository(session).delete(ids)
     
-    async def get(self, ids: list[int]) -> list[ProjectOutgoingDto]:
+    async def get(self, ids: list[uuid.UUID]) -> list[ProjectOutgoingDto]:
         async with session_handler(self.engine) as session:
             projects: list[Project] = await ProjectRepository(session).get(ids)
             result=ProjectMapper.to_outgoing_dtos(projects)
@@ -88,7 +88,7 @@ class ProjectService:
             result = ProjectMapper.to_outgoing_dtos(projects)
         return result
 
-    async def get_populated_projects(self, ids: list[int]) -> list[PopulatedProjectDto]:
+    async def get_populated_projects(self, ids: list[uuid.UUID]) -> list[PopulatedProjectDto]:
         async with session_handler(self.engine) as session:
             projects: list[Project] = await ProjectRepository(session).get(ids)
             result=ProjectMapper.to_populated_dtos(projects)

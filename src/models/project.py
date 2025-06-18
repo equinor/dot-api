@@ -1,5 +1,7 @@
-from sqlalchemy import String
+import uuid
+from sqlalchemy import String, UUID
 from sqlalchemy.orm import Mapped, relationship, mapped_column
+from sqlalchemy.event import listens_for
 from typing import Optional, TYPE_CHECKING
 from src.models.base import Base
 from src.models.base_auditable_entity import BaseAuditableEntity
@@ -12,7 +14,7 @@ if TYPE_CHECKING:
 class Project(Base, BaseAuditableEntity):
     __tablename__ = "project"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
     name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True)
     description: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value))
 
@@ -22,11 +24,8 @@ class Project(Base, BaseAuditableEntity):
         cascade="all, delete-orphan",
     )
 
-    def __init__(self, id: Optional[int], description: str, name: str, user_id: int, scenarios: Optional[list["Scenario"]]):
-        if id is not None:
-            self.id = id
-        else:
-            self.created_by_id = user_id
+    def __init__(self, id: uuid.UUID, description: str, name: str, user_id: int, scenarios: Optional[list["Scenario"]]):
+        self.id = id
             
         if scenarios is not None:
             self.scenarios=scenarios
@@ -37,3 +36,8 @@ class Project(Base, BaseAuditableEntity):
 
     def __repr__(self):
         return f"id: {self.id}, name: {self.name}"
+
+
+@listens_for(Project, "before_insert")
+def set_created_by_id(mapper, connection, target: Project): # type: ignore
+    target.created_by_id = target.updated_by_id

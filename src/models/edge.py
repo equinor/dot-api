@@ -1,5 +1,5 @@
-from typing import Optional
-from sqlalchemy import ForeignKey
+import uuid
+from sqlalchemy import ForeignKey, UUID
 from sqlalchemy.orm import (
     Mapped, 
     relationship, 
@@ -12,11 +12,11 @@ from src.models.scenario import Scenario
 class Edge(Base):
     __tablename__ = "edge"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
 
-    tail_id: Mapped[int] = mapped_column(ForeignKey(Node.id))
-    head_id: Mapped[int] = mapped_column(ForeignKey(Node.id))
-    scenario_id: Mapped[int] = mapped_column(ForeignKey(Scenario.id))
+    tail_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey(Node.id))
+    head_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey(Node.id))
+    scenario_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey(Scenario.id))
 
     scenario: Mapped[Scenario] = relationship(Scenario, foreign_keys=[scenario_id])
 
@@ -32,9 +32,8 @@ class Edge(Base):
         back_populates="head_edges", 
     )
 
-    def __init__(self, id: Optional[int], tail_node_id: int, head_node_id: int, scenario_id: int):
-        if id is not None:
-            self.id = id
+    def __init__(self, id: uuid.UUID, tail_node_id: uuid.UUID, head_node_id: uuid.UUID, scenario_id: uuid.UUID):
+        self.id = id
         self.tail_id = tail_node_id
         self.head_id = head_node_id
         self.scenario_id = scenario_id

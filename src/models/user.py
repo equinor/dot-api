@@ -9,7 +9,7 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value))
-    azure_id: Mapped[str] = mapped_column(unique=True)
+    azure_id: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), unique=True)
 
     def __init__(self, id: Optional[int], name: str, azure_id: str):
         if id is not None:

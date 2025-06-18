@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.opportunity_dtos import OpportunityIncomingDto, OpportunityOutgoingDto
 from src.services.opportunity_service import OpportunityService
@@ -19,7 +20,7 @@ async def create_opportunities(
 
 @router.get("/opportunities/{id}")
 async def get_opportunity(
-    id: int,
+    id: uuid.UUID,
     opportunity_service: OpportunityService = Depends(get_opportunity_service)
 ) -> OpportunityOutgoingDto:
     try:
@@ -44,7 +45,7 @@ async def get_all_opportunity(
 
 @router.delete("/opportunities/{id}")
 async def delete_opportunity(
-    id: int,
+    id: uuid.UUID,
     opportunity_service: OpportunityService = Depends(get_opportunity_service)
 ):
     try:

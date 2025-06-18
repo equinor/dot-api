@@ -1,5 +1,6 @@
+import uuid
 from typing import Optional, TYPE_CHECKING
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, ForeignKey, UUID
 from sqlalchemy.orm import (
     Mapped, 
     relationship, 
@@ -16,9 +17,9 @@ if TYPE_CHECKING:
 class Node(Base):
     __tablename__ = "node"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    scenario_id: Mapped[int] = mapped_column(ForeignKey(Scenario.id))
-    issue_id: Mapped[int] = mapped_column(ForeignKey("issue.id"))
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    scenario_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey(Scenario.id))
+    issue_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("issue.id"))
 
     name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True)
 
@@ -45,9 +46,8 @@ class Node(Base):
         single_parent=True,
     )
 
-    def __init__(self, id: Optional[int], scenario_id: int, name: str, issue_id: Optional[int], node_style: Optional["NodeStyle"]):
-        if id is not None:
-            self.id = id
+    def __init__(self, id: uuid.UUID, scenario_id: uuid.UUID, name: str, issue_id: Optional[uuid.UUID], node_style: Optional["NodeStyle"]):
+        self.id = id
         
         self.scenario_id = scenario_id
         self.name = name

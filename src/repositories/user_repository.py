@@ -5,7 +5,7 @@ from sqlalchemy import select
 from src.repositories.base_repository import BaseRepository
 from src.repositories.query_extensions import QueryExtensions
 
-class UserRepository(BaseRepository[User]):
+class UserRepository(BaseRepository[User, int]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, User, query_extension_method=QueryExtensions.empty_load)
 

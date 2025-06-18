@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.node_style import NodeStyle
@@ -27,11 +28,11 @@ class NodeStyleService:
             result: list[NodeStyleOutgoingDto] = NodeStyleMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[int]):
+    async def delete(self, ids: list[uuid.UUID]):
         async with session_handler(self.engine) as session:
             await NodeStyleRepository(session).delete(ids)
     
-    async def get(self, ids: list[int]) -> list[NodeStyleOutgoingDto]:
+    async def get(self, ids: list[uuid.UUID]) -> list[NodeStyleOutgoingDto]:
         async with session_handler(self.engine) as session:
             node_styles: list[NodeStyle] = await NodeStyleRepository(session).get(ids)
             result=NodeStyleMapper.to_outgoing_dtos(node_styles)

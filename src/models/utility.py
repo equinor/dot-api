@@ -1,5 +1,6 @@
-from typing import Optional, TYPE_CHECKING
-from sqlalchemy import String, ForeignKey
+import uuid
+from typing import TYPE_CHECKING
+from sqlalchemy import String, ForeignKey, UUID
 from sqlalchemy.orm import (
     Mapped, 
     relationship,
@@ -12,15 +13,13 @@ if TYPE_CHECKING:
 
 class Utility(Base):
     __tablename__ = "utility"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    issue_id: Mapped[int] = mapped_column(ForeignKey("issue.id"))
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    issue_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("issue.id"))
 
     values: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="")
     issue: Mapped["Issue"] = relationship("Issue", back_populates="utility")
 
-    def __init__(self, id: Optional[int], values: str, issue_id: Optional[int]):
-        if id is not None:
-            self.id = id
-        if issue_id:
-            self.issue_id=issue_id
+    def __init__(self, id: uuid.UUID, values: str, issue_id: uuid.UUID):
+        self.id = id
+        self.issue_id=issue_id
         self.values = values

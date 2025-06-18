@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.uncertainty import Uncertainty
@@ -27,11 +28,11 @@ class UncertaintyService:
             result: list[UncertaintyOutgoingDto] = UncertaintyMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[int]):
+    async def delete(self, ids: list[uuid.UUID]):
         async with session_handler(self.engine) as session:
             await UncertaintyRepository(session).delete(ids)
     
-    async def get(self, ids: list[int]) -> list[UncertaintyOutgoingDto]:
+    async def get(self, ids: list[uuid.UUID]) -> list[UncertaintyOutgoingDto]:
         async with session_handler(self.engine) as session:
             decisions: list[Uncertainty] = await UncertaintyRepository(session).get(ids)
             result=UncertaintyMapper.to_outgoing_dtos(decisions)

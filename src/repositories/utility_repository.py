@@ -1,9 +1,10 @@
+import uuid
 from src.models.utility import Utility
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.base_repository import BaseRepository
 from src.repositories.query_extensions import QueryExtensions
 
-class UtilityRepository(BaseRepository[Utility]):
+class UtilityRepository(BaseRepository[Utility, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Utility, query_extension_method=QueryExtensions.empty_load)
 

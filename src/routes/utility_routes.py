@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.utility_dtos import UtilityIncomingDto, UtilityOutgoingDto
 from src.services.utility_service import UtilityService
@@ -7,7 +8,7 @@ router = APIRouter(tags=["utilities"])
 
 @router.get("/utilities/{id}")
 async def get_utility(
-    id: int,
+    id: uuid.UUID,
     utility_service: UtilityService = Depends(get_utility_service)
 ) -> UtilityOutgoingDto:
     try:
@@ -32,7 +33,7 @@ async def get_all_utility(
 
 @router.delete("/utilities/{id}")
 async def delete_utility(
-    id: int,
+    id: uuid.UUID,
     utility_service: UtilityService = Depends(get_utility_service)
 ):
     try:

@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.value_metric import ValueMetric
@@ -27,11 +28,11 @@ class ValueMetricService:
             result: list[ValueMetricOutgoingDto] = ValueMetricMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[int]):
+    async def delete(self, ids: list[uuid.UUID]):
         async with session_handler(self.engine) as session:
             await ValueMetricRepository(session).delete(ids)
     
-    async def get(self, ids: list[int]) -> list[ValueMetricOutgoingDto]:
+    async def get(self, ids: list[uuid.UUID]) -> list[ValueMetricOutgoingDto]:
         async with session_handler(self.engine) as session:
             entities: list[ValueMetric] = await ValueMetricRepository(session).get(ids)
             result=ValueMetricMapper.to_outgoing_dtos(entities)

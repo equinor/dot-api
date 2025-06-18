@@ -1,5 +1,5 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncEngine
-
 from src.models.edge import Edge
 from src.dtos.edge_dtos import (
     EdgeMapper,
@@ -27,11 +27,11 @@ class EdgeService:
             result: list[EdgeOutgoingDto] = EdgeMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[int]):
+    async def delete(self, ids: list[uuid.UUID]):
         async with session_handler(self.engine) as session:
             await EdgeRepository(session).delete(ids)
     
-    async def get(self, ids: list[int]) -> list[EdgeOutgoingDto]:
+    async def get(self, ids: list[uuid.UUID]) -> list[EdgeOutgoingDto]:
         async with session_handler(self.engine) as session:
             edges: list[Edge] = await EdgeRepository(session).get(ids)
             result=EdgeMapper.to_outgoing_dtos(edges)

@@ -1,15 +1,16 @@
+import uuid
 from src.models.project import Project
 from src.repositories.query_extensions import QueryExtensions
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.base_repository import BaseRepository
 from src.repositories.query_extensions import QueryExtensions
 
-class ProjectRepository(BaseRepository[Project]):
+class ProjectRepository(BaseRepository[Project, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Project, query_extension_method=QueryExtensions.load_project_with_relationships)
 
     async def update(self, entities: list[Project]) -> list[Project]:
-        entities_to_update=await self.get([decision.id for decision in entities])
+        entities_to_update=await self.get([entity.id for entity in entities])
 
         for n, entity_to_update in enumerate(entities_to_update):
             entity=entities[n]

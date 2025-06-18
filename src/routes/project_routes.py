@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.project_dtos import (
     ProjectIncomingDto, 
@@ -29,7 +30,7 @@ async def create_projects(
 
 @router.get("/projects/{id}")
 async def get_project(
-    id: int,
+    id: uuid.UUID,
     project_service: ProjectService = Depends(get_project_service),
 ) -> ProjectOutgoingDto:
     try:
@@ -44,7 +45,7 @@ async def get_project(
     
 @router.get("/projects-populated/{id}")
 async def get_populated_project(
-    id: int,
+    id: uuid.UUID,
     project_service: ProjectService = Depends(get_project_service),
 ) -> PopulatedProjectDto:
     try:
@@ -69,7 +70,7 @@ async def get_all_project(
 
 @router.delete("/projects/{id}")
 async def delete_project(
-    id: int,
+    id: uuid.UUID,
     project_service: ProjectService = Depends(get_project_service)
 ):
     try:

@@ -1,19 +1,20 @@
-from pydantic import BaseModel
-from typing import Optional, List
+import uuid
+from pydantic import BaseModel, Field
+from typing import List
 from src.models.uncertainty import (
     Uncertainty
 )
 
 class UncertaintyDto(BaseModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    issue_id: uuid.UUID
     probabilities: List[float]
 
 class UncertaintyIncomingDto(UncertaintyDto):
-    id: Optional[int]
-    issue_id: Optional[int]
+    pass
 
 class UncertaintyOutgoingDto(UncertaintyDto):
-    id: int
-    issue_id: int
+    pass
 
 class UncertaintyMapper:
     @staticmethod
@@ -28,7 +29,7 @@ class UncertaintyMapper:
     def to_entity(dto: UncertaintyIncomingDto) -> Uncertainty:
         return Uncertainty(
             id=dto.id,
-            issue_id=dto.issue_id if dto.issue_id else None,
+            issue_id=dto.issue_id,
             probabilities=",".join(map(str, dto.probabilities))
         )
     

@@ -1,5 +1,5 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncEngine
-
 from src.models.decision import Decision
 from src.dtos.decision_dtos import (
     DecisionIncomingDto, 
@@ -27,11 +27,11 @@ class DecisionService:
             result: list[DecisionOutgoingDto] = DecisionMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[int]):
+    async def delete(self, ids: list[uuid.UUID]):
         async with session_handler(self.engine) as session:
             await DecisionRepository(session).delete(ids)
     
-    async def get(self, ids: list[int]) -> list[DecisionOutgoingDto]:
+    async def get(self, ids: list[uuid.UUID]) -> list[DecisionOutgoingDto]:
         async with session_handler(self.engine) as session:
             decisions: list[Decision] = await DecisionRepository(session).get(ids)
             result=DecisionMapper.to_outgoing_dtos(decisions)

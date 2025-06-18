@@ -1,19 +1,20 @@
-from pydantic import BaseModel
-from typing import Optional, List
+import uuid
+from pydantic import BaseModel, Field
+from typing import List
 from src.models.utility import (
     Utility
 )
 
 class UtilityDto(BaseModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    issue_id: uuid.UUID
     values: List[float]
 
 class UtilityIncomingDto(UtilityDto):
-    id: Optional[int]
-    issue_id: Optional[int]
+    pass
 
 class UtilityOutgoingDto(UtilityDto):
-    id: int
-    issue_id: int
+    pass
 
 class UtilityMapper:
     @staticmethod
@@ -28,7 +29,7 @@ class UtilityMapper:
     def to_entity(dto: UtilityIncomingDto) -> Utility:
         return Utility(
             id=dto.id,
-            issue_id=dto.issue_id if dto.issue_id else None,
+            issue_id=dto.issue_id,
             values=",".join(map(str, dto.values))
         )
     

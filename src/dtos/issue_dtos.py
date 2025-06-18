@@ -1,3 +1,4 @@
+import uuid
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, Annotated
 from src.constants import (
@@ -36,7 +37,8 @@ from src.dtos.node_dtos import (
 from src.constants import DatabaseConstants
 
 class IssueDto(BaseModel):
-    scenario_id: int
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    scenario_id: uuid.UUID
     name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
     description: Annotated[str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)] = ""
     order: int
@@ -44,7 +46,6 @@ class IssueDto(BaseModel):
 class IssueIncomingDto(IssueDto):
     model_config=ConfigDict(use_enum_values=True)
 
-    id: Optional[int]
     type: Type = Type.UNDECIDED
     boundary: Boundary = Boundary.OUT
     node: Optional[NodeIncomingDto]
@@ -54,7 +55,6 @@ class IssueIncomingDto(IssueDto):
     value_metric: Optional[ValueMetricIncomingDto]
 
 class IssueOutgoingDto(IssueDto):
-    id: int
     type: str
     boundary: str
     node: NodeViaIssueOutgoingDto
@@ -64,7 +64,6 @@ class IssueOutgoingDto(IssueDto):
     value_metric: Optional[ValueMetricOutgoingDto]
 
 class IssueViaNodeOutgoingDto(IssueDto):
-    id: int
     type: str
     boundary: str
     decision: Optional[DecisionOutgoingDto]
@@ -130,5 +129,5 @@ class IssueMapper:
     @staticmethod
     def to_entities(dtos: list[IssueIncomingDto], user_id: int) -> list[Issue]:
         return [IssueMapper.to_entity(dto, user_id) for dto in dtos]
-    
+
 NodeOutgoingDto.model_rebuild()

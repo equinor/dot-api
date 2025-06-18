@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.node_style_dtos import NodeStyleIncomingDto, NodeStyleOutgoingDto
 from src.services.node_style_service import NodeStyleService
@@ -7,7 +8,7 @@ router = APIRouter(tags=["node_styles"])
 
 @router.get("/node-styles/{id}")
 async def get_node_style(
-    id: int,
+    id: uuid.UUID,
     node_style_service: NodeStyleService = Depends(get_node_style_service)
 ) -> NodeStyleOutgoingDto:
     try:
@@ -32,7 +33,7 @@ async def get_all_node_style(
 
 @router.delete("/node-styles/{id}")
 async def delete_node_style(
-    id: int,
+    id: uuid.UUID,
     node_style_service: NodeStyleService = Depends(get_node_style_service)
 ):
     try:

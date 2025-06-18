@@ -1,3 +1,4 @@
+import uuid
 from pydantic import BaseModel, Field
 from typing import Optional, Annotated, TYPE_CHECKING
 from src.models.node import (
@@ -16,23 +17,19 @@ if TYPE_CHECKING:
     )
 
 class NodeDto(BaseModel):
-    scenario_id: int
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    scenario_id: uuid.UUID
+    issue_id: uuid.UUID
     name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
 
 class NodeIncomingDto(NodeDto):
-    id: Optional[int]    
-    issue_id: Optional[int]
     node_style: Optional[NodeStyleIncomingDto]
 
 class NodeOutgoingDto(NodeDto):
-    id: int
-    issue_id: int
     issue: "IssueViaNodeOutgoingDto"
     node_style: NodeStyleOutgoingDto
 
 class NodeViaIssueOutgoingDto(NodeDto):
-    id: int
-    issue_id: int
     node_style: NodeStyleOutgoingDto
 
 class NodeMapper:
