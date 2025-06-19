@@ -1,20 +1,20 @@
-from pydantic import BaseModel
+import uuid
+from pydantic import BaseModel, Field
 from src.models.edge import (
     Edge
 )
-from typing import Optional
 
-# Edge DTOs
 class EdgeDto(BaseModel):
-    tail_id: int
-    head_id: int
-    scenario_id: int
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    tail_id: uuid.UUID
+    head_id: uuid.UUID
+    scenario_id: uuid.UUID
 
 class EdgeIncomingDto(EdgeDto):
-    id: Optional[int]
+    pass
 
 class EdgeOutgoingDto(EdgeDto):
-    id: int
+    pass
 
 class EdgeMapper:
     @staticmethod

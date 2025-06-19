@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.opportunity import Opportunity
@@ -34,11 +35,11 @@ class OpportunityService:
             result: list[OpportunityOutgoingDto] = OpportunityMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[int]):
+    async def delete(self, ids: list[uuid.UUID]):
         async with session_handler(self.engine) as session:
             await OpportunityRepository(session).delete(ids)
     
-    async def get(self, ids: list[int]) -> list[OpportunityOutgoingDto]:
+    async def get(self, ids: list[uuid.UUID]) -> list[OpportunityOutgoingDto]:
         async with session_handler(self.engine) as session:
             opportunities: list[Opportunity] = await OpportunityRepository(session).get(ids)
             result=OpportunityMapper.to_outgoing_dtos(opportunities)

@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.uncertainty_dtos import UncertaintyIncomingDto, UncertaintyOutgoingDto
 from src.services.uncertainty_service import UncertaintyService
@@ -7,7 +8,7 @@ router = APIRouter(tags=["uncertainties"])
 
 @router.get("/uncertainties/{id}")
 async def get_uncertainty(
-    id: int,
+    id: uuid.UUID,
     uncertainty_service: UncertaintyService = Depends(get_uncertainty_service)
 ) -> UncertaintyOutgoingDto:
     try:
@@ -32,7 +33,7 @@ async def get_all_uncertainty(
 
 @router.delete("/uncertainties/{id}")
 async def delete_uncertainty(
-    id: int,
+    id: uuid.UUID,
     uncertainty_service: UncertaintyService = Depends(get_uncertainty_service)
 ):
     try:

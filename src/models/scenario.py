@@ -1,11 +1,14 @@
-from typing import Optional, TYPE_CHECKING
-from sqlalchemy import String, ForeignKey
+from typing import TYPE_CHECKING
+import uuid
+from sqlalchemy import String, ForeignKey, UUID
 from sqlalchemy.orm import (
     Mapped, 
     relationship, 
     mapped_column,
 )
 from src.models.base import Base
+from sqlalchemy.event import listens_for
+
 if TYPE_CHECKING:
     from src.models.node import Node
     from src.models.edge import Edge
@@ -19,8 +22,8 @@ from src.constants import DatabaseConstants
 class Scenario(Base, BaseAuditableEntity):
     __tablename__ = "scenario"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    project_id: Mapped[int] = mapped_column(ForeignKey(Project.id), index=True)
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey(Project.id), index=True)
 
     name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True, default="")
 
@@ -52,12 +55,8 @@ class Scenario(Base, BaseAuditableEntity):
         cascade="all, delete-orphan",
     )
 
-    def __init__(self, id: Optional[int], name: str, project_id: int, user_id: int, objectives: list["Objective"], opportunities: list["Opportunity"]):
-        if id is not None:
-            self.id = id
-        else:
-            self.created_by_id = user_id
-
+    def __init__(self, id: uuid.UUID, name: str, project_id: uuid.UUID, user_id: int, objectives: list["Objective"], opportunities: list["Opportunity"]):
+        self.id = id
         self.name = name
         self.project_id = project_id
         self.updated_by_id = user_id
@@ -66,3 +65,7 @@ class Scenario(Base, BaseAuditableEntity):
 
     def __repr__(self):
         return f"id: {self.id}, name: {self.name}"
+
+@listens_for(Scenario, "before_insert")
+def set_created_by_id(mapper, connection, target: Scenario): # type: ignore
+    target.created_by_id = target.updated_by_id

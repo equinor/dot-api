@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from typing import Optional
 
@@ -57,8 +58,8 @@ class IssueService:
             if dto.node:
                 nodes.append(dto.node)
             else:
-                # issue id is set later
-                nodes.append(NodeIncomingDto(scenario_id=dto.scenario_id, issue_id=None, id=None, node_style=NodeStyleIncomingDto()))
+                node_id = uuid.uuid4()
+                nodes.append(NodeIncomingDto(id=node_id, scenario_id=dto.scenario_id, issue_id=dto.id, node_style=NodeStyleIncomingDto(node_id=node_id)))
 
             decisions.append(dto.decision)
             uncertainties.append(dto.uncertainty)
@@ -113,11 +114,11 @@ class IssueService:
             result: list[IssueOutgoingDto] = IssueMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[int]):
+    async def delete(self, ids: list[uuid.UUID]):
         async with session_handler(self.engine) as session:
             await IssueRepository(session).delete(ids)
     
-    async def get(self, ids: list[int]) -> list[IssueOutgoingDto]:
+    async def get(self, ids: list[uuid.UUID]) -> list[IssueOutgoingDto]:
         async with session_handler(self.engine) as session:
             issues: list[Issue] = await IssueRepository(session).get(ids)
             result=IssueMapper.to_outgoing_dtos(issues)

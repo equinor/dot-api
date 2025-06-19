@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.scenario import Scenario
@@ -37,7 +38,7 @@ class ScenarioService:
             # create objectives/opportunities
             for entity, dto in zip(entities, dtos):
                 objectives=await ObjectiveRepository(session).create(ObjectiveMapper.via_scenario_to_entities(dto.objectives, user.id, entity.id))
-                opportunities=await OpportunityRepository(session).create(OpportunityMapper.via_project_to_entities(dto.opportunities, user.id, entity.id))
+                opportunities=await OpportunityRepository(session).create(OpportunityMapper.via_scenario_to_entities(dto.opportunities, user.id, entity.id))
 
                 entity.objectives=objectives
                 entity.opportunities=opportunities
@@ -54,17 +55,17 @@ class ScenarioService:
             result: list[ScenarioOutgoingDto] = ScenarioMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[int]):
+    async def delete(self, ids: list[uuid.UUID]):
         async with session_handler(self.engine) as session:
             await ScenarioRepository(session).delete(ids)
                 
-    async def get(self, ids: list[int]) -> list[ScenarioOutgoingDto]:
+    async def get(self, ids: list[uuid.UUID]) -> list[ScenarioOutgoingDto]:
         async with session_handler(self.engine) as session:
             scenarios: list[Scenario] = await ScenarioRepository(session).get(ids)
             result=ScenarioMapper.to_outgoing_dtos(scenarios)
         return result
     
-    async def get_populated(self, ids: list[int]) -> list[PopulatedScenarioDto]:
+    async def get_populated(self, ids: list[uuid.UUID]) -> list[PopulatedScenarioDto]:
         async with session_handler(self.engine) as session:
             scenarios: list[Scenario] = await ScenarioRepository(session).get(ids)
             result=ScenarioMapper.to_populated_dtos(scenarios)

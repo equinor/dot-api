@@ -1,11 +1,13 @@
+import uuid
 from pydantic import BaseModel, Field
-from typing import Optional, Annotated
+from typing import Annotated
 from src.models.objective import (
     Objective
 )
 from src.constants import DatabaseConstants
 
 class ObjectiveDto(BaseModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
     name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)]
     description: Annotated[str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)]
 
@@ -16,19 +18,17 @@ class ObjectiveViaScenarioDto(ObjectiveDto):
     pass
 
 class ObjectiveIncomingDto(ObjectiveDto):
-    id: Optional[int]
-    scenario_id: int
+    scenario_id: uuid.UUID
 
 class ObjectiveOutgoingDto(ObjectiveDto):
-    id: int
-    scenario_id: int
+    scenario_id: uuid.UUID
 
 class ObjectiveMapper:
     @staticmethod
-    def via_scenario_to_entity(dto: ObjectiveViaScenarioDto, user_id: int, project_id: int) -> Objective:
+    def via_scenario_to_entity(dto: ObjectiveViaScenarioDto, user_id: int, senario_id: uuid.UUID) -> Objective:
         return Objective(
-            id=None,
-            scenario_id=project_id,
+            id=dto.id,
+            scenario_id=senario_id,
             name=dto.name,
             description=dto.description,
             user_id=user_id,
@@ -54,8 +54,8 @@ class ObjectiveMapper:
         )
     
     @staticmethod
-    def via_scenario_to_entities(dtos: list[ObjectiveViaScenarioDto], user_id: int, project_id: int) -> list[Objective]:
-        return [ObjectiveMapper.via_scenario_to_entity(dto, user_id, project_id) for dto in dtos]
+    def via_scenario_to_entities(dtos: list[ObjectiveViaScenarioDto], user_id: int, scenario_id: uuid.UUID) -> list[Objective]:
+        return [ObjectiveMapper.via_scenario_to_entity(dto, user_id, scenario_id) for dto in dtos]
     
     @staticmethod
     def to_outgoing_dtos(entities: list[Objective]) -> list[ObjectiveOutgoingDto]:

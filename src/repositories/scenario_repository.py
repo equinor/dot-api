@@ -1,10 +1,11 @@
+import uuid
 from src.models.scenario import Scenario
 from src.repositories.query_extensions import QueryExtensions
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.base_repository import BaseRepository
 from src.repositories.query_extensions import QueryExtensions
 
-class ScenarioRepository(BaseRepository[Scenario]):
+class ScenarioRepository(BaseRepository[Scenario, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Scenario, query_extension_method=QueryExtensions.load_scenario_with_relationships)
     

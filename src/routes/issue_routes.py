@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.issue_dtos import IssueIncomingDto, IssueOutgoingDto
 from src.services.issue_service import IssueService
@@ -25,7 +26,7 @@ async def create_issues(
 
 @router.get("/issues/{id}")
 async def get_issue(
-    id: int,
+    id: uuid.UUID,
     issue_service: IssueService = Depends(get_issue_service)
 ) -> IssueOutgoingDto:
     try:
@@ -50,7 +51,7 @@ async def get_all_issue(
 
 @router.delete("/issues/{id}")
 async def delete_issue(
-    id: int,
+    id: uuid.UUID,
     issue_service: IssueService = Depends(get_issue_service)
 ):
     try:

@@ -2,17 +2,18 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
 from sqlalchemy.orm.strategy_options import _AbstractLoad # type: ignore
-from typing import Type, TypeVar, Generic, List, Protocol, Callable
-from typing import List
+from typing import Type, TypeVar, Generic, List, Protocol, Callable, Union
+import uuid
 
 LoadOptions = List[_AbstractLoad]
 
 class AlchemyModel(Protocol):
-    id: InstrumentedAttribute[int]
+    id: InstrumentedAttribute[Union[int, uuid.UUID]]
 
 T = TypeVar('T', bound=AlchemyModel)
+IDType = TypeVar('IDType', int, uuid.UUID)
 
-class BaseRepository(Generic[T]):
+class BaseRepository(Generic[T, IDType]):
     def __init__(self, session: AsyncSession, model: Type[T], query_extension_method: Callable[[], LoadOptions]):
         self.session = session
         self.model = model
@@ -28,7 +29,7 @@ class BaseRepository(Generic[T]):
         await self.session.flush()
         return entity
 
-    async def get(self, ids: List[int]) -> List[T]:
+    async def get(self, ids: List[IDType]) -> List[T]:
         query = select(self.model).where(self.model.id.in_(ids)).options(
             *self.query_extension_method()
         )
@@ -40,7 +41,7 @@ class BaseRepository(Generic[T]):
         )
         return list((await self.session.scalars(query)).all())
 
-    async def delete(self, ids: List[int]) -> None:
+    async def delete(self, ids: List[IDType]) -> None:
         entities = await self.get(ids)
         for entity in entities:
             await self.session.delete(entity)

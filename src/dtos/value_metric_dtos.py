@@ -1,19 +1,19 @@
-from pydantic import BaseModel
-from typing import Optional
+import uuid
+from pydantic import BaseModel, Field
 from src.models.value_metric import (
     ValueMetric
 )
 
 class ValueMetricDto(BaseModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    issue_id: uuid.UUID
     name: str
 
 class ValueMetricIncomingDto(ValueMetricDto):
-    id: Optional[int]
-    issue_id: Optional[int]
+    pass
 
 class ValueMetricOutgoingDto(ValueMetricDto):
-    id: int
-    issue_id: int
+    pass
 
 class ValueMetricMapper:
     @staticmethod
@@ -28,7 +28,7 @@ class ValueMetricMapper:
     def to_entity(dto: ValueMetricIncomingDto) -> ValueMetric:
         return ValueMetric(
             id=dto.id,
-            issue_id=dto.issue_id if dto.issue_id else None,
+            issue_id=dto.issue_id,
             name=dto.name,
         )
     

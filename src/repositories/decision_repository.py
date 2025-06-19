@@ -1,9 +1,10 @@
+import uuid
 from src.models.decision import Decision
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.base_repository import BaseRepository
 from src.repositories.query_extensions import QueryExtensions
 
-class DecisionRepository(BaseRepository[Decision]):
+class DecisionRepository(BaseRepository[Decision, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Decision, query_extension_method=QueryExtensions.empty_load)
 

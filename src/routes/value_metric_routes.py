@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.value_metric_dtos import ValueMetricIncomingDto, ValueMetricOutgoingDto
 from src.services.value_metric_service import ValueMetricService
@@ -7,7 +8,7 @@ router = APIRouter(tags=["value-metrics"])
 
 @router.get("/value-metrics/{id}")
 async def get_value_metric(
-    id: int,
+    id: uuid.UUID,
     value_metric_service: ValueMetricService = Depends(get_value_metric_service)
 ) -> ValueMetricOutgoingDto:
     try:
@@ -32,7 +33,7 @@ async def get_all_value_metric(
 
 @router.delete("/value-metrics/{id}")
 async def delete_value_metric(
-    id: int,
+    id: uuid.UUID,
     value_metric_service: ValueMetricService = Depends(get_value_metric_service)
 ):
     try:

@@ -1,9 +1,10 @@
+import uuid
 from src.models.opportunity import Opportunity
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.base_repository import BaseRepository
 from src.repositories.query_extensions import QueryExtensions
 
-class OpportunityRepository(BaseRepository[Opportunity]):
+class OpportunityRepository(BaseRepository[Opportunity, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Opportunity, query_extension_method=QueryExtensions.empty_load)
 

@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.edge_dtos import (
     EdgeIncomingDto,
@@ -20,7 +21,7 @@ async def create_edges(
 
 @router.get("/edges/{id}")
 async def get_edge(
-    id: int,
+    id: uuid.UUID,
     edge_service: EdgeService = Depends(get_edge_service)
 ) -> EdgeOutgoingDto:
     try:
@@ -45,7 +46,7 @@ async def get_all_edge(
 
 @router.delete("/edges/{id}")
 async def delete_edge(
-    id: int,
+    id: uuid.UUID,
     edge_service: EdgeService = Depends(get_edge_service)
 ):
     try:

@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.objective import Objective
@@ -34,11 +35,11 @@ class ObjectiveService:
             result: list[ObjectiveOutgoingDto] = ObjectiveMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[int]):
+    async def delete(self, ids: list[uuid.UUID]):
         async with session_handler(self.engine) as session:
             await ObjectiveRepository(session).delete(ids)
     
-    async def get(self, ids: list[int]) -> list[ObjectiveOutgoingDto]:
+    async def get(self, ids: list[uuid.UUID]) -> list[ObjectiveOutgoingDto]:
         async with session_handler(self.engine) as session:
             objectives: list[Objective] = await ObjectiveRepository(session).get(ids)
             result=ObjectiveMapper.to_outgoing_dtos(objectives)

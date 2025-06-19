@@ -1,19 +1,19 @@
-from pydantic import BaseModel
-from typing import Optional
+import uuid
+from pydantic import BaseModel, Field
 
 from src.models import NodeStyle
 
 class NodeStyleDto(BaseModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    node_id: uuid.UUID
     x_position: int = 0
     y_position: int = 0
 
 class NodeStyleIncomingDto(NodeStyleDto):
-    id: Optional[int] = None
-    node_id: Optional[int] = None
+    pass
 
 class NodeStyleOutgoingDto(NodeStyleDto):
-    id: int
-    node_id: int
+    pass
 
 class NodeStyleMapper:
     @staticmethod

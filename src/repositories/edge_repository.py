@@ -1,9 +1,10 @@
+import uuid
 from src.models.edge import Edge
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.base_repository import BaseRepository
 from src.repositories.query_extensions import QueryExtensions
 
-class EdgeRepository(BaseRepository[Edge]):
+class EdgeRepository(BaseRepository[Edge, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, Edge, query_extension_method=QueryExtensions.empty_load)
 

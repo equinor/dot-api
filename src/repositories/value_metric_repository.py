@@ -1,9 +1,10 @@
+import uuid
 from src.models.value_metric import ValueMetric
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.base_repository import BaseRepository
 from src.repositories.query_extensions import QueryExtensions
 
-class ValueMetricRepository(BaseRepository[ValueMetric]):
+class ValueMetricRepository(BaseRepository[ValueMetric, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, ValueMetric, query_extension_method=QueryExtensions.empty_load)
 

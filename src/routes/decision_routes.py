@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.decision_dtos import DecisionIncomingDto, DecisionOutgoingDto
 from src.services.decision_service import DecisionService
@@ -7,7 +8,7 @@ router = APIRouter(tags=["decisions"])
 
 @router.get("/decisions/{id}")
 async def get_decision(
-    id: int,
+    id: uuid.UUID,
     decision_service: DecisionService = Depends(get_decision_service)
 ) -> DecisionOutgoingDto:
     try:
@@ -32,7 +33,7 @@ async def get_all_decision(
 
 @router.delete("/decisions/{id}")
 async def delete_decision(
-    id: int,
+    id: uuid.UUID,
     decision_service: DecisionService = Depends(get_decision_service)
 ):
     try:

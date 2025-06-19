@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.scenario_dtos import (
     ScenarioIncomingDto, 
@@ -28,7 +29,7 @@ async def create_scenarios(
 
 @router.get("/scenarios/{id}")
 async def get_scenario(
-    id: int,
+    id: uuid.UUID,
     scenario_service: ScenarioService = Depends(get_scenario_service)
 ) -> ScenarioOutgoingDto:
     try:
@@ -43,7 +44,7 @@ async def get_scenario(
     
 @router.get("/scenarios-populated/{id}")
 async def get_scenario_populated(
-    id: int,
+    id: uuid.UUID,
     scenario_service: ScenarioService = Depends(get_scenario_service)
 ) -> PopulatedScenarioDto:
     try:
@@ -68,7 +69,7 @@ async def get_all_scenario(
 
 @router.delete("/scenarios/{id}")
 async def delete_scenario(
-    id: int,
+    id: uuid.UUID,
     scenario_service: ScenarioService = Depends(get_scenario_service)
 ):
     try:

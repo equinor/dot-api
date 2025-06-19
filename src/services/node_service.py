@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.node import Node
@@ -27,11 +28,11 @@ class NodeService:
             result: list[NodeOutgoingDto] = NodeMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[int]):
+    async def delete(self, ids: list[uuid.UUID]):
         async with session_handler(self.engine) as session:
             await NodeRepository(session).delete(ids)
     
-    async def get(self, ids: list[int]) -> list[NodeOutgoingDto]:
+    async def get(self, ids: list[uuid.UUID]) -> list[NodeOutgoingDto]:
         async with session_handler(self.engine) as session:
             nodes: list[Node] = await NodeRepository(session).get(ids)
             result=NodeMapper.to_outgoing_dtos(nodes)

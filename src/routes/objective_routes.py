@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.objective_dtos import ObjectiveIncomingDto, ObjectiveOutgoingDto
 from src.services.objective_service import ObjectiveService
@@ -19,7 +20,7 @@ async def create_objectives(
 
 @router.get("/objectives/{id}")
 async def get_objective(
-    id: int,
+    id: uuid.UUID,
     objective_service: ObjectiveService = Depends(get_objective_service)
 ) -> ObjectiveOutgoingDto:
     try:
@@ -44,7 +45,7 @@ async def get_all_objective(
 
 @router.delete("/objectives/{id}")
 async def delete_objective(
-    id: int,
+    id: uuid.UUID,
     objective_service: ObjectiveService = Depends(get_objective_service)
 ):
     try:

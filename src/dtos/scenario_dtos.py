@@ -1,5 +1,6 @@
+import uuid
 from pydantic import BaseModel, Field
-from typing import Optional, Annotated
+from typing import Annotated
 from src.models.scenario import (
     Scenario
 )
@@ -26,41 +27,40 @@ from src.dtos.edge_dtos import (
 from src.constants import DatabaseConstants
 
 class ScenarioDto(BaseModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
     name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
 
 class ScenarioCreateViaProjectDto(ScenarioDto):
-    project_id: Optional[int]
     objectives: list[ObjectiveViaScenarioDto]
     opportunities: list[OpportunityViaProjectDto]
 
 class ScenarioCreateDto(ScenarioDto):
-    project_id: int
+    project_id: uuid.UUID
     objectives: list[ObjectiveViaScenarioDto]
     opportunities: list[OpportunityViaProjectDto]
 
 class ScenarioIncomingDto(ScenarioDto):
-    id: Optional[int]
-    project_id: int
+    project_id: uuid.UUID
     objectives: list[ObjectiveIncomingDto]
     opportunities: list[OpportunityIncomingDto]
 
 class ScenarioOutgoingDto(ScenarioDto):
-    id: int
-    project_id: int
+    project_id: uuid.UUID
     objectives: list[ObjectiveOutgoingDto]
     opportunities: list[OpportunityOutgoingDto]
 
 class PopulatedScenarioDto(ScenarioOutgoingDto):
+    project_id: uuid.UUID
     edges: list[EdgeOutgoingDto]
     issues: list[IssueOutgoingDto]
 
 class ScenarioMapper:
     @staticmethod
-    def from_create_via_project_to_entity(dto: ScenarioCreateViaProjectDto, user_id: int, project_id: int) -> Scenario:
+    def from_create_via_project_to_entity(dto: ScenarioCreateViaProjectDto, user_id: int, project_id: uuid.UUID) -> Scenario:
         return Scenario(
-            id=None,
+            id=dto.id,
             name=dto.name,
-            project_id=dto.project_id if dto.project_id is not None else project_id,
+            project_id=project_id,
             user_id=user_id,
             opportunities=[], # must create the scenario first
             objectives=[], # must create the scenario first
@@ -69,7 +69,7 @@ class ScenarioMapper:
     @staticmethod
     def from_create_to_entity(dto: ScenarioCreateDto, user_id: int) -> Scenario:
         return Scenario(
-            id=None,
+            id=dto.id,
             name=dto.name,
             project_id=dto.project_id,
             user_id=user_id,
@@ -111,7 +111,7 @@ class ScenarioMapper:
         )
 
     @staticmethod
-    def from_create_via_project_to_entities(dtos: list[ScenarioCreateViaProjectDto], user_id: int, project_id: int) -> list[Scenario]:
+    def from_create_via_project_to_entities(dtos: list[ScenarioCreateViaProjectDto], user_id: int, project_id: uuid.UUID) -> list[Scenario]:
         return [ScenarioMapper.from_create_via_project_to_entity(dto, user_id, project_id) for dto in dtos]
         
     @staticmethod

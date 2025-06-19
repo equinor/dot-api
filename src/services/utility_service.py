@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.utility import Utility
@@ -27,11 +28,11 @@ class UtilityService:
             result: list[UtilityOutgoingDto] = UtilityMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[int]):
+    async def delete(self, ids: list[uuid.UUID]):
         async with session_handler(self.engine) as session:
             await UtilityRepository(session).delete(ids)
     
-    async def get(self, ids: list[int]) -> list[UtilityOutgoingDto]:
+    async def get(self, ids: list[uuid.UUID]) -> list[UtilityOutgoingDto]:
         async with session_handler(self.engine) as session:
             entities: list[Utility] = await UtilityRepository(session).get(ids)
             result=UtilityMapper.to_outgoing_dtos(entities)

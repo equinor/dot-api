@@ -1,20 +1,21 @@
+import uuid
 from pydantic import BaseModel, Field
-from typing import Optional, List, Annotated
+from typing import List, Annotated
 from src.models.decision import (
     Decision
 )
 from src.constants import DatabaseConstants
 
 class DecisionDto(BaseModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    issue_id: uuid.UUID
     alternatives: List[Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)]] = [""]
 
 class DecisionIncomingDto(DecisionDto):
-    id: Optional[int] = Field(default=None, gt=0)
-    issue_id: Optional[int]
+    pass
 
 class DecisionOutgoingDto(DecisionDto):
-    id: int
-    issue_id: int
+    pass
 
 
 class DecisionMapper:
@@ -30,7 +31,7 @@ class DecisionMapper:
     def to_entity(dto: DecisionIncomingDto) -> Decision:
         return Decision(
             id=dto.id,
-            issue_id=dto.issue_id if dto.issue_id else None,
+            issue_id=dto.issue_id,
             alternatives=",".join(dto.alternatives)
         )
 
