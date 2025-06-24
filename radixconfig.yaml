@@ -59,3 +59,6 @@ spec:
             REDIRECT_URL: 'https://api-dot-api-dev.radix.equinor.com/docs/oauth2-redirect'
             AUDIENCE: "api://4251833c-b9c3-4013-afda-cbfd2cc50f3f"
             APP_ENV: 'dev'
+          identity:
+            azure:
+              clientId: c0d1f6a5-93b5-432b-8c2e-bf26583a7626
