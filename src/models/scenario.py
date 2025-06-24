@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 import uuid
-from sqlalchemy import String, ForeignKey, UUID
+from sqlalchemy.dialects.mssql import UNIQUEIDENTIFIER
+from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import (
     Mapped, 
     relationship, 
@@ -22,7 +23,7 @@ from src.constants import DatabaseConstants
 class Scenario(Base, BaseAuditableEntity):
     __tablename__ = "scenario"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(UNIQUEIDENTIFIER(as_uuid=True), primary_key=True)
     project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey(Project.id), index=True)
 
     name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True, default="")

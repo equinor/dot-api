@@ -1,5 +1,6 @@
 import uuid
-from sqlalchemy import String, UUID
+from sqlalchemy import String
+from sqlalchemy.dialects.mssql import UNIQUEIDENTIFIER
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 from sqlalchemy.event import listens_for
 from typing import Optional, TYPE_CHECKING
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
 class Project(Base, BaseAuditableEntity):
     __tablename__ = "project"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(UNIQUEIDENTIFIER(as_uuid=True), primary_key=True)
     name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True)
     description: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value))
 

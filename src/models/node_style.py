@@ -1,6 +1,7 @@
 import uuid
 from typing import Optional, TYPE_CHECKING
-from sqlalchemy import ForeignKey, INT, UUID
+from sqlalchemy import ForeignKey, INT
+from sqlalchemy.dialects.mssql import UNIQUEIDENTIFIER
 from sqlalchemy.orm import (
     Mapped, 
     relationship,
@@ -12,8 +13,8 @@ if TYPE_CHECKING:
 
 class NodeStyle(Base):
     __tablename__ = "node_style"
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
-    node_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("node.id"))
+    id: Mapped[uuid.UUID] = mapped_column(UNIQUEIDENTIFIER(as_uuid=True), primary_key=True)
+    node_id: Mapped[uuid.UUID] = mapped_column(UNIQUEIDENTIFIER(as_uuid=True), ForeignKey("node.id"))
 
     x_position: Mapped[int] = mapped_column(INT)
     y_position: Mapped[int] = mapped_column(INT)

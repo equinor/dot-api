@@ -1,6 +1,7 @@
 import uuid
 from typing import TYPE_CHECKING
-from sqlalchemy import String, ForeignKey, UUID
+from sqlalchemy import String, ForeignKey
+from sqlalchemy.dialects.mssql import UNIQUEIDENTIFIER
 from sqlalchemy.orm import (
     Mapped, 
     relationship,
@@ -12,8 +13,8 @@ if TYPE_CHECKING:
 
 class Uncertainty(Base):
     __tablename__ = "uncertainty"
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
-    issue_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("issue.id"))
+    id: Mapped[uuid.UUID] = mapped_column(UNIQUEIDENTIFIER(as_uuid=True), primary_key=True)
+    issue_id: Mapped[uuid.UUID] = mapped_column(UNIQUEIDENTIFIER(as_uuid=True), ForeignKey("issue.id"))
 
     probabilities: Mapped[str] = mapped_column(String, default="1")
     issue: Mapped["Issue"] = relationship("Issue", back_populates="uncertainty")
