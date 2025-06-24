@@ -21,7 +21,7 @@ class GUID(TypeDecorator[uuid.UUID]):
         Determines the underlying database type to use based on the dialect.
         """
         if dialect.name == "mssql":
-            return dialect.type_descriptor(GUID())
+            return dialect.type_descriptor(UNIQUEIDENTIFIER(as_uuid=True))
         elif dialect.name == "sqlite":
             return dialect.type_descriptor(UUID(as_uuid=True))
         else:
