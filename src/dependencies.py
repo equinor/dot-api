@@ -15,19 +15,28 @@ from src.database import connection_strings
 from src.models.base import Base
 from src.seed_database import seed_database
 from src.config import Config
+from azure.identity import DefaultAzureCredential
 
 config = Config()
 # use adapter to change based on environment
 connection_string = connection_strings.sql_lite_memory.value
 if(config.APP_ENV == "local"):
     connection_string = connection_strings.sql_lite_memory.value
+elif(config.APP_ENV == "dev"):
+    connection_string = connection_strings.ODBC_Msi_dev.value
 else:
     connection_string = config.DATABASE_URL
 async_engine: AsyncEngine|None = None
 async def get_async_engine() -> AsyncEngine:
     global async_engine
     if async_engine is None:
-        async_engine = create_async_engine(connection_string, echo=False)
+        if connection_string == connection_strings.ODBC_Msi_dev.value:
+            credential = DefaultAzureCredential()
+            token = credential.get_token("https://database.windows.net/.default")
+            async_engine=create_async_engine(connection_string,  connect_args={"authentication": "ActiveDirectoryAccessToken",
+            "token": token.token})
+        else:
+            async_engine = create_async_engine(connection_string, echo=False)
 
         # create all tables in the in memory database
         if connection_string==connection_strings.sql_lite_memory.value:
