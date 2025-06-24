@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy import ForeignKey
-from sqlalchemy.dialects.mssql import UNIQUEIDENTIFIER
+from src.models.guid import GUID
 from sqlalchemy.orm import (
     Mapped, 
     relationship, 
@@ -13,11 +13,11 @@ from src.models.scenario import Scenario
 class Edge(Base):
     __tablename__ = "edge"
 
-    id: Mapped[uuid.UUID] = mapped_column(UNIQUEIDENTIFIER(as_uuid=True), primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
 
-    tail_id: Mapped[uuid.UUID] = mapped_column(UNIQUEIDENTIFIER(as_uuid=True), ForeignKey(Node.id))
-    head_id: Mapped[uuid.UUID] = mapped_column(UNIQUEIDENTIFIER(as_uuid=True), ForeignKey(Node.id))
-    scenario_id: Mapped[uuid.UUID] = mapped_column(UNIQUEIDENTIFIER(as_uuid=True), ForeignKey(Scenario.id))
+    tail_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey(Node.id))
+    head_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey(Node.id))
+    scenario_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey(Scenario.id))
 
     scenario: Mapped[Scenario] = relationship(Scenario, foreign_keys=[scenario_id])
 

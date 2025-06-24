@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy import String, ForeignKey
-from sqlalchemy.dialects.mssql import UNIQUEIDENTIFIER
+from src.models.guid import GUID
 from sqlalchemy.orm import (
     Mapped, 
     relationship, 
@@ -15,7 +15,7 @@ from src.constants import DatabaseConstants
 class Objective(Base, BaseAuditableEntity):
     __tablename__ = "objective"
 
-    id: Mapped[uuid.UUID] = mapped_column(UNIQUEIDENTIFIER(as_uuid=True), primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
     scenario_id: Mapped[uuid.UUID] = mapped_column(ForeignKey(Scenario.id), index=True)
 
     name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True, default="")
