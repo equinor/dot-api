@@ -15,12 +15,21 @@ WORKDIR /code
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends build-essential && \
+    apt-get install -y --no-install-recommends build-essential \
+    curl \
+    apt-utils \
+    gnupg2 &&\
     pip install --upgrade pip && \
     pip install poetry && \
     poetry config virtualenvs.create false && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+RUN curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list
+
+RUN apt-get update
+RUN env ACCEPT_EULA=Y apt-get install -y msodbcsql17
 
 # Copy necessary files for poetry install
 COPY  pyproject.toml poetry.lock* README.md /code/
