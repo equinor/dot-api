@@ -33,7 +33,7 @@ async def get_async_engine() -> AsyncEngine:
         if connection_string == connection_strings.ODBC_Msi_dev.value:
             credential = DefaultAzureCredential()
             token = credential.get_token("https://database.windows.net/.default")
-            async_engine=create_async_engine(connection_string,  connect_args={"authentication": "ActiveDirectoryAccessToken",
+            async_engine=create_async_engine(connection_string,  connect_args={"authentication": "ActiveDirectoryMSI",
             "token": token.token})
         else:
             async_engine = create_async_engine(connection_string, echo=False)
