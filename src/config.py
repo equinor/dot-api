@@ -24,7 +24,7 @@ class Config(BaseSettings):
     )
     ISSUER: str = f"https://sts.windows.net/{TENANT_ID}/"
     APP_ENV: str = Field(
-        default=os.getenv("APP_ENV", "dev")
+        default=os.getenv("APP_ENV", "local")
     )
     DATABASE_CONN_DEV: str = Field(
         default=os.getenv("DATABASE_CONN_DEV", "DRIVER={ODBC Driver 18 for SQL Server};Server=decision-optimization-sqlserver-dev.database.windows.net;Database=decision-optimization-sqldb-dev;")

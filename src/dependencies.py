@@ -27,6 +27,7 @@ async def get_async_engine() -> AsyncEngine:
     if async_engine is None:
         # create all tables in the in memory database
         if config.APP_ENV == "local":
+            async_engine = create_async_engine(db_connection_string, echo=False)
             async with async_engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
                 await seed_database(conn, num_projects=10, num_scenarios=10, num_nodes=50)
