@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
+from src.auth.db_auth import DatabaseAuthenticator
 from src.services.decision_service import DecisionService
 from src.services.project_service import ProjectService
 from src.services.objective_service import ObjectiveService
@@ -16,33 +17,48 @@ from src.models.base import Base
 from src.seed_database import seed_database
 from src.config import Config
 from azure.identity import DefaultAzureCredential
+import urllib
 
 config = Config()
 # use adapter to change based on environment
-connection_string = connection_strings.sql_lite_memory.value
-if(config.APP_ENV == "local"):
-    connection_string = connection_strings.sql_lite_memory.value
-elif(config.APP_ENV == "dev"):
-    connection_string = connection_strings.ODBC_Msi_dev.value
-else:
-    connection_string = config.DATABASE_URL
+# connection_string = connection_strings.sql_lite_memory.value
+# if(config.APP_ENV == "local"):
+#     connection_string = connection_strings.sql_lite_memory.value
+# elif(config.APP_ENV == "dev"):
+#     connection_string = connection_strings.ODBC_Msi_dev.value
+# else:
+#     connection_string = config.DATABASE_URL
 async_engine: AsyncEngine|None = None
 async def get_async_engine() -> AsyncEngine:
     global async_engine
     if async_engine is None:
-        if connection_string == connection_strings.ODBC_Msi_dev.value:
-            credential = DefaultAzureCredential()
-            token = credential.get_token("https://database.windows.net/.default")
-            async_engine=create_async_engine(connection_string,  connect_args={"authentication": "ActiveDirectoryMsi",
-            "token": token.token})
-        else:
-            async_engine = create_async_engine(connection_string, echo=False)
+        authenticator = DatabaseAuthenticator(env=config.APP_ENV)
+        await authenticator.close()
+        token_dict = await authenticator.authenticate_db_connection_string()
+
+        db_connection_string = "DRIVER={ODBC Driver 18 for SQL Server};Server=decision-optimization-sqlserver-dev.database.windows.net;Database=decision-optimization-sqldb-dev;"
+        params = urllib.parse.quote_plus(db_connection_string.replace('"', ""))
+        # Set up the logger
+        conn_str = "mssql+aioodbc:///?odbc_connect={}".format(params)
+        if token_dict:
+            async_engine = create_async_engine(
+                conn_str,
+                echo=False,
+                connect_args={"attrs_before": token_dict}
+            )
+        # if connection_string == connection_strings.ODBC_Msi_dev.value:
+        #     credential = DefaultAzureCredential()
+        #     token = credential.get_token("https://database.windows.net/.default")
+        #     async_engine=create_async_engine(connection_string,  connect_args={"authentication": "ActiveDirectoryMsi",
+        #     "token": token.token})
+        # else:
+        #     async_engine = create_async_engine(connection_string, echo=False)
 
         # create all tables in the in memory database
-        if connection_string==connection_strings.sql_lite_memory.value:
-            async with async_engine.begin() as conn:
-                await conn.run_sync(Base.metadata.create_all)
-                await seed_database(conn, num_projects=10, num_scenarios=10, num_nodes=50)
+        # if connection_string==connection_strings.sql_lite_memory.value:
+        #     async with async_engine.begin() as conn:
+        #         await conn.run_sync(Base.metadata.create_all)
+        #         await seed_database(conn, num_projects=10, num_scenarios=10, num_nodes=50)
                 
     return async_engine
 
