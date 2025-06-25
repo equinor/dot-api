@@ -1,6 +1,21 @@
 from enum import Enum
-from urllib import parse
 
-class connection_strings(Enum):
-    sql_lite_memory="sqlite+aiosqlite:///:memory:"
-    ODBC_Msi_dev="mssql+aioodbc://decision-optimization-sqlserver-dev.database.windows.net:1433/decision-optimization-sqldb-dev?uid=decision-optimization-identity-dev&driver=ODBC+Driver+18+for+SQL+Server&authentication=ActiveDirectoryMsi&connectionTimeout=300"
+from src.config import Config
+
+
+config = Config()
+class DatabaseConnectionStrings(Enum):
+    local = "sqlite+aiosqlite:///:memory:"
+    @classmethod
+    def get_connection_string(cls, app_env: str) -> str:
+        """Retrieve the appropriate connection string based on the application environment."""
+        if app_env == "local":
+            return cls.local.value
+        elif app_env == "dev":
+            return config.DATABASE_CONN_DEV
+        elif app_env == "test":
+            return config.DATABASE_CONN_TEST
+        elif app_env == "prod":
+            return config.DATABASE_CONN_PROD
+        else:
+            raise ValueError(f"Unknown environment: {app_env}")

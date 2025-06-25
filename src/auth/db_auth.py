@@ -3,11 +3,8 @@ import struct
 
 
 class DatabaseAuthenticator:
-    def __init__(self, env="local"):
-        if env == "local":
-            self.credential = DefaultAzureCredential()
-        else:
-            self.credential = DefaultAzureCredential()
+    def __init__(self,):
+        self.credential = DefaultAzureCredential()
 
     async def authenticate_db_connection_string(self) -> dict[int, bytes]:
         """
