@@ -33,8 +33,8 @@ async def get_async_engine() -> AsyncEngine:
                 await seed_database(conn, num_projects=10, num_scenarios=10, num_nodes=50)
         else:
             database_authenticator = DatabaseAuthenticator()
-            await database_authenticator.close()
             token_dict = await database_authenticator.authenticate_db_connection_string()
+            await database_authenticator.close()
             params = urllib.parse.quote_plus(db_connection_string.replace('"', ""))
             conn_str = "mssql+aioodbc:///?odbc_connect={}".format(params)
             if token_dict:
