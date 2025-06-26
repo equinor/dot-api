@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
+from src.auth.db_auth import DatabaseAuthenticator
 from src.services.decision_service import DecisionService
 from src.services.project_service import ProjectService
 from src.services.objective_service import ObjectiveService
@@ -11,30 +12,37 @@ from src.services.edge_service import EdgeService
 from src.services.node_service import NodeService
 from src.services.node_style_service import NodeStyleService
 from src.services.issue_service import IssueService
-from src.database import connection_strings
+from src.database import DatabaseConnectionStrings
 from src.models.base import Base
 from src.seed_database import seed_database
 from src.config import Config
+import urllib
 
 config = Config()
-# use adapter to change based on environment
-connection_string = connection_strings.sql_lite_memory.value
-if(config.APP_ENV == "local"):
-    connection_string = connection_strings.sql_lite_memory.value
-else:
-    connection_string = config.DATABASE_URL
+
+db_connection_string = DatabaseConnectionStrings.get_connection_string(config.APP_ENV)
 async_engine: AsyncEngine|None = None
 async def get_async_engine() -> AsyncEngine:
     global async_engine
     if async_engine is None:
-        async_engine = create_async_engine(connection_string, echo=False)
-
         # create all tables in the in memory database
-        if connection_string==connection_strings.sql_lite_memory.value:
+        if config.APP_ENV == "local":
+            async_engine = create_async_engine(db_connection_string, echo=False)
             async with async_engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
                 await seed_database(conn, num_projects=10, num_scenarios=10, num_nodes=50)
-                
+        else:
+            database_authenticator = DatabaseAuthenticator()
+            token_dict = await database_authenticator.authenticate_db_connection_string()
+            await database_authenticator.close()
+            params = urllib.parse.quote_plus(db_connection_string.replace('"', ""))
+            conn_str = "mssql+aioodbc:///?odbc_connect={}".format(params)
+            if token_dict:
+                async_engine = create_async_engine(
+                    conn_str,
+                    echo=False,
+                    connect_args={"attrs_before": token_dict}
+                )
     return async_engine
 
 async def get_project_service() -> ProjectService:

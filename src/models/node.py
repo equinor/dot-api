@@ -1,6 +1,7 @@
 import uuid
 from typing import Optional, TYPE_CHECKING
-from sqlalchemy import String, ForeignKey, UUID
+from sqlalchemy import String, ForeignKey
+from src.models.guid import GUID
 from sqlalchemy.orm import (
     Mapped, 
     relationship, 
@@ -17,9 +18,9 @@ if TYPE_CHECKING:
 class Node(Base):
     __tablename__ = "node"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
-    scenario_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey(Scenario.id))
-    issue_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("issue.id"))
+    id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
+    scenario_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey(Scenario.id))
+    issue_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("issue.id"))
 
     name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True)
 
