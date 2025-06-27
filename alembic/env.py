@@ -6,6 +6,8 @@ from sqlalchemy import pool
 from alembic import context
 
 from src.models.base import Base
+from urllib import parse
+from sqlalchemy import create_engine
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -59,13 +61,15 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
 
-    with connectable.connect() as connection:
+    user_id="@equinor.com"
+    env="dev"
+    connecting_string = f"DRIVER={{ODBC Driver 18 for SQL Server}};Server=decision-optimization-sqlserver-{env}.database.windows.net;Database=decision-optimization-sqldb-{env};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;Authentication=ActiveDirectoryInteractive;Uid={user_id}"
+    params = parse.quote_plus(connecting_string)
+
+    engine = create_engine("mssql+pyodbc:///?odbc_connect=%s" % params)
+
+    with engine.connect() as connection:
         context.configure(
             connection=connection, target_metadata=target_metadata
         )
