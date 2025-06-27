@@ -1,8 +1,10 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
+from sqlalchemy.sql import ColumnElement
+from sqlalchemy.sql._typing import _ColumnExpressionArgument # type: ignore
 from sqlalchemy.orm.strategy_options import _AbstractLoad # type: ignore
-from typing import Type, TypeVar, Generic, List, Protocol, Callable, Union
+from typing import Type, TypeVar, Generic, List, Protocol, Callable, Union, Optional
 import uuid
 
 LoadOptions = List[_AbstractLoad]
@@ -35,10 +37,12 @@ class BaseRepository(Generic[T, IDType]):
         )
         return list((await self.session.scalars(query)).all())
 
-    async def get_all(self) -> List[T]:
+    async def get_all(self, model_filter: Optional[ColumnElement[bool]]=None) -> List[T]:
         query = select(self.model).options(
             *self.query_extension_method()
         )
+        if model_filter is not None:
+            query=query.filter(model_filter)
         return list((await self.session.scalars(query)).all())
 
     async def delete(self, ids: List[IDType]) -> None:
