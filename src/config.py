@@ -1,10 +1,11 @@
 import os
+from typing import List
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
 class Config(BaseSettings):
 
-    ORIGINS = [
+    ORIGINS: List[str] = [
     "http://localhost:5004",
     "https://frontend-dot-web-dev.radix.equinor.com",
     "https://frontend-dot-web-test.radix.equinor.com",

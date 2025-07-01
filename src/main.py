@@ -27,11 +27,11 @@ app = FastAPI(swagger_ui_init_oauth={
 
 # Adding CORS middleware to the FastAPI application
 app.add_middleware(
-CORSMiddleware,
-allow_origins=config.ORIGINS, # List of allowed origins
-allow_credentials=True, # Allow credentials (cookies, authorization headers, etc.)
-allow_methods=["*"], # Allow all HTTP methods
-allow_headers=["*"], # Allow all HTTP headers
+    CORSMiddleware,
+    allow_origins=config.ORIGINS, # List of allowed origins
+    allow_credentials=True, # Allow credentials (cookies, authorization headers, etc.)
+    allow_methods=["*"], # Allow all HTTP methods
+    allow_headers=["*"], # Allow all HTTP headers
 )
 
 @app.get("/", status_code=status.HTTP_200_OK)
