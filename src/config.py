@@ -3,6 +3,14 @@ from pydantic import Field
 from pydantic_settings import BaseSettings
 
 class Config(BaseSettings):
+
+    ORIGINS = [
+    "http://localhost:5004",
+    "https://frontend-dot-web-dev.radix.equinor.com",
+    "https://frontend-dot-web-test.radix.equinor.com",
+    "https://frontend-dot-web-prod.radix.equinor.com",
+    ]
+
     CLIENT_ID: str = Field(
         default=os.getenv("CLIENT_ID", "4251833c-b9c3-4013-afda-cbfd2cc50f3f")
     )
