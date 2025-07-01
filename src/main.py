@@ -13,6 +13,7 @@ import src.routes.value_metric_routes as value_metric_routes
 import src.routes.project_routes as project_routes
 import src.routes.issue_routes as issue_routes
 from src.config import Config
+from fastapi.middleware.cors import CORSMiddleware
 
 config = Config()
 
@@ -22,6 +23,16 @@ app = FastAPI(swagger_ui_init_oauth={
         "redirectUrl": "http://localhost:8000/docs/oauth2-redirect",
     },)
 
+
+
+# Adding CORS middleware to the FastAPI application
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=config.ORIGINS, # List of allowed origins
+    allow_credentials=True, # Allow credentials (cookies, authorization headers, etc.)
+    allow_methods=["*"], # Allow all HTTP methods
+    allow_headers=["*"], # Allow all HTTP headers
+)
 
 @app.get("/", status_code=status.HTTP_200_OK)
 async def root():
