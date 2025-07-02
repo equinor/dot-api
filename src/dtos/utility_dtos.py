@@ -21,7 +21,7 @@ class UtilityMapper:
     def to_outgoing_dto(entity: Utility) -> UtilityOutgoingDto:
         return UtilityOutgoingDto(
             id=entity.id,
-            values=[float(p) for p in entity.values.split(",")],
+            values = [float(p) for p in entity.values.split(",") if p.strip()] if entity.values else [],
             issue_id=entity.issue_id
         )
 

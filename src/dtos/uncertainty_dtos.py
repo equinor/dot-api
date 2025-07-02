@@ -21,7 +21,7 @@ class UncertaintyMapper:
     def to_outgoing_dto(entity: Uncertainty) -> UncertaintyOutgoingDto:
         return UncertaintyOutgoingDto(
             id=entity.id,
-            probabilities=[float(p) for p in entity.probabilities.split(",")],
+            probabilities = [float(p) for p in entity.probabilities.split(",") if p.strip()] if entity.probabilities else [],
             issue_id=entity.issue_id,
         )
 
