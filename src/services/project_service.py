@@ -93,3 +93,9 @@ class ProjectService:
             projects: list[Project] = await ProjectRepository(session).get(ids)
             result=ProjectMapper.to_populated_dtos(projects)
         return result
+    
+    async def get_all_populated_projects(self) -> list[PopulatedProjectDto]:
+        async with session_handler(self.engine) as session:
+            projects: list[Project] = await ProjectRepository(session).get_all()
+            result=ProjectMapper.to_populated_dtos(projects)
+        return result

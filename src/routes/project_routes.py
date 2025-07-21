@@ -58,6 +58,16 @@ async def get_populated_project(
     else:
         raise HTTPException(status_code=404)
     
+@router.get("/projects-populated")
+async def get_all_populated_project(
+    project_service: ProjectService = Depends(get_project_service),
+) -> list[PopulatedProjectDto]:
+    try:
+        projects: list[PopulatedProjectDto] = await project_service.get_all_populated_projects()
+        return projects
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
 @router.get("/projects")
 async def get_all_project(
     project_service: ProjectService = Depends(get_project_service)

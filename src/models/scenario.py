@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 import uuid
-from sqlalchemy import String, ForeignKey, UUID
+from src.models.guid import GUID
+from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import (
     Mapped, 
     relationship, 
@@ -8,6 +9,7 @@ from sqlalchemy.orm import (
 )
 from src.models.base import Base
 from sqlalchemy.event import listens_for
+from src.models.guid import GUID
 
 if TYPE_CHECKING:
     from src.models.node import Node
@@ -22,7 +24,7 @@ from src.constants import DatabaseConstants
 class Scenario(Base, BaseAuditableEntity):
     __tablename__ = "scenario"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
     project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey(Project.id), index=True)
 
     name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True, default="")
