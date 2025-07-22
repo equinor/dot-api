@@ -1,3 +1,4 @@
+import urllib.parse
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
 from src.auth.db_auth import DatabaseAuthenticator
 from src.services.decision_service import DecisionService
@@ -12,6 +13,7 @@ from src.services.edge_service import EdgeService
 from src.services.node_service import NodeService
 from src.services.node_style_service import NodeStyleService
 from src.services.issue_service import IssueService
+from src.services.user_service import UserService
 from src.database import DatabaseConnectionStrings
 from src.models.base import Base
 from src.seed_database import seed_database
@@ -80,3 +82,6 @@ async def get_node_style_service() -> NodeStyleService:
 
 async def get_issue_service() -> IssueService:
     return IssueService(await get_async_engine())
+
+async def get_user_service() -> UserService:
+    return UserService(await get_async_engine())

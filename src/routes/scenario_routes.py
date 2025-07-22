@@ -8,22 +8,23 @@ from src.dtos.scenario_dtos import (
 )
 from src.services.scenario_service import ScenarioService
 from src.dependencies import get_scenario_service
-from src.services.user_service import get_temp_user
+from src.services.user_service import get_current_user
+from src.dtos.user_dtos import UserIncomingDto
 
 router = APIRouter(tags=["scenarios"])
 
 @router.post("/scenarios")
 async def create_scenarios(
     dtos: list[ScenarioCreateDto],
-    scenario_service: ScenarioService = Depends(get_scenario_service)
+    scenario_service: ScenarioService = Depends(get_scenario_service),
+    current_user: UserIncomingDto = Depends(get_current_user)
 )-> list[ScenarioOutgoingDto]:
     """
     Endpoint for creating Scenarios.
     If Objectives/Opportunities are supplied with the Scenario, then they will be created after the Scenario with the appropriate Id.
     """
     try:
-        user_dto=get_temp_user()
-        return list(await scenario_service.create(dtos, user_dto))
+        return list(await scenario_service.create(dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -80,11 +81,11 @@ async def delete_scenario(
 @router.put("/scenarios")
 async def update_scenarios(
     dtos: list[ScenarioIncomingDto],
-    scenario_service: ScenarioService = Depends(get_scenario_service)
+    scenario_service: ScenarioService = Depends(get_scenario_service),
+    current_user: UserIncomingDto = Depends(get_current_user)
 )-> list[ScenarioOutgoingDto]:
     try:
-        user_dto=get_temp_user()
-        return list(await scenario_service.update(dtos, user_dto))
+        return list(await scenario_service.update(dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     

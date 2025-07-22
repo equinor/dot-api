@@ -3,18 +3,19 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.opportunity_dtos import OpportunityIncomingDto, OpportunityOutgoingDto
 from src.services.opportunity_service import OpportunityService
 from src.dependencies import get_opportunity_service
-from src.services.user_service import get_temp_user
+from src.services.user_service import get_current_user
+from src.dtos.user_dtos import UserIncomingDto
 
 router = APIRouter(tags=["opportunities"])
 
 @router.post("/opportunities")
 async def create_opportunities(
     dtos: list[OpportunityIncomingDto],
-    opportunity_service: OpportunityService = Depends(get_opportunity_service)
+    opportunity_service: OpportunityService = Depends(get_opportunity_service),
+    current_user: UserIncomingDto = Depends(get_current_user)
 )-> list[OpportunityOutgoingDto]:
     try:
-        user_dto=get_temp_user()
-        return list(await opportunity_service.create(dtos, user_dto))
+        return list(await opportunity_service.create(dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -56,11 +57,11 @@ async def delete_opportunity(
 @router.put("/opportunities")
 async def update_opportunities(
     dtos: list[OpportunityIncomingDto],
-    opportunity_service: OpportunityService = Depends(get_opportunity_service)
+    opportunity_service: OpportunityService = Depends(get_opportunity_service),
+    current_user: UserIncomingDto = Depends(get_current_user)
 )-> list[OpportunityOutgoingDto]:
     try:
-        user_dto=get_temp_user()
-        return list(await opportunity_service.update(dtos, user_dto))
+        return list(await opportunity_service.update(dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     

@@ -3,15 +3,16 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.issue_dtos import IssueIncomingDto, IssueOutgoingDto
 from src.services.issue_service import IssueService
 from src.dependencies import get_issue_service
-from src.services.user_service import get_temp_user
-
+from src.services.user_service import get_current_user
+from src.dtos.user_dtos import UserIncomingDto
 
 router = APIRouter(tags=["issues"])
 
 @router.post("/issues")
 async def create_issues(
     dtos: list[IssueIncomingDto],
-    issue_service: IssueService = Depends(get_issue_service)
+    issue_service: IssueService = Depends(get_issue_service),
+    current_user: UserIncomingDto = Depends(get_current_user)
 )-> list[IssueOutgoingDto]:
     """
     Endpoint for creating Issues. 
@@ -19,8 +20,7 @@ async def create_issues(
     If node is not supplied an empty node will be created
     """
     try:
-        user_dto=get_temp_user()
-        return list(await issue_service.create(dtos, user_dto))
+        return list(await issue_service.create(dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -62,11 +62,11 @@ async def delete_issue(
 @router.put("/issues")
 async def update_issues(
     dtos: list[IssueIncomingDto],
-    issue_service: IssueService = Depends(get_issue_service)
+    issue_service: IssueService = Depends(get_issue_service),
+    current_user: UserIncomingDto = Depends(get_current_user)
 )-> list[IssueOutgoingDto]:
     try:
-        user_dto=get_temp_user()
-        return list(await issue_service.update(dtos, user_dto))
+        return list(await issue_service.update(dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     

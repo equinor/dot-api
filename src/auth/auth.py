@@ -25,7 +25,7 @@ def get_claims_options():
         "iat": {"essential": True},
     }
 
-def verify_token(token: str = Depends(oauth2_scheme)):
+def verify_token(token: str = Depends(oauth2_scheme)) -> dict[str, str]:
     try:
         claims_options = get_claims_options()
         jwt = JsonWebToken(["RS256"])  # Only allow RS256
@@ -37,6 +37,7 @@ def verify_token(token: str = Depends(oauth2_scheme)):
             raise HTTPException(
                 status_code=403, detail="Forbidden: Insufficient role"
             )
+        return claims
     except JoseError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

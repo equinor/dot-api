@@ -8,14 +8,16 @@ from src.dtos.project_dtos import (
 )
 from src.services.project_service import ProjectService
 from src.dependencies import get_project_service
-from src.services.user_service import get_temp_user
+from src.services.user_service import get_current_user
+from src.dtos.user_dtos import UserIncomingDto
 
 router = APIRouter(tags=["projects"])
 
 @router.post("/projects")
 async def create_projects(
     dtos: list[ProjectCreateDto],
-    project_service: ProjectService = Depends(get_project_service)
+    project_service: ProjectService = Depends(get_project_service),
+    current_user: UserIncomingDto = Depends(get_current_user)
 )-> list[ProjectOutgoingDto]:
     """
     Endpoint for creating Projects.
@@ -23,8 +25,7 @@ async def create_projects(
     If Objectives/Opportunities are supplied with the Scenario, then they will be created after the Scenario with the appropriate Id.
     """
     try:
-        user_dto=get_temp_user()
-        return list(await project_service.create(dtos, user_dto))
+        return list(await project_service.create(dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -91,11 +92,11 @@ async def delete_project(
 @router.put("/projects")
 async def update_projects(
     dtos: list[ProjectIncomingDto],
-    project_service: ProjectService = Depends(get_project_service)
+    project_service: ProjectService = Depends(get_project_service),
+    current_user: UserIncomingDto = Depends(get_current_user)
 )-> list[ProjectOutgoingDto]:
     try:
-        user_dto=get_temp_user()
-        return list(await project_service.update(dtos, user_dto))
+        return list(await project_service.update(dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
