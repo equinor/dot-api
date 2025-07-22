@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.node_dtos import NodeIncomingDto, NodeOutgoingDto
 from src.services.node_service import NodeService
 from src.dependencies import get_node_service
+from src.models.filters.node_filter import NodeFilter
 
 router = APIRouter(tags=["nodes"])
 
@@ -28,6 +29,28 @@ async def get_all_node(
     try:
         nodes: list[NodeOutgoingDto] = await node_service.get_all()
         return nodes
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get("/projects/{project_id}/nodes")
+async def get_all_nodes_from_project(
+    project_id: uuid.UUID,
+    issue_service: NodeService = Depends(get_node_service)
+) -> list[NodeOutgoingDto]:
+    try:
+        issues: list[NodeOutgoingDto] = await issue_service.get_all(NodeFilter(project_id=project_id))
+        return issues
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get("/scenarios/{scenario_id}/nodes")
+async def get_all_nodes_from_scenario(
+    scenario_id: uuid.UUID,
+    issue_service: NodeService = Depends(get_node_service)
+) -> list[NodeOutgoingDto]:
+    try:
+        issues: list[NodeOutgoingDto] = await issue_service.get_all(NodeFilter(scenario_id=scenario_id))
+        return issues
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

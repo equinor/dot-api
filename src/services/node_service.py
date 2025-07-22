@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.node import Node
@@ -8,6 +9,7 @@ from src.dtos.node_dtos import (
     NodeMapper
 )
 from src.repositories.node_repository import NodeRepository
+from src.models.filters.node_filter import NodeFilter, node_conditions
 from src.services.session_handler import session_handler
 
 class NodeService:
@@ -38,9 +40,10 @@ class NodeService:
             result=NodeMapper.to_outgoing_dtos(nodes)
         return result
     
-    async def get_all(self) -> list[NodeOutgoingDto]:
+    async def get_all(self, filter: Optional[NodeFilter]=None) -> list[NodeOutgoingDto]:
         async with session_handler(self.engine) as session:
-            nodes: list[Node] = await NodeRepository(session).get_all()
+            model_filter = NodeFilter.combine_conditions(node_conditions(filter)) if filter else None
+            nodes: list[Node] = await NodeRepository(session).get_all(model_filter=model_filter)
             result=NodeMapper.to_outgoing_dtos(nodes)
         return result
     

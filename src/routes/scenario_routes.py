@@ -9,6 +9,7 @@ from src.dtos.scenario_dtos import (
 from src.services.scenario_service import ScenarioService
 from src.dependencies import get_scenario_service
 from src.services.user_service import get_temp_user
+from src.models.filters.scenario_filter import ScenarioFilter
 
 router = APIRouter(tags=["scenarios"])
 
@@ -63,6 +64,17 @@ async def get_all_scenario(
 ) -> list[ScenarioOutgoingDto]:
     try:
         scenarios: list[ScenarioOutgoingDto] = await scenario_service.get_all()
+        return scenarios
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get("/projects/{project_id}/scenarios")
+async def get_all_scenario_from_project(
+    project_id: uuid.UUID,
+    scenario_service: ScenarioService = Depends(get_scenario_service)
+) -> list[ScenarioOutgoingDto]:
+    try:
+        scenarios: list[ScenarioOutgoingDto] = await scenario_service.get_all(ScenarioFilter(project_id=project_id))
         return scenarios
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
