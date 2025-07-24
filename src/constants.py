@@ -46,3 +46,6 @@ class SwaggerDocumentationConstants:
         Notes:
         - This parameter is optional. If no filter is provided, all entities will be returned.
 """
+
+class PageSize:
+    DEFAULT: int=1000000
