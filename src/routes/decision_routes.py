@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from src.dtos.decision_dtos import DecisionIncomingDto, DecisionOutgoingDto
 from src.services.decision_service import DecisionService
 from src.dependencies import get_decision_service
+from src.constants import SwaggerDocumentationConstants
 
 router = APIRouter(tags=["decisions"])
 
@@ -25,7 +26,7 @@ async def get_decision(
 @router.get("/decisions")
 async def get_all_decision(
     decision_service: DecisionService = Depends(get_decision_service),
-    filter: Optional[str] = Query(None),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[DecisionOutgoingDto]:
     try:
         decisions: list[DecisionOutgoingDto] = await decision_service.get_all(odata_query=filter)

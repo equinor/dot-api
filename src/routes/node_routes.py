@@ -5,6 +5,7 @@ from src.dtos.node_dtos import NodeIncomingDto, NodeOutgoingDto
 from src.services.node_service import NodeService
 from src.dependencies import get_node_service
 from src.models.filters.node_filter import NodeFilter
+from src.constants import SwaggerDocumentationConstants
 
 router = APIRouter(tags=["nodes"])
 
@@ -26,7 +27,7 @@ async def get_node(
 @router.get("/nodes")
 async def get_all_node(
     node_service: NodeService = Depends(get_node_service),
-    filter: Optional[str]=Query(None),
+    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[NodeOutgoingDto]:
     try:
         nodes: list[NodeOutgoingDto] = await node_service.get_all(odata_query=filter)
@@ -38,7 +39,7 @@ async def get_all_node(
 async def get_all_nodes_from_project(
     project_id: uuid.UUID,
     issue_service: NodeService = Depends(get_node_service),
-    filter: Optional[str]=Query(None),
+    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[NodeOutgoingDto]:
     try:
         issues: list[NodeOutgoingDto] = await issue_service.get_all(NodeFilter(project_id=project_id), odata_query=filter)
@@ -50,7 +51,7 @@ async def get_all_nodes_from_project(
 async def get_all_nodes_from_scenario(
     scenario_id: uuid.UUID,
     issue_service: NodeService = Depends(get_node_service),
-    filter: Optional[str]=Query(None),
+    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[NodeOutgoingDto]:
     try:
         issues: list[NodeOutgoingDto] = await issue_service.get_all(NodeFilter(scenario_id=scenario_id), odata_query=filter)

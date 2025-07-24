@@ -6,7 +6,7 @@ from src.services.issue_service import IssueService
 from src.dependencies import get_issue_service
 from src.services.user_service import get_temp_user
 from src.models.filters.issues_filter import IssueFilter
-
+from src.constants import SwaggerDocumentationConstants
 
 router = APIRouter(tags=["issues"])
 
@@ -44,7 +44,7 @@ async def get_issue(
 @router.get("/issues")
 async def get_all_issue(
     issue_service: IssueService = Depends(get_issue_service),
-    filter: Optional[str] = Query(None),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[IssueOutgoingDto]:
     try:
         issues: list[IssueOutgoingDto] = await issue_service.get_all(odata_query=filter)
@@ -56,7 +56,7 @@ async def get_all_issue(
 async def get_all_issues_from_project(
     project_id: uuid.UUID,
     issue_service: IssueService = Depends(get_issue_service),
-    filter: Optional[str] = Query(None),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[IssueOutgoingDto]:
     try:
         issues: list[IssueOutgoingDto] = await issue_service.get_all(IssueFilter(project_id=project_id), odata_query=filter)
@@ -68,7 +68,7 @@ async def get_all_issues_from_project(
 async def get_all_issues_from_scenario(
     scenario_id: uuid.UUID,
     issue_service: IssueService = Depends(get_issue_service),
-    filter: Optional[str] = Query(None),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[IssueOutgoingDto]:
     try:
         issues: list[IssueOutgoingDto] = await issue_service.get_all(IssueFilter(scenario_id=scenario_id), odata_query=filter)

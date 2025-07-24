@@ -11,6 +11,7 @@ from src.services.scenario_service import ScenarioService
 from src.dependencies import get_scenario_service
 from src.services.user_service import get_temp_user
 from src.models.filters.scenario_filter import ScenarioFilter
+from src.constants import SwaggerDocumentationConstants
 
 router = APIRouter(tags=["scenarios"])
 
@@ -62,7 +63,7 @@ async def get_scenario_populated(
 @router.get("/scenarios")
 async def get_all_scenario(
     scenario_service: ScenarioService = Depends(get_scenario_service),
-    filter: Optional[str]=Query(None),
+    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[ScenarioOutgoingDto]:
     try:
         scenarios: list[ScenarioOutgoingDto] = await scenario_service.get_all(odata_query=filter)
@@ -73,7 +74,7 @@ async def get_all_scenario(
 @router.get("/scenarios-populated")
 async def get_all_scenarios_populated(
     scenario_service: ScenarioService = Depends(get_scenario_service),
-    filter: Optional[str]=Query(None),
+    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[PopulatedScenarioDto]:
     try:
         scenarios: list[PopulatedScenarioDto] = await scenario_service.get_all_populated(odata_query=filter)
@@ -85,7 +86,7 @@ async def get_all_scenarios_populated(
 async def get_all_scenario_from_project(
     project_id: uuid.UUID,
     scenario_service: ScenarioService = Depends(get_scenario_service),
-    filter: Optional[str]=Query(None),
+    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[ScenarioOutgoingDto]:
     try:
         scenarios: list[ScenarioOutgoingDto] = await scenario_service.get_all(ScenarioFilter(project_id=project_id), odata_query=filter)
@@ -97,7 +98,7 @@ async def get_all_scenario_from_project(
 async def get_all_scenarios_populated_from_project(
     project_id: uuid.UUID,
     scenario_service: ScenarioService = Depends(get_scenario_service),
-    filter: Optional[str]=Query(None),
+    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[PopulatedScenarioDto]:
     try:
         scenarios: list[PopulatedScenarioDto] = await scenario_service.get_all_populated(ScenarioFilter(project_id=project_id), odata_query=filter)

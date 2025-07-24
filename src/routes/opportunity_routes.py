@@ -5,6 +5,7 @@ from src.dtos.opportunity_dtos import OpportunityIncomingDto, OpportunityOutgoin
 from src.services.opportunity_service import OpportunityService
 from src.dependencies import get_opportunity_service
 from src.services.user_service import get_temp_user
+from src.constants import SwaggerDocumentationConstants
 
 router = APIRouter(tags=["opportunities"])
 
@@ -37,7 +38,7 @@ async def get_opportunity(
 @router.get("/opportunities")
 async def get_all_opportunity(
     opportunity_service: OpportunityService = Depends(get_opportunity_service),
-    filter: Optional[str]=Query(None),
+    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[OpportunityOutgoingDto]:
     try:
         opportunities: list[OpportunityOutgoingDto] = await opportunity_service.get_all(odata_query=filter)
