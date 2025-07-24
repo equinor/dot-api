@@ -79,3 +79,10 @@ class ScenarioService:
             scenarios: list[Scenario] = await ScenarioRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
             result=ScenarioMapper.to_outgoing_dtos(scenarios)
         return result
+    
+    async def get_all_populated(self, filter: Optional[ScenarioFilter] = None, odata_query: Optional[str]=None) -> list[PopulatedScenarioDto]:
+        async with session_handler(self.engine) as session:
+            model_filter=ScenarioFilter.combine_conditions(scenario_conditions(filter)) if filter else None
+            scenarios: list[Scenario] = await ScenarioRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
+            result=ScenarioMapper.to_populated_dtos(scenarios)
+        return result
