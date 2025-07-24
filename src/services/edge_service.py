@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncEngine
 from src.models.edge import Edge
 from src.dtos.edge_dtos import (
@@ -37,8 +38,8 @@ class EdgeService:
             result=EdgeMapper.to_outgoing_dtos(edges)
         return result
     
-    async def get_all(self) -> list[EdgeOutgoingDto]:
+    async def get_all(self, odata_query: Optional[str]=None) -> list[EdgeOutgoingDto]:
         async with session_handler(self.engine) as session:
-            edges: list[Edge] = await EdgeRepository(session).get_all()
+            edges: list[Edge] = await EdgeRepository(session).get_all(odata_query=odata_query)
             result=EdgeMapper.to_outgoing_dtos(edges)
         return result

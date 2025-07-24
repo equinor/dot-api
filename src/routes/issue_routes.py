@@ -1,5 +1,6 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from src.dtos.issue_dtos import IssueIncomingDto, IssueOutgoingDto
 from src.services.issue_service import IssueService
 from src.dependencies import get_issue_service
@@ -42,10 +43,11 @@ async def get_issue(
     
 @router.get("/issues")
 async def get_all_issue(
-    issue_service: IssueService = Depends(get_issue_service)
+    issue_service: IssueService = Depends(get_issue_service),
+    filter: Optional[str] = Query(None),
 ) -> list[IssueOutgoingDto]:
     try:
-        issues: list[IssueOutgoingDto] = await issue_service.get_all()
+        issues: list[IssueOutgoingDto] = await issue_service.get_all(odata_query=filter)
         return issues
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -53,10 +55,11 @@ async def get_all_issue(
 @router.get("/projects/{project_id}/issues")
 async def get_all_issues_from_project(
     project_id: uuid.UUID,
-    issue_service: IssueService = Depends(get_issue_service)
+    issue_service: IssueService = Depends(get_issue_service),
+    filter: Optional[str] = Query(None),
 ) -> list[IssueOutgoingDto]:
     try:
-        issues: list[IssueOutgoingDto] = await issue_service.get_all(IssueFilter(project_id=project_id))
+        issues: list[IssueOutgoingDto] = await issue_service.get_all(IssueFilter(project_id=project_id), odata_query=filter)
         return issues
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -64,10 +67,11 @@ async def get_all_issues_from_project(
 @router.get("/scenarios/{scenario_id}/issues")
 async def get_all_issues_from_scenario(
     scenario_id: uuid.UUID,
-    issue_service: IssueService = Depends(get_issue_service)
+    issue_service: IssueService = Depends(get_issue_service),
+    filter: Optional[str] = Query(None),
 ) -> list[IssueOutgoingDto]:
     try:
-        issues: list[IssueOutgoingDto] = await issue_service.get_all(IssueFilter(scenario_id=scenario_id))
+        issues: list[IssueOutgoingDto] = await issue_service.get_all(IssueFilter(scenario_id=scenario_id), odata_query=filter)
         return issues
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

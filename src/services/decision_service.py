@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncEngine
 from src.models.decision import Decision
 from src.dtos.decision_dtos import (
@@ -37,8 +38,8 @@ class DecisionService:
             result=DecisionMapper.to_outgoing_dtos(decisions)
         return result
     
-    async def get_all(self) -> list[DecisionOutgoingDto]:
+    async def get_all(self, odata_query: Optional[str]=None) -> list[DecisionOutgoingDto]:
         async with session_handler(self.engine) as session:
-            decisions: list[Decision] = await DecisionRepository(session).get_all()
+            decisions: list[Decision] = await DecisionRepository(session).get_all(odata_query=odata_query)
             result=DecisionMapper.to_outgoing_dtos(decisions)
         return result

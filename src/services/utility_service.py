@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.utility import Utility
@@ -38,8 +39,8 @@ class UtilityService:
             result=UtilityMapper.to_outgoing_dtos(entities)
         return result
     
-    async def get_all(self) -> list[UtilityOutgoingDto]:
+    async def get_all(self, odata_query: Optional[str]=None) -> list[UtilityOutgoingDto]:
         async with session_handler(self.engine) as session:
-            entities: list[Utility] = await UtilityRepository(session).get_all()
+            entities: list[Utility] = await UtilityRepository(session).get_all(odata_query=odata_query)
             result=UtilityMapper.to_outgoing_dtos(entities)
         return result

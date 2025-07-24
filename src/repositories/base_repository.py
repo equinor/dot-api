@@ -1,10 +1,9 @@
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
-from sqlalchemy.sql import ColumnElement
-from sqlalchemy.sql._typing import _ColumnExpressionArgument # type: ignore
+from sqlalchemy.sql import ColumnElement, Select, select
 from sqlalchemy.orm.strategy_options import _AbstractLoad # type: ignore
-from typing import Type, TypeVar, Generic, List, Protocol, Callable, Union, Optional
+from typing import Type, TypeVar, Generic, List, Protocol, Callable, Union, Optional, Tuple, cast
+from odata_query.sqlalchemy.shorthand import apply_odata_query
 import uuid
 
 LoadOptions = List[_AbstractLoad]
@@ -37,12 +36,14 @@ class BaseRepository(Generic[T, IDType]):
         )
         return list((await self.session.scalars(query)).all())
 
-    async def get_all(self, model_filter: Optional[ColumnElement[bool]]=None) -> List[T]:
+    async def get_all(self, model_filter: Optional[ColumnElement[bool]]=None, odata_query: Optional[str]=None) -> List[T]:
         query = select(self.model).options(
             *self.query_extension_method()
         )
         if model_filter is not None:
             query=query.filter(model_filter)
+        if odata_query is not None:
+            query = cast(Select[Tuple[T]], apply_odata_query(query, odata_query))
         return list((await self.session.scalars(query)).all())
 
     async def delete(self, ids: List[IDType]) -> None:

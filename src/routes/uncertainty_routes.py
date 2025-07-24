@@ -1,5 +1,6 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from src.dtos.uncertainty_dtos import UncertaintyIncomingDto, UncertaintyOutgoingDto
 from src.services.uncertainty_service import UncertaintyService
 from src.dependencies import get_uncertainty_service
@@ -23,10 +24,11 @@ async def get_uncertainty(
     
 @router.get("/uncertainties")
 async def get_all_uncertainty(
-    uncertainty_service: UncertaintyService = Depends(get_uncertainty_service)
+    uncertainty_service: UncertaintyService = Depends(get_uncertainty_service),
+    filter: Optional[str]=Query(None)
 ) -> list[UncertaintyOutgoingDto]:
     try:
-        uncertainties: list[UncertaintyOutgoingDto] = await uncertainty_service.get_all()
+        uncertainties: list[UncertaintyOutgoingDto] = await uncertainty_service.get_all(odata_query=filter)
         return uncertainties
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

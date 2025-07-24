@@ -1,5 +1,6 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from src.dtos.opportunity_dtos import OpportunityIncomingDto, OpportunityOutgoingDto
 from src.services.opportunity_service import OpportunityService
 from src.dependencies import get_opportunity_service
@@ -35,10 +36,11 @@ async def get_opportunity(
     
 @router.get("/opportunities")
 async def get_all_opportunity(
-    opportunity_service: OpportunityService = Depends(get_opportunity_service)
+    opportunity_service: OpportunityService = Depends(get_opportunity_service),
+    filter: Optional[str]=Query(None),
 ) -> list[OpportunityOutgoingDto]:
     try:
-        opportunities: list[OpportunityOutgoingDto] = await opportunity_service.get_all()
+        opportunities: list[OpportunityOutgoingDto] = await opportunity_service.get_all(odata_query=filter)
         return opportunities
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

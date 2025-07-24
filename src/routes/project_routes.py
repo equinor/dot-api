@@ -1,5 +1,6 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from src.dtos.project_dtos import (
     ProjectIncomingDto, 
     ProjectOutgoingDto, 
@@ -61,19 +62,21 @@ async def get_populated_project(
 @router.get("/projects-populated")
 async def get_all_populated_project(
     project_service: ProjectService = Depends(get_project_service),
+    filter: Optional[str]=Query(None),
 ) -> list[PopulatedProjectDto]:
     try:
-        projects: list[PopulatedProjectDto] = await project_service.get_all_populated_projects()
+        projects: list[PopulatedProjectDto] = await project_service.get_all_populated_projects(odata_query=filter)
         return projects
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.get("/projects")
 async def get_all_project(
-    project_service: ProjectService = Depends(get_project_service)
+    project_service: ProjectService = Depends(get_project_service),
+    filter: Optional[str]=Query(None),
 ) -> list[ProjectOutgoingDto]:
     try:
-        projects: list[ProjectOutgoingDto] = await project_service.get_all()
+        projects: list[ProjectOutgoingDto] = await project_service.get_all(odata_query=filter)
         return projects
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

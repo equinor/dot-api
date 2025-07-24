@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.objective import Objective
@@ -45,8 +46,8 @@ class ObjectiveService:
             result=ObjectiveMapper.to_outgoing_dtos(objectives)
         return result
     
-    async def get_all(self) -> list[ObjectiveOutgoingDto]:
+    async def get_all(self, odata_query: Optional[str]=None) -> list[ObjectiveOutgoingDto]:
         async with session_handler(self.engine) as session:
-            objectives: list[Objective] = await ObjectiveRepository(session).get_all()
+            objectives: list[Objective] = await ObjectiveRepository(session).get_all(odata_query=odata_query)
             result=ObjectiveMapper.to_outgoing_dtos(objectives)
         return result

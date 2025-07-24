@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.opportunity import Opportunity
@@ -45,8 +46,8 @@ class OpportunityService:
             result=OpportunityMapper.to_outgoing_dtos(opportunities)
         return result
     
-    async def get_all(self) -> list[OpportunityOutgoingDto]:
+    async def get_all(self, odata_query: Optional[str]=None) -> list[OpportunityOutgoingDto]:
         async with session_handler(self.engine) as session:
-            opportunities: list[Opportunity] = await OpportunityRepository(session).get_all()
+            opportunities: list[Opportunity] = await OpportunityRepository(session).get_all(odata_query=odata_query)
             result=OpportunityMapper.to_outgoing_dtos(opportunities)
         return result

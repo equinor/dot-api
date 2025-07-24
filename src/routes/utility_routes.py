@@ -1,5 +1,6 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from src.dtos.utility_dtos import UtilityIncomingDto, UtilityOutgoingDto
 from src.services.utility_service import UtilityService
 from src.dependencies import get_utility_service
@@ -23,10 +24,11 @@ async def get_utility(
     
 @router.get("/utilities")
 async def get_all_utility(
-    utility_service: UtilityService = Depends(get_utility_service)
+    utility_service: UtilityService = Depends(get_utility_service),
+    filter: Optional[str]=Query(None),
 ) -> list[UtilityOutgoingDto]:
     try:
-        utilities: list[UtilityOutgoingDto] = await utility_service.get_all()
+        utilities: list[UtilityOutgoingDto] = await utility_service.get_all(odata_query=filter)
         return utilities
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
