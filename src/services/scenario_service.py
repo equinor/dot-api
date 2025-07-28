@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.scenario import Scenario
@@ -23,6 +24,7 @@ from src.repositories.scenario_repository import ScenarioRepository
 from src.repositories.user_repository import UserRepository
 from src.repositories.objective_repository import ObjectiveRepository
 from src.repositories.opportunity_repository import OpportunityRepository
+from src.models.filters.scenario_filter import ScenarioFilter, scenario_conditions
 from src.services.session_handler import session_handler
 
 class ScenarioService:
@@ -71,8 +73,16 @@ class ScenarioService:
             result=ScenarioMapper.to_populated_dtos(scenarios)
         return result
     
-    async def get_all(self) -> list[ScenarioOutgoingDto]:
+    async def get_all(self, filter: Optional[ScenarioFilter] = None, odata_query: Optional[str]=None) -> list[ScenarioOutgoingDto]:
         async with session_handler(self.engine) as session:
-            scenarios: list[Scenario] = await ScenarioRepository(session).get_all()
+            model_filter=ScenarioFilter.combine_conditions(scenario_conditions(filter)) if filter else None
+            scenarios: list[Scenario] = await ScenarioRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
             result=ScenarioMapper.to_outgoing_dtos(scenarios)
+        return result
+    
+    async def get_all_populated(self, filter: Optional[ScenarioFilter] = None, odata_query: Optional[str]=None) -> list[PopulatedScenarioDto]:
+        async with session_handler(self.engine) as session:
+            model_filter=ScenarioFilter.combine_conditions(scenario_conditions(filter)) if filter else None
+            scenarios: list[Scenario] = await ScenarioRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
+            result=ScenarioMapper.to_populated_dtos(scenarios)
         return result

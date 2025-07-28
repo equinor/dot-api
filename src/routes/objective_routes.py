@@ -1,9 +1,11 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from src.dtos.objective_dtos import ObjectiveIncomingDto, ObjectiveOutgoingDto
 from src.services.objective_service import ObjectiveService
 from src.dependencies import get_objective_service
 from src.services.user_service import get_temp_user
+from src.constants import SwaggerDocumentationConstants
 
 router = APIRouter(tags=["objectives"])
 
@@ -35,10 +37,11 @@ async def get_objective(
     
 @router.get("/objectives")
 async def get_all_objective(
-    objective_service: ObjectiveService = Depends(get_objective_service)
+    objective_service: ObjectiveService = Depends(get_objective_service),
+    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[ObjectiveOutgoingDto]:
     try:
-        objectives: list[ObjectiveOutgoingDto] = await objective_service.get_all()
+        objectives: list[ObjectiveOutgoingDto] = await objective_service.get_all(odata_query=filter)
         return objectives
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

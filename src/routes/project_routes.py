@@ -1,5 +1,6 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from src.dtos.project_dtos import (
     ProjectIncomingDto, 
     ProjectOutgoingDto, 
@@ -9,6 +10,7 @@ from src.dtos.project_dtos import (
 from src.services.project_service import ProjectService
 from src.dependencies import get_project_service
 from src.services.user_service import get_temp_user
+from src.constants import SwaggerDocumentationConstants
 
 router = APIRouter(tags=["projects"])
 
@@ -18,9 +20,9 @@ async def create_projects(
     project_service: ProjectService = Depends(get_project_service)
 )-> list[ProjectOutgoingDto]:
     """
-    Endpoint for creating Projects.
-    A Scenario must be supplied and will be created after the Project with the appropriate Id.
-    If Objectives/Opportunities are supplied with the Scenario, then they will be created after the Scenario with the appropriate Id.
+        Endpoint for creating Projects.
+        A Scenario must be supplied and will be created after the Project with the appropriate Id.
+        If Objectives/Opportunities are supplied with the Scenario, then they will be created after the Scenario with the appropriate Id.
     """
     try:
         user_dto=get_temp_user()
@@ -61,19 +63,21 @@ async def get_populated_project(
 @router.get("/projects-populated")
 async def get_all_populated_project(
     project_service: ProjectService = Depends(get_project_service),
+    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[PopulatedProjectDto]:
     try:
-        projects: list[PopulatedProjectDto] = await project_service.get_all_populated_projects()
+        projects: list[PopulatedProjectDto] = await project_service.get_all_populated_projects(odata_query=filter)
         return projects
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.get("/projects")
 async def get_all_project(
-    project_service: ProjectService = Depends(get_project_service)
+    project_service: ProjectService = Depends(get_project_service),
+    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[ProjectOutgoingDto]:
     try:
-        projects: list[ProjectOutgoingDto] = await project_service.get_all()
+        projects: list[ProjectOutgoingDto] = await project_service.get_all(odata_query=filter)
         return projects
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

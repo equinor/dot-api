@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
 from src.models import (
@@ -33,6 +34,7 @@ from src.repositories.user_repository import UserRepository
 from src.repositories.scenario_repository import ScenarioRepository
 from src.repositories.opportunity_repository import OpportunityRepository
 from src.repositories.objective_repository import ObjectiveRepository
+from src.models.filters.project_filter import ProjectFilter, project_conditions
 from src.services.session_handler import session_handler
 
 class ProjectService:
@@ -82,9 +84,10 @@ class ProjectService:
             result=ProjectMapper.to_outgoing_dtos(projects)
         return result
     
-    async def get_all(self) -> list[ProjectOutgoingDto]:
+    async def get_all(self, filter: Optional[ProjectFilter]=None, odata_query: Optional[str]=None) -> list[ProjectOutgoingDto]:
         async with session_handler(self.engine) as session:
-            projects: list[Project] = await ProjectRepository(session).get_all()
+            model_filter=ProjectFilter.combine_conditions(project_conditions(filter)) if filter else None
+            projects: list[Project] = await ProjectRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
             result = ProjectMapper.to_outgoing_dtos(projects)
         return result
 
@@ -94,8 +97,9 @@ class ProjectService:
             result=ProjectMapper.to_populated_dtos(projects)
         return result
     
-    async def get_all_populated_projects(self) -> list[PopulatedProjectDto]:
+    async def get_all_populated_projects(self, filter: Optional[ProjectFilter]=None, odata_query: Optional[str]=None) -> list[PopulatedProjectDto]:
         async with session_handler(self.engine) as session:
-            projects: list[Project] = await ProjectRepository(session).get_all()
+            model_filter=ProjectFilter.combine_conditions(project_conditions(filter)) if filter else None
+            projects: list[Project] = await ProjectRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
             result=ProjectMapper.to_populated_dtos(projects)
         return result

@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.node_style import NodeStyle
@@ -38,8 +39,8 @@ class NodeStyleService:
             result=NodeStyleMapper.to_outgoing_dtos(node_styles)
         return result
     
-    async def get_all(self) -> list[NodeStyleOutgoingDto]:
+    async def get_all(self, odata_query: Optional[str]=None) -> list[NodeStyleOutgoingDto]:
         async with session_handler(self.engine) as session:
-            node_styles: list[NodeStyle] = await NodeStyleRepository(session).get_all()
+            node_styles: list[NodeStyle] = await NodeStyleRepository(session).get_all(odata_query=odata_query)
             result=NodeStyleMapper.to_outgoing_dtos(node_styles)
         return result

@@ -42,6 +42,7 @@ from src.repositories.uncertainty_repository import UncertaintyRepository
 from src.repositories.utility_repository import UtilityRepository
 from src.repositories.value_metric_repository import ValueMetricRepository 
 from src.repositories.user_repository import UserRepository
+from src.models.filters.issues_filter import IssueFilter, issue_conditions
 from src.services.session_handler import session_handler
 
 class IssueService:
@@ -124,9 +125,9 @@ class IssueService:
             result=IssueMapper.to_outgoing_dtos(issues)
         return result
     
-    async def get_all(self) -> list[IssueOutgoingDto]:
+    async def get_all(self, filter: Optional[IssueFilter]=None, odata_query: Optional[str]=None) -> list[IssueOutgoingDto]:
         async with session_handler(self.engine) as session:
-            issues: list[Issue] = await IssueRepository(session).get_all()
+            model_filter=IssueFilter.combine_conditions(issue_conditions(filter)) if filter else None
+            issues: list[Issue] = await IssueRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
             result=IssueMapper.to_outgoing_dtos(issues)
         return result
-    
