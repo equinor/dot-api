@@ -1,6 +1,5 @@
 import uuid
 from typing import Optional
-from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.node import Node
