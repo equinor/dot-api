@@ -13,5 +13,5 @@ def project_conditions(filter: ProjectFilter) -> list[_ColumnExpressionArgument[
     conditions: list[_ColumnExpressionArgument[bool]] = []
     BaseFilter.add_condition(conditions, Project.id == filter.project_id if filter.project_id else None)
     BaseFilter.add_condition(conditions, Project.name.ilike(f"%{filter.name}%") if filter.name else None)
-    BaseFilter.add_condition(conditions, Project.description.ilike(f"%{filter.name}%") if filter.name else None)
+    BaseFilter.add_condition(conditions, Project.description.ilike(f"%{filter.name}%") if filter.description else None)
     return conditions
