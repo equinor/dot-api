@@ -18,14 +18,14 @@ async def get_current_user(
 ) -> UserIncomingDto:
         if claims.get("name") is not None and claims.get("oid") is not None:
             name: str = cast(str, claims.get("name"))
-            upn: str = cast(str, claims.get("oid"))
+            oid: str = cast(str, claims.get("oid"))
         else:
             raise ValueError("Invalid claims: 'name' or 'oid' is missing")
             
         return UserIncomingDto(
             id=None,
             name=name,
-            azure_id=upn
+            azure_id=oid
         )
         
 class UserService:
