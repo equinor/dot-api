@@ -38,24 +38,24 @@ async def get_all_node(
 @router.get("/projects/{project_id}/nodes")
 async def get_all_nodes_from_project(
     project_id: uuid.UUID,
-    issue_service: NodeService = Depends(get_node_service),
+    node_service: NodeService = Depends(get_node_service),
     filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[NodeOutgoingDto]:
     try:
-        issues: list[NodeOutgoingDto] = await issue_service.get_all(NodeFilter(project_id=project_id), odata_query=filter)
-        return issues
+        nodes: list[NodeOutgoingDto] = await node_service.get_all(NodeFilter(project_id=project_id), odata_query=filter)
+        return nodes
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.get("/scenarios/{scenario_id}/nodes")
 async def get_all_nodes_from_scenario(
     scenario_id: uuid.UUID,
-    issue_service: NodeService = Depends(get_node_service),
+    node_service: NodeService = Depends(get_node_service),
     filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[NodeOutgoingDto]:
     try:
-        issues: list[NodeOutgoingDto] = await issue_service.get_all(NodeFilter(scenario_id=scenario_id), odata_query=filter)
-        return issues
+        nodes: list[NodeOutgoingDto] = await node_service.get_all(NodeFilter(scenario_id=scenario_id), odata_query=filter)
+        return nodes
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
