@@ -1,7 +1,9 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from src.dtos.value_metric_dtos import ValueMetricIncomingDto, ValueMetricOutgoingDto
 from src.services.value_metric_service import ValueMetricService
+from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_value_metric_service
 
 router = APIRouter(tags=["value-metrics"])
@@ -23,10 +25,11 @@ async def get_value_metric(
     
 @router.get("/value-metrics")
 async def get_all_value_metric(
-    value_metric_service: ValueMetricService = Depends(get_value_metric_service)
+    value_metric_service: ValueMetricService = Depends(get_value_metric_service),
+    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[ValueMetricOutgoingDto]:
     try:
-        value_metrics: list[ValueMetricOutgoingDto] = await value_metric_service.get_all()
+        value_metrics: list[ValueMetricOutgoingDto] = await value_metric_service.get_all(odata_query=filter)
         return value_metrics
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

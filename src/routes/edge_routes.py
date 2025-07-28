@@ -1,11 +1,13 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from src.dtos.edge_dtos import (
     EdgeIncomingDto,
     EdgeOutgoingDto,
 )
 from src.services.edge_service import EdgeService
 from src.dependencies import get_edge_service
+from src.constants import SwaggerDocumentationConstants
 
 router = APIRouter(tags=["edges"])
 
@@ -36,10 +38,11 @@ async def get_edge(
     
 @router.get("/edges")
 async def get_all_edge(
-    edge_service: EdgeService = Depends(get_edge_service)
+    edge_service: EdgeService = Depends(get_edge_service),
+    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[EdgeOutgoingDto]:
     try:
-        edges: list[EdgeOutgoingDto] = await edge_service.get_all()
+        edges: list[EdgeOutgoingDto] = await edge_service.get_all(odata_query=filter)
         return edges
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

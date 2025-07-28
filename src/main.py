@@ -22,7 +22,12 @@ app = FastAPI(swagger_ui_init_oauth={
         "usePkceWithAuthorizationCodeGrant": True,
         "clientId": config.CLIENT_ID,
         "redirectUrl": "http://localhost:8000/docs/oauth2-redirect",
-    },)
+
+    },
+    swagger_ui_parameters={
+        "syntaxHighlight": False
+    }
+)
 
 
 

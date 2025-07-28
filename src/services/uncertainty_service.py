@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.uncertainty import Uncertainty
@@ -38,8 +39,8 @@ class UncertaintyService:
             result=UncertaintyMapper.to_outgoing_dtos(decisions)
         return result
     
-    async def get_all(self) -> list[UncertaintyOutgoingDto]:
+    async def get_all(self, odata_query: Optional[str]=None) -> list[UncertaintyOutgoingDto]:
         async with session_handler(self.engine) as session:
-            decisions: list[Uncertainty] = await UncertaintyRepository(session).get_all()
+            decisions: list[Uncertainty] = await UncertaintyRepository(session).get_all(odata_query=odata_query)
             result=UncertaintyMapper.to_outgoing_dtos(decisions)
         return result

@@ -1,15 +1,17 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from src.dtos.decision_dtos import DecisionIncomingDto, DecisionOutgoingDto
 from src.services.decision_service import DecisionService
 from src.dependencies import get_decision_service
+from src.constants import SwaggerDocumentationConstants
 
 router = APIRouter(tags=["decisions"])
 
 @router.get("/decisions/{id}")
 async def get_decision(
     id: uuid.UUID,
-    decision_service: DecisionService = Depends(get_decision_service)
+    decision_service: DecisionService = Depends(get_decision_service),
 ) -> DecisionOutgoingDto:
     try:
         decisions: list[DecisionOutgoingDto] = await decision_service.get([id])
@@ -23,10 +25,11 @@ async def get_decision(
     
 @router.get("/decisions")
 async def get_all_decision(
-    decision_service: DecisionService = Depends(get_decision_service)
+    decision_service: DecisionService = Depends(get_decision_service),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[DecisionOutgoingDto]:
     try:
-        decisions: list[DecisionOutgoingDto] = await decision_service.get_all()
+        decisions: list[DecisionOutgoingDto] = await decision_service.get_all(odata_query=filter)
         return decisions
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

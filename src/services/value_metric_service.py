@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.models.value_metric import ValueMetric
@@ -38,8 +39,8 @@ class ValueMetricService:
             result=ValueMetricMapper.to_outgoing_dtos(entities)
         return result
     
-    async def get_all(self) -> list[ValueMetricOutgoingDto]:
+    async def get_all(self, odata_query: Optional[str]=None) -> list[ValueMetricOutgoingDto]:
         async with session_handler(self.engine) as session:
-            entities: list[ValueMetric] = await ValueMetricRepository(session).get_all()
+            entities: list[ValueMetric] = await ValueMetricRepository(session).get_all(odata_query=odata_query)
             result=ValueMetricMapper.to_outgoing_dtos(entities)
         return result
