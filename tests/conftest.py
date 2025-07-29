@@ -1,3 +1,4 @@
+import uuid
 import pytest_asyncio
 from typing import AsyncGenerator
 from httpx import ASGITransport, AsyncClient
@@ -6,7 +7,10 @@ from src.auth.auth import verify_token
 from src.main import app
 
 async def mock_verify_token():
-    return
+    return {
+        "name": "test_user",
+        "oid": str(uuid.uuid4())
+    }
 app.dependency_overrides[verify_token] = mock_verify_token
 
 @pytest_asyncio.fixture
