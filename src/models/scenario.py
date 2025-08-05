@@ -18,10 +18,11 @@ if TYPE_CHECKING:
     from src.models.opportunity import Opportunity
     from src.models.issue import Issue
 from src.models.project import Project
+from src.models.base_entity import BaseEntity
 from src.models.base_auditable_entity import BaseAuditableEntity
 from src.constants import DatabaseConstants
 
-class Scenario(Base, BaseAuditableEntity):
+class Scenario(Base, BaseEntity, BaseAuditableEntity):
     __tablename__ = "scenario"
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)

@@ -9,13 +9,14 @@ from sqlalchemy.orm import (
 )
 from src.models.base import Base
 from src.models.scenario import Scenario
+from src.models.base_entity import BaseEntity
 from src.constants import DatabaseConstants
 if TYPE_CHECKING:
     from src.models import Edge
     from src.models import Issue
     from src.models import NodeStyle
 
-class Node(Base):
+class Node(Base, BaseEntity):
     __tablename__ = "node"
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)

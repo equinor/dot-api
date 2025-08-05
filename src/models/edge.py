@@ -9,8 +9,9 @@ from sqlalchemy.orm import (
 from src.models.base import Base
 from src.models.node import Node
 from src.models.scenario import Scenario
+from src.models.base_entity import BaseEntity
 
-class Edge(Base):
+class Edge(Base, BaseEntity):
     __tablename__ = "edge"
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
