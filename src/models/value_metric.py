@@ -7,11 +7,12 @@ from sqlalchemy.orm import (
     relationship,
     mapped_column,
 )
+from src.models.base_entity import BaseEntity
 from src.models.base import Base
 if TYPE_CHECKING:
     from src.models.issue import Issue
 
-class ValueMetric(Base):
+class ValueMetric(Base, BaseEntity):
     __tablename__ = "value_metric"
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
     issue_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("issue.id"))

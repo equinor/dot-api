@@ -8,10 +8,11 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 from src.models.base import Base
+from src.models.base_entity import BaseEntity
 if TYPE_CHECKING:
     from src.models import Node
 
-class NodeStyle(Base):
+class NodeStyle(Base, BaseEntity):
     __tablename__ = "node_style"
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
     node_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("node.id"))

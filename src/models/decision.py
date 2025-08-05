@@ -8,11 +8,12 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 from src.models.base import Base
+from src.models.base_entity import BaseEntity
 from src.constants import DatabaseConstants
 if TYPE_CHECKING:
     from src.models.issue import Issue
 
-class Decision(Base):
+class Decision(Base, BaseEntity):
     __tablename__ = "decision"
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
     issue_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("issue.id"))

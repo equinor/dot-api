@@ -3,8 +3,9 @@ from sqlalchemy.orm import Mapped, mapped_column
 from typing import Optional
 from src.models.base import Base
 from src.constants import DatabaseConstants
+from src.models.base_entity import BaseEntity
 
-class User(Base):
+class User(Base, BaseEntity):
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)

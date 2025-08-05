@@ -5,15 +5,15 @@ from sqlalchemy.orm import Mapped, relationship, mapped_column
 from sqlalchemy.event import listens_for
 from typing import Optional, TYPE_CHECKING
 from src.models.base import Base
+from src.models.base_entity import BaseEntity
 from src.models.base_auditable_entity import BaseAuditableEntity
 from src.models.base import Base
-from src.models.base_auditable_entity import BaseAuditableEntity
 from src.constants import DatabaseConstants
 if TYPE_CHECKING:
     from models.scenario import Scenario
 from src.models.guid import GUID
 
-class Project(Base, BaseAuditableEntity):
+class Project(Base, BaseEntity, BaseAuditableEntity):
     __tablename__ = "project"
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
