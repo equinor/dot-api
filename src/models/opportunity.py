@@ -8,11 +8,12 @@ from sqlalchemy.orm import (
 )
 from src.models.base import Base
 from sqlalchemy.event import listens_for
+from src.models.base_entity import BaseEntity
 from src.models.base_auditable_entity import BaseAuditableEntity
 from src.models.scenario import Scenario
 from src.constants import DatabaseConstants
 
-class Opportunity(Base, BaseAuditableEntity):
+class Opportunity(Base, BaseEntity, BaseAuditableEntity):
     __tablename__ = "opportunity"
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
