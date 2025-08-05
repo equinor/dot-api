@@ -10,7 +10,7 @@ config = Config()
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl=config.AUTH_URL,
     tokenUrl=config.TOKEN_URL,
-    scopes={f"{config.SCOPE}": "Read"},
+    scopes={f"{config.SCOPE}": "Read",},
 )
 
 def get_jwks(jwks_uri: str):
@@ -37,7 +37,7 @@ def verify_token(token: str = Depends(oauth2_scheme)) -> dict[str, str]:
             raise HTTPException(
                 status_code=403, detail="Forbidden: Insufficient role"
             )
-        return claims
+        return token
     except JoseError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
