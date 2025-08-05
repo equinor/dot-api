@@ -39,8 +39,8 @@ async def call_ms_graph_api (token: str) -> UserIncomingDto:
                     name=graph.get("displayName"),
                     azure_id=graph.get("id")
                 )
-            elif not graph_response.is_success:
+            elif not obo_response.is_success:
                 raise HTTPException(
-                    status_code=graph_response.status_code,
-                    detail=f"Graph API error: {graph.get('error', {}).get('message', 'Unknown error')}"
+                    status_code=obo_response.status_code,
+                    detail=f"Graph API error: {obo_response.text}"
                 )
