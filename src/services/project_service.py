@@ -32,9 +32,10 @@ from src.dtos.scenario_dtos import (
 from src.repositories.project_repository import ProjectRepository
 from src.repositories.user_repository import UserRepository
 from src.repositories.scenario_repository import ScenarioRepository
+from src.repositories.user_repository import UserRepository
 from src.repositories.opportunity_repository import OpportunityRepository
 from src.repositories.objective_repository import ObjectiveRepository
-from src.models.filters.project_filter import ProjectFilter, project_conditions
+from src.models.filters.project_filter import ProjectFilter, project_conditions, project_access_conditions
 from src.services.session_handler import session_handler
 
 class ProjectService:
@@ -73,20 +74,41 @@ class ProjectService:
             # get the dtos while the entities are still connected to the session
             result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(entities)
         return result
-    
-    async def delete(self, ids: list[uuid.UUID]):
+
+    async def delete(self, ids: list[uuid.UUID], user_dto: UserIncomingDto) -> None:
         async with session_handler(self.engine) as session:
-            await ProjectRepository(session).delete(ids)
+            accessible_project_ids = await self.check_accessible_projects(user_dto)
+            # Filter ids to only those the user owns
+            project_owner_ids = accessible_project_ids.get("owner")
+            ids_to_delete = [pid for pid in ids if pid in project_owner_ids]
+            if not ids_to_delete:
+                return
+            await ProjectRepository(session).delete(ids_to_delete)
     
     async def get(self, ids: list[uuid.UUID]) -> list[ProjectOutgoingDto]:
         async with session_handler(self.engine) as session:
+            if not ids:
+                return []
             projects: list[Project] = await ProjectRepository(session).get(ids)
             result=ProjectMapper.to_outgoing_dtos(projects)
         return result
     
-    async def get_all(self, filter: Optional[ProjectFilter]=None, odata_query: Optional[str]=None) -> list[ProjectOutgoingDto]:
+    async def check_accessible_projects(self, user_dto: UserIncomingDto) -> dict[str, list[uuid.UUID]]:
         async with session_handler(self.engine) as session:
-            model_filter=ProjectFilter.combine_conditions(project_conditions(filter)) if filter else None
+            accessible_project_ids = await UserRepository(session).get_accessible_projects_by_user(user_dto.id)
+            return accessible_project_ids
+        
+    async def get_all(self, user_dto: UserIncomingDto, filter: Optional[ProjectFilter]=None, odata_query: Optional[str]=None) -> list[ProjectOutgoingDto]:
+        async with session_handler(self.engine) as session:
+            accessible_project_ids = await self.check_accessible_projects(user_dto)
+            if not accessible_project_ids:
+                return []
+            if filter is None:
+                filter = ProjectFilter(project_id=[accessible_project_ids["contributor"], accessible_project_ids["owner"]])
+                # filter.accessing_user_id = user_dto.id
+            else:
+                filter.project_id = [accessible_project_ids["contributor"], accessible_project_ids["owner"]]
+            model_filter=ProjectFilter.combine_conditions(project_conditions(filter) + project_access_conditions(filter)) if filter else None
             projects: list[Project] = await ProjectRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
             result = ProjectMapper.to_outgoing_dtos(projects)
         return result

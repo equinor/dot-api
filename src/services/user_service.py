@@ -52,3 +52,4 @@ class UserService:
             else:
                 result=UserMapper.to_outgoing_dto(user)
         return result
+    

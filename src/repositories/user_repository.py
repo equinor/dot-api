@@ -1,9 +1,12 @@
 from typing import Optional
+import uuid
+from models.filters.user_filter import UserFilter
 from src.models.user import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from src.repositories.base_repository import BaseRepository
 from src.repositories.query_extensions import QueryExtensions
+from src.models.filters.user_filter import UserFilter, user_conditions
 
 class UserRepository(BaseRepository[User, int]):
     def __init__(self, session: AsyncSession):
@@ -28,3 +31,11 @@ class UserRepository(BaseRepository[User, int]):
 
         await self.session.flush()
         return entities_to_update
+
+    async def get_accessible_projects_by_user(self, id: int) -> dict[str, list[uuid.UUID]]:
+        user = (await self.session.scalars(select(User).where(User.id == id))).first()
+        if user is None:
+            return []
+        contributor_projects_ids: list[uuid.UUID] = [project.project_id for project in user.project_contributors]
+        owner_projects_ids: list[uuid.UUID] = [project.project_id for project in user.project_owners]
+        return { "contributor": contributor_projects_ids, "owner": owner_projects_ids}
