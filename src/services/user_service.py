@@ -14,7 +14,7 @@ from src.services.session_handler import session_handler
 from src.auth.graph_api import call_ms_graph_api
 
 async def get_current_user(
-    token: dict[str, str] = Depends(verify_token),
+    token: str = Depends(verify_token),
 ) -> UserIncomingDto:
     return await call_ms_graph_api(token)
 
