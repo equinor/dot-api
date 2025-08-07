@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 import uuid
-from models.base_entity import BaseEntity
-from models.base_auditable_entity import BaseAuditableEntity
+from src.models.base_entity import BaseEntity
+from src.models.base_auditable_entity import BaseAuditableEntity
 from sqlalchemy import  ForeignKey
 from sqlalchemy.orm import (
     Mapped, 

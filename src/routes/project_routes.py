@@ -106,4 +106,8 @@ async def update_projects(
         return list(await project_service.update(dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+    
+
     

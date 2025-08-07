@@ -35,7 +35,7 @@ from src.repositories.scenario_repository import ScenarioRepository
 from src.repositories.user_repository import UserRepository
 from src.repositories.opportunity_repository import OpportunityRepository
 from src.repositories.objective_repository import ObjectiveRepository
-from src.models.filters.project_filter import ProjectFilter, project_conditions, project_access_conditions
+from src.models.filters.project_filter import ProjectFilter, project_conditions
 from src.services.session_handler import session_handler
 
 class ProjectService:
@@ -108,7 +108,8 @@ class ProjectService:
                 # filter.accessing_user_id = user_dto.id
             else:
                 filter.project_id = [accessible_project_ids["contributor"], accessible_project_ids["owner"]]
-            model_filter=ProjectFilter.combine_conditions(project_conditions(filter) + project_access_conditions(filter)) if filter else None
+            # model_filter=ProjectFilter.combine_conditions(project_conditions(filter) + project_access_conditions(filter)) if filter else None
+            model_filter=ProjectFilter.combine_conditions(project_conditions(filter)) if filter else None
             projects: list[Project] = await ProjectRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
             result = ProjectMapper.to_outgoing_dtos(projects)
         return result

@@ -1,6 +1,6 @@
 import uuid
-from models.base_entity import BaseEntity
-from models.base_auditable_entity import BaseAuditableEntity
+from src.models.base_entity import BaseEntity
+from src.models.base_auditable_entity import BaseAuditableEntity
 from sqlalchemy import  ForeignKey
 from sqlalchemy.orm import (
     Mapped, 
@@ -12,7 +12,7 @@ from src.models.project import Project
 from src.models.user import User
 
 class ProjectOwners(Base,BaseEntity, BaseAuditableEntity):
-    __tablename__ = "project_contributors"
+    __tablename__ = "project_owners"
 
     project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("project.id"), primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)

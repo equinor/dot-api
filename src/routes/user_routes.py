@@ -58,3 +58,4 @@ async def get_user_by_azure_id(
         raise HTTPException(status_code=404)
     else:
         return result
+    

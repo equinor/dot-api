@@ -1,12 +1,11 @@
 from typing import Optional
 import uuid
-from models.filters.user_filter import UserFilter
 from src.models.user import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from src.repositories.base_repository import BaseRepository
+from src.repositories.project_repository import ProjectRepository
 from src.repositories.query_extensions import QueryExtensions
-from src.models.filters.user_filter import UserFilter, user_conditions
 
 class UserRepository(BaseRepository[User, int]):
     def __init__(self, session: AsyncSession):
