@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
+from src.auth.graph_api import call_ms_graph_api
+from src.auth.auth import verify_token
 from src.services.user_service import (
-    get_current_user, 
     UserService,
 )
 from src.dtos.user_dtos import (
-    UserIncomingDto,
     UserOutgoingDto,
+    UserIncomingDto
 )
 from src.dependencies import get_user_service
 
@@ -13,13 +14,13 @@ router = APIRouter(tags=["user"])
 
 @router.get("/user/me")
 async def get_me(
-    current_user: UserIncomingDto = Depends(get_current_user)
+    token: str = Depends(verify_token)
 ) -> UserIncomingDto:
     try:
-        return current_user
+        return await call_ms_graph_api(token)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to retrieve user: {str(e)}")
-    
+
 @router.get("/users")
 async def get_users(
     user_service: UserService = Depends(get_user_service),

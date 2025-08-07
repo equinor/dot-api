@@ -1,5 +1,4 @@
-from typing import cast, Optional
-from src.dtos.user_dtos import UserIncomingDto
+from typing import  Optional
 from src.auth.auth import verify_token
 from fastapi import Depends
 
@@ -12,22 +11,13 @@ from src.dtos.user_dtos import (
 from src.repositories.user_repository import UserRepository
 from src.models.user import User
 from src.services.session_handler import session_handler
+from src.auth.graph_api import call_ms_graph_api
 
 async def get_current_user(
-    claims: dict[str, str] = Depends(verify_token),
+    token: str = Depends(verify_token),
 ) -> UserIncomingDto:
-        if claims.get("name") is not None and claims.get("oid") is not None:
-            name: str = cast(str, claims.get("name"))
-            oid: str = cast(str, claims.get("oid"))
-        else:
-            raise ValueError("Invalid claims: 'name' or 'oid' is missing")
-            
-        return UserIncomingDto(
-            id=None,
-            name=name,
-            azure_id=oid
-        )
-        
+    return await call_ms_graph_api(token)
+
 class UserService:
     def __init__(self, engine: AsyncEngine):
         self.engine=engine

@@ -38,8 +38,8 @@ class GenerateUuid:
         return uuid.uuid5(uuid.NAMESPACE_DNS, f"{index}")
 
 async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios: int, num_nodes: int):
-    user1 = User(id=1, name=str(uuid4()), azure_id=str(uuid4()))
-    user2 = User(id=2, name=str(uuid4()), azure_id=str(uuid4()))
+    user1 = User(id=1, name=str("test_user_1"), azure_id=str(uuid4()))
+    user2 = User(id=2, name=str("test_user_2"), azure_id=str(uuid4()))
     entities: list[Any]=[user1, user2]
 
     for project_index in range(num_projects):
