@@ -40,12 +40,12 @@ class BaseRepository(Generic[T, IDType]):
         )
         return list((await self.session.scalars(query)).all())
 
-    async def get_all(self, model_filter: Optional[ColumnElement[bool]]=None, odata_query: Optional[str]=None, skip: int=0, take: int=PageSize.DEFAULT) -> List[T]:
+    async def get_all(self, model_filter: List[ColumnElement[bool]] = [], odata_query: Optional[str]=None, skip: int=0, take: int=PageSize.DEFAULT) -> List[T]:
         query = select(self.model).options(
             *self.query_extension_method()
         )
-        if model_filter is not None:
-            query=query.filter(model_filter)
+        if model_filter.__len__() != 0:
+            query = query.filter(*model_filter)
         if odata_query is not None:
             query = cast(Select[Tuple[T]], apply_odata_query(query, odata_query))
         query=query.order_by(desc(self.model.created_at)).offset(skip).limit(take)

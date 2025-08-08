@@ -80,7 +80,7 @@ async def get_all_project(
 ) -> list[ProjectOutgoingDto]:
     try:
    
-        projects: list[ProjectOutgoingDto] = await project_service.get_all(odata_query=filter,current_user=current_user)
+        projects: list[ProjectOutgoingDto] = await project_service.get_all(odata_query=filter,user_dto=current_user)
         return projects
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

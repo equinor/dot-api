@@ -2,6 +2,8 @@ import uuid
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
+from src.dtos.project_owners_dtos import ProjectOwnersDto, ProjectOwnersMapper
+from src.repositories.project_owners_repository import ProjectOwnersRepository
 from src.models import (
     Project,
     User,
@@ -35,7 +37,7 @@ from src.repositories.scenario_repository import ScenarioRepository
 from src.repositories.user_repository import UserRepository
 from src.repositories.opportunity_repository import OpportunityRepository
 from src.repositories.objective_repository import ObjectiveRepository
-from src.models.filters.project_filter import ProjectFilter, project_conditions
+from src.models.filters.project_filter import ProjectFilter, project_access_conditions, project_conditions
 from src.services.session_handler import session_handler
 
 class ProjectService:
@@ -58,6 +60,12 @@ class ProjectService:
         async with session_handler(self.engine) as session:
             user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
             entities: list[Project] = await ProjectRepository(session).create(ProjectMapper.from_create_to_entities(dtos, user.id))
+            entity_ids = [entity.id for entity in entities]
+            project_owners_dto: ProjectOwnersDto = ProjectOwnersDto(
+                user_ids=[user.id],
+                project_id=entity_ids[0]
+            )
+            await ProjectOwnersRepository(session).create(ProjectOwnersMapper.from_role_to_entity(project_owners_dto))
 
             for entity, dto in zip(entities, dtos):
                 scenarios=await self._create_scenarios_for_project(session, dto.scenarios, user, entity.id)
@@ -103,14 +111,9 @@ class ProjectService:
             accessible_project_ids = await self.check_accessible_projects(user_dto)
             if not accessible_project_ids:
                 return []
-            if filter is None:
-                filter = ProjectFilter(project_id=[accessible_project_ids["contributor"], accessible_project_ids["owner"]])
-                # filter.accessing_user_id = user_dto.id
-            else:
-                filter.project_id = [accessible_project_ids["contributor"], accessible_project_ids["owner"]]
-            # model_filter=ProjectFilter.combine_conditions(project_conditions(filter) + project_access_conditions(filter)) if filter else None
             model_filter=ProjectFilter.combine_conditions(project_conditions(filter)) if filter else None
-            projects: list[Project] = await ProjectRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
+            project_access_model_filter=ProjectFilter.combine_conditions(project_access_conditions(filter)) if filter else None
+            projects: list[Project] = await ProjectRepository(session).get_all(model_filter=[model_filter,project_access_model_filter], odata_query=odata_query)
             result = ProjectMapper.to_outgoing_dtos(projects)
         return result
 

@@ -21,18 +21,20 @@ class RoleAssignmentService:
         if not dtos or not current_user:
             return None
         async with session_handler(self.async_engine) as session:
-            accessible_project_ids = await UserRepository(session).get_accessible_projects_by_user(current_user.id)
+            user = await UserRepository(session).get_by_azure_id(current_user.azure_id)
+            accessible_project_ids = await UserRepository(session).get_accessible_projects_by_user(user.id)
             if not accessible_project_ids:
                 return None
             if(dtos.project_id in accessible_project_ids.get("owner")):
                projects: list[Project] = await ProjectRepository(session).get([dtos.project_id])
                if(dtos.role == "contributor"):
                    await ProjectContributorsRepository(session).create(ProjectContributorMapper.from_role_to_entity(dtos))
-                   return RoleAssignmentOutgoingDto(
-                        project_id=dtos.project_id,
-                        project_name=projects[0].name,
-                        role=dtos.role
-                    )
+                   result = RoleAssignmentOutgoingDto(
+                       project_id=dtos.project_id,
+                       project_name=projects[0].name,
+                       role=dtos.role
+                   )
+                   return result
                elif(dtos.role == "owner"):
                    await ProjectOwnersRepository(session).create(ProjectOwnersMapper.from_role_to_entity(dtos))
                    return RoleAssignmentOutgoingDto(

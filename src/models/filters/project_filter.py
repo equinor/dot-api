@@ -24,9 +24,9 @@ def project_conditions(filter: ProjectFilter) -> list[_ColumnExpressionArgument[
     BaseFilter.add_condition(conditions, Project.description.ilike(f"%{filter.description}%") if filter.description else None)
     return conditions
 
-# def project_access_conditions(filter: ProjectFilter) -> list[_ColumnExpressionArgument[bool]]:
-#     conditions: list[_ColumnExpressionArgument[bool]] = []
-#     BaseFilter.add_condition(conditions, Project.project_contributors.has(User.id == filter.accessing_user_id) if filter.accessing_user_id else None)
+def project_access_conditions(filter: ProjectFilter) -> list[_ColumnExpressionArgument[bool]]:
+    conditions: list[_ColumnExpressionArgument[bool]] = []
+    BaseFilter.add_condition(conditions, Project.project_contributors.has(User.id == filter.accessing_user_id) if filter.accessing_user_id else None)
     
-#     BaseFilter.add_condition(conditions, Project.project_owners.has(User.id == filter.accessing_user_id) if filter.accessing_user_id else None)
-#     return conditions
+    BaseFilter.add_condition(conditions, Project.project_owners.has(User.id == filter.accessing_user_id) if filter.accessing_user_id else None)
+    return conditions

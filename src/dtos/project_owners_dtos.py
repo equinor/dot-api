@@ -5,8 +5,8 @@ from src.models.project_owners import (
 )
 
 class ProjectOwnersDto(BaseModel):
-        user_id: int
-        project_id: list[uuid.UUID]
+        user_ids: list[int]
+        project_id: uuid.UUID
 
 
 class ProjectOwnersCreateDto(ProjectOwnersDto):

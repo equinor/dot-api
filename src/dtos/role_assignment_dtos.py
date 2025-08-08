@@ -13,9 +13,17 @@ class RoleAssignmentDto(BaseModel):
 class RoleAssignmentIncomingDto(RoleAssignmentDto):
     pass
 
-class RoleAssignmentOutgoingDto():
+class RoleAssignmentOutgoingDto(BaseModel):
     project_id: uuid.UUID
     project_name: str
     role:str
 
 
+# class RoleAssignmentMapper:
+#     @staticmethod
+#     def to_outgoing_dto(entity: RoleAssignment) -> RoleAssignmentOutgoingDto:
+#         return RoleAssignmentOutgoingDto(
+#             project_id=entity.project_id,
+#             project_name=entity.project_name,
+#             role=entity.role
+#         )

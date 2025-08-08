@@ -6,6 +6,7 @@ from sqlalchemy import select
 from src.repositories.base_repository import BaseRepository
 from src.repositories.project_repository import ProjectRepository
 from src.repositories.query_extensions import QueryExtensions
+from sqlalchemy.orm import selectinload
 
 class UserRepository(BaseRepository[User, int]):
     def __init__(self, session: AsyncSession):
@@ -30,11 +31,20 @@ class UserRepository(BaseRepository[User, int]):
 
         await self.session.flush()
         return entities_to_update
+    # from sqlalchemy.orm import selectinload  # Already imported at the top
 
     async def get_accessible_projects_by_user(self, id: int) -> dict[str, list[uuid.UUID]]:
-        user = (await self.session.scalars(select(User).where(User.id == id))).first()
+        stmt = (
+            select(User)
+            .options(
+                selectinload(User.project_contributors),
+                selectinload(User.project_owners)
+            )
+            .where(User.id == id)
+        )
+        user = (await self.session.scalars(stmt)).first()
         if user is None:
-            return []
+            return {"contributor": [], "owner": []}
         contributor_projects_ids: list[uuid.UUID] = [project.project_id for project in user.project_contributors]
         owner_projects_ids: list[uuid.UUID] = [project.project_id for project in user.project_owners]
         return { "contributor": contributor_projects_ids, "owner": owner_projects_ids}

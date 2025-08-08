@@ -22,11 +22,13 @@ class User(Base, BaseEntity):
         "ProjectContributors",
         back_populates="user",
         cascade="all, delete-orphan",
+        foreign_keys='ProjectContributors.user_id'
     )
     project_owners: Mapped[list["ProjectOwners"]] = relationship(
         "ProjectOwners",
         back_populates="user",
         cascade="all, delete-orphan",
+        foreign_keys='ProjectOwners.user_id'
     )
     def __init__(self, id: Optional[int], name: str, azure_id: str):
         if id is not None:
