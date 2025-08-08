@@ -1,5 +1,7 @@
 
 from http.client import HTTPException
+
+from sqlalchemy import Enum
 from src.dtos.role_assignment_dtos import  RoleAssignmentDto, RoleAssignmentOutgoingDto
 from src.dtos.project_contributors_dtos import  ProjectContributorMapper
 from src.dtos.project_owners_dtos import  ProjectOwnersMapper
@@ -12,7 +14,9 @@ from src.services.session_handler import session_handler
 from src.repositories.project_repository import ProjectRepository
 from src.repositories.user_repository import UserRepository
 
-
+class ProjectRole(Enum):
+    CONTRIBUTOR: str = "contributor"
+    OWNER: str = "owner"
 class RoleAssignmentService:
     def __init__(self, async_engine: AsyncEngine):
         self.async_engine = async_engine
@@ -27,7 +31,7 @@ class RoleAssignmentService:
                 return None
             if(dtos.project_id in accessible_project_ids.get("owner")):
                projects: list[Project] = await ProjectRepository(session).get([dtos.project_id])
-               if(dtos.role == "contributor"):
+               if(dtos.role == ProjectRole.CONTRIBUTOR.value):
                    await ProjectContributorsRepository(session).create(ProjectContributorMapper.from_role_to_entity(dtos))
                    result = RoleAssignmentOutgoingDto(
                        project_id=dtos.project_id,
@@ -35,7 +39,7 @@ class RoleAssignmentService:
                        role=dtos.role
                    )
                    return result
-               elif(dtos.role == "owner"):
+               elif(dtos.role == ProjectRole.OWNER.value):
                    await ProjectOwnersRepository(session).create(ProjectOwnersMapper.from_role_to_entity(dtos))
                    return RoleAssignmentOutgoingDto(
                         project_id=dtos.project_id,
