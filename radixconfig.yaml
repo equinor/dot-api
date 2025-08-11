@@ -11,9 +11,6 @@ spec:
     - name: dev
       build:
         from: main|dev-deploy*
-  build:
-    secrets:
-      - CLIENT_SECRET
   components:
     - name: api
       src: .
@@ -22,6 +19,8 @@ spec:
         - name: http
           port: 8000
       publicPort: http
+      secrets:
+        - CLIENT_SECRET
       resources:
         requests:
           memory: '900Mi'
