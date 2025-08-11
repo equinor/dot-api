@@ -55,7 +55,6 @@ spec:
             AUDIENCE: "945882c1-69f4-41cd-a42a-22516ca01868"
             APP_ENV: 'test'
             SCOPE: '945882c1-69f4-41cd-a42a-22516ca01868/Read'
-
             DATABASE_CONN_TEST: 'DRIVER={ODBC Driver 18 for SQL Server};Server=decision-optimization-sqlserver-test.database.windows.net;Database=decision-optimization-sqldb-test;'
         - environment: dev  
           replicas: 1
