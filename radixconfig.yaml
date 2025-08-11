@@ -11,6 +11,9 @@ spec:
     - name: dev
       build:
         from: main|dev-deploy*
+  build:
+    secrets:
+      - CLIENT_SECRET
   components:
     - name: api
       src: .
