@@ -43,7 +43,8 @@ spec:
           variables:
             CLIENT_ID: '4251833c-b9c3-4013-afda-cbfd2cc50f3f'
             REDIRECT_URL: 'https://api-dot-api-prod.radix.equinor.com/docs/oauth2-redirect'
-            AUDIENCE: "api://4251833c-b9c3-4013-afda-cbfd2cc50f3f"
+            AUDIENCE: "4251833c-b9c3-4013-afda-cbfd2cc50f3f"
+            SCOPE: '4251833c-b9c3-4013-afda-cbfd2cc50f3f/Read'
             APP_ENV: 'production'
             DATABASE_CONN_PROD: 'DRIVER={ODBC Driver 18 for SQL Server};Server=decision-optimization-sqlserver-prod.database.windows.net;Database=decision-optimization-sqldb-prod;'
         - environment: test
@@ -51,17 +52,20 @@ spec:
           variables:
             CLIENT_ID: '945882c1-69f4-41cd-a42a-22516ca01868'
             REDIRECT_URL: 'https://api-dot-api-test.radix.equinor.com/docs/oauth2-redirect'
-            AUDIENCE: "api://945882c1-69f4-41cd-a42a-22516ca01868"
+            AUDIENCE: "945882c1-69f4-41cd-a42a-22516ca01868"
             APP_ENV: 'test'
+            SCOPE: '945882c1-69f4-41cd-a42a-22516ca01868/Read'
+
             DATABASE_CONN_TEST: 'DRIVER={ODBC Driver 18 for SQL Server};Server=decision-optimization-sqlserver-test.database.windows.net;Database=decision-optimization-sqldb-test;'
         - environment: dev  
           replicas: 1
           variables:
             CLIENT_ID: '4251833c-b9c3-4013-afda-cbfd2cc50f3f'
             REDIRECT_URL: 'https://api-dot-api-dev.radix.equinor.com/docs/oauth2-redirect'
-            AUDIENCE: "api://4251833c-b9c3-4013-afda-cbfd2cc50f3f"
+            AUDIENCE: "4251833c-b9c3-4013-afda-cbfd2cc50f3f"
             APP_ENV: 'dev'
             DATABASE_CONN_DEV: 'DRIVER={ODBC Driver 18 for SQL Server};Server=decision-optimization-sqlserver-dev.database.windows.net;Database=decision-optimization-sqldb-dev;'
+            SCOPE: '4251833c-b9c3-4013-afda-cbfd2cc50f3f/Read'
           identity:
             azure:
               clientId: c0d1f6a5-93b5-432b-8c2e-bf26583a7626
