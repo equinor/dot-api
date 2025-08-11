@@ -34,7 +34,7 @@ class UserRepository(BaseRepository[User, int]):
     # from sqlalchemy.orm import selectinload  # Already imported at the top
 
     async def get_accessible_projects_by_user(self, id: int) -> dict[str, list[uuid.UUID]]:
-        stmt = (
+        user_with_roles = (
             select(User)
             .options(
                 selectinload(User.project_contributors),
@@ -42,7 +42,7 @@ class UserRepository(BaseRepository[User, int]):
             )
             .where(User.id == id)
         )
-        user = (await self.session.scalars(stmt)).first()
+        user = (await self.session.scalars(user_with_roles)).first()
         if user is None:
             return {"contributor": [], "owner": []}
         contributor_projects_ids: list[uuid.UUID] = [project.project_id for project in user.project_contributors]
