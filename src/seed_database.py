@@ -56,22 +56,20 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
             user_id=user.id,
             scenarios=None,
         )
+        project = add_auditable_fields(project, user)
+        entities.append(project)
         project_contributors = ProjectContributors(
             project_id=project_id,
-            user_id=2
+            user_id=user.id
         )
         project_contributors = add_auditable_fields(project_contributors, user)
         entities.append(project_contributors)
         project_owners = ProjectOwners(
             project_id=project_id,
-            user_id=1
+            user_id= user.id
         )
         project_owners = add_auditable_fields(project_owners, user)
-
         entities.append(project_owners)
-
-        project = add_auditable_fields(project, user)
-        entities.append(project)
 
         objective=Objective(
             id=project_id,

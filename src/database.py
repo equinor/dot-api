@@ -10,7 +10,7 @@ class DatabaseConnectionStrings(Enum):
     def get_connection_string(cls, app_env: str) -> str:
         """Retrieve the appropriate connection string based on the application environment."""
         if app_env == "local":
-            return config.DATABASE_CONN_LOCAL
+            return cls.local.value
         elif app_env == "dev":
             return config.DATABASE_CONN_DEV
         elif app_env == "test":
