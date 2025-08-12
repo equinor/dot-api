@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def session_handler(engine: AsyncEngine):
-    async with AsyncSession(engine, autoflush=True, autocommit=False) as session:
+    async with AsyncSession(engine, autoflush=False, autocommit=False) as session:
         try:
             yield session
             await session.commit()
