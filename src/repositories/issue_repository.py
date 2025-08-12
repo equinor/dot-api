@@ -10,7 +10,10 @@ class IssueRepository(BaseRepository[Issue, uuid.UUID]):
         super().__init__(session, Issue, query_extension_method=QueryExtensions.load_issue_with_relationships)
 
     async def update(self, entities: list[Issue]) -> list[Issue]:
-        entities_to_update=await self.get([decision.id for decision in entities])
+        entities_to_update=await self.get([decision.id for decision in entities])  
+        # sort the entity lists to share the same order according to the entity.id
+        entities.sort(key=lambda entity: entity.id)
+        entities_to_update.sort(key=lambda entity: entity.id)
 
         for n, entity_to_update in enumerate(entities_to_update):
             entity=entities[n]

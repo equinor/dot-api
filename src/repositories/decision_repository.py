@@ -10,6 +10,9 @@ class DecisionRepository(BaseRepository[Decision, uuid.UUID]):
 
     async def update(self, entities: list[Decision]) -> list[Decision]:
         entities_to_update=await self.get([decision.id for decision in entities])
+        # sort the entity lists to share the same order according to the entity.id
+        entities.sort(key=lambda entity: entity.id)
+        entities_to_update.sort(key=lambda entity: entity.id)
 
         for n, entity_to_update in enumerate(entities_to_update):
             entity=entities[n]
