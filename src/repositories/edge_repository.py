@@ -11,8 +11,7 @@ class EdgeRepository(BaseRepository[Edge, uuid.UUID]):
     async def update(self, entities: list[Edge]) -> list[Edge]:
         entities_to_update=await self.get([edge.id for edge in entities])
         # sort the entity lists to share the same order according to the entity.id
-        entities.sort(key=lambda entity: entity.id)
-        entities_to_update.sort(key=lambda entity: entity.id)
+        self.sort_entity_collections_by_id([entities, entities_to_update])
         
         for n, edge_to_update in enumerate(entities_to_update):
             edge=entities[n]

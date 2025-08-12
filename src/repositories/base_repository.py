@@ -59,3 +59,8 @@ class BaseRepository(Generic[T, IDType]):
 
     async def update(self, entities: List[T]) -> List[T]:
         raise NotImplementedError("Subclasses must implement update_entity method.")
+
+    @staticmethod
+    def sort_entity_collections_by_id(entity_lists: List[List[T]]):
+        for entiy_list in entity_lists:
+            entiy_list.sort(key=lambda entity: entity.id)

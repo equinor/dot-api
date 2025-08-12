@@ -11,8 +11,7 @@ class UtilityRepository(BaseRepository[Utility, uuid.UUID]):
     async def update(self, entities: list[Utility]) -> list[Utility]:
         entities_to_update=await self.get([utility.id for utility in entities])
         # sort the entity lists to share the same order according to the entity.id
-        entities.sort(key=lambda entity: entity.id)
-        entities_to_update.sort(key=lambda entity: entity.id)
+        self.sort_entity_collections_by_id([entities, entities_to_update])
 
         for n, entity_to_update in enumerate(entities_to_update):
             entity=entities[n]
