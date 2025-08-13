@@ -44,7 +44,7 @@ class BaseRepository(Generic[T, IDType]):
         query = select(self.model).options(
             *self.query_extension_method()
         )
-        if model_filter.__len__() != 0:
+        if model_filter is not None and model_filter.__len__() != 0:
             query = query.filter(*model_filter)
         if odata_query is not None:
             query = cast(Select[Tuple[T]], apply_odata_query(query, odata_query))
@@ -62,5 +62,5 @@ class BaseRepository(Generic[T, IDType]):
 
     @staticmethod
     def sort_entity_collections_by_id(entity_lists: List[List[T]]):
-        for entiy_list in entity_lists:
-            entiy_list.sort(key=lambda entity: entity.id)
+        for entity_list in entity_lists:
+            entity_list.sort(key=lambda entity: entity.id)
