@@ -34,7 +34,6 @@ class UserRepository(BaseRepository[User, int]):
 
         await self.session.flush()
         return entities_to_update
-    # from sqlalchemy.orm import selectinload  # Already imported at the top
 
     async def get_accessible_projects_by_user(self, id: int) -> dict[str, list[uuid.UUID]]:
         user_with_roles = self.query_extension_method().where(User.id == id)
