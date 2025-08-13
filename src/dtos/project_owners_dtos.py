@@ -18,10 +18,11 @@ class ProjectOwnersOutgoingDto(ProjectOwnersDto):
 class ProjectOwnersMapper:
     @staticmethod
     def from_role_to_entity(dto: ProjectOwnersCreateDto) -> list[ProjectOwners]:
-        owners = []
-        for user_id in dto.user_ids:
-            owners.append(ProjectOwners(
-            user_id=user_id,
-            project_id=dto.project_id,
-            ))
-        return owners
+       project_owners = [
+            ProjectOwners(
+                user_id=user_id,
+                project_id=dto.project_id,
+            )
+            for user_id in dto.user_ids
+        ]
+       return project_owners

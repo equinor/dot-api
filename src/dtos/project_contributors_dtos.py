@@ -21,12 +21,12 @@ class ProjectContributorOutgoingDto(ProjectContributorDto):
 class ProjectContributorMapper:
     @staticmethod
     def from_role_to_entity(dto: RoleAssignmentIncomingDto) -> list[ProjectContributors]:
-        contributors = []
-        for user_id in dto.user_ids:
-            contributors.append(ProjectContributors(
-            user_id=user_id,
-            project_id=dto.project_id,
-            ))
-        return contributors
-
+        project_contributors = [
+            ProjectContributors(
+                user_id=user_id,
+                project_id=dto.project_id,
+            )
+            for user_id in dto.user_ids
+        ]
+        return project_contributors
       

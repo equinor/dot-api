@@ -10,7 +10,6 @@ class UtilityRepository(BaseRepository[Utility, uuid.UUID]):
 
     async def update(self, entities: list[Utility]) -> list[Utility]:
         entities_to_update=await self.get([utility.id for utility in entities])
-
         for n, entity_to_update in enumerate(entities_to_update):
             entity=entities[n]
             entity_to_update.values=entity.values
