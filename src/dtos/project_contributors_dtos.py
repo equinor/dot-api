@@ -9,7 +9,7 @@ from src.dtos.role_assignment_dtos import (
 
 class ProjectContributorDto(BaseModel):
         user_id: int
-        project_id: list[uuid.UUID]
+        project_ids: list[uuid.UUID]
 
 
 class ProjectContributorCreateDto(ProjectContributorDto):
