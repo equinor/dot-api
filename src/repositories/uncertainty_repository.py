@@ -10,6 +10,8 @@ class UncertaintyRepository(BaseRepository[Uncertainty, uuid.UUID]):
 
     async def update(self, entities: list[Uncertainty]) -> list[Uncertainty]:
         entities_to_update=await self.get([entity.id for entity in entities])
+        # sort the entity lists to share the same order according to the entity.id
+        self.sort_entity_collections_by_id([entities, entities_to_update])
 
         for n, entity_to_update in enumerate(entities_to_update):
             entity=entities[n]
