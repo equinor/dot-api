@@ -18,22 +18,22 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential \
     curl \
     apt-utils \
-    gnupg2 &&\
+    gnupg2 && \
     pip install --upgrade pip && \
     pip install poetry && \
     poetry config virtualenvs.create false && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-RUN curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list
+# Add Microsoft GPG key and repository
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/debian/11/prod bullseye main" > /etc/apt/sources.list.d/mssql-release.list
 
 RUN apt-get update
 RUN env ACCEPT_EULA=Y apt-get install -y msodbcsql18
 
 # Copy necessary files for poetry install
-COPY  pyproject.toml poetry.lock* README.md /code/
-
+COPY pyproject.toml poetry.lock* README.md /code/
 
 # Install project dependencies
 RUN poetry install --no-root --only main
@@ -42,7 +42,6 @@ RUN poetry install --no-root --only main
 COPY . /code/
 
 WORKDIR /code/src
-
 
 # Add a new group "non-root-group" with group id 1001 and user "non-root-user" with the same id
 RUN groupadd --gid 1001 non-root-group && \
