@@ -9,6 +9,7 @@ from src.models import (
     User,
 )
 from src.dtos.project_dtos import (
+    AccessibleProjectsDto,
     ProjectMapper,
     ProjectIncomingDto,
     ProjectOutgoingDto,
@@ -87,7 +88,9 @@ class ProjectService:
         async with session_handler(self.engine) as session:
             accessible_project_ids = await self.check_accessible_projects(user_dto)
             # Filter ids to only those the user owns
-            project_owner_ids = accessible_project_ids.get("owner")
+            project_owner_ids = accessible_project_ids.owner_projects_ids
+            if len(project_owner_ids) == 0:
+                return
             ids_to_delete = [pid for pid in ids if pid in project_owner_ids]
             if not ids_to_delete:
                 return
@@ -100,8 +103,8 @@ class ProjectService:
             projects: list[Project] = await ProjectRepository(session).get(ids)
             result=ProjectMapper.to_outgoing_dtos(projects)
         return result
-    
-    async def check_accessible_projects(self, user_dto: UserIncomingDto) -> dict[str, list[uuid.UUID]]:
+
+    async def check_accessible_projects(self, user_dto: UserIncomingDto) -> AccessibleProjectsDto:
         async with session_handler(self.engine) as session:
             accessible_project_ids = await UserRepository(session).get_accessible_projects_by_user(user_dto.id)
             return accessible_project_ids
