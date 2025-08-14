@@ -44,7 +44,7 @@ class BaseRepository(Generic[T, IDType]):
         query = select(self.model).options(
             *self.query_extension_method()
         )
-        if model_filter is not None and model_filter.__len__() != 0:
+        if len(model_filter) != 0:
             query = query.filter(*model_filter)
         if odata_query is not None:
             query = cast(Select[Tuple[T]], apply_odata_query(query, odata_query))

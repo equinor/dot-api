@@ -35,11 +35,11 @@ class UserRepository(BaseRepository[User, int]):
         await self.session.flush()
         return entities_to_update
 
-    async def get_accessible_projects_by_user(self, id: int) -> dict[str, list[uuid.UUID]]:
+    async def get_accessible_projects_by_user(self, id: int) -> AccessibleProjectsDto:
         user_with_roles = self.query_extension_method().where(User.id == id)
         user = (await self.session.scalars(user_with_roles)).first()
         if user is None:
-            return {"contributor": [], "owner": []}
+            return AccessibleProjectsDto(contributor_projects_ids=[], owner_projects_ids=[])
         contributor_projects_ids: list[uuid.UUID] = [project.project_id for project in user.project_contributors]
         owner_projects_ids: list[uuid.UUID] = [project.project_id for project in user.project_owners]
         return AccessibleProjectsDto(

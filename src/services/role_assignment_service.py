@@ -1,5 +1,6 @@
 
 from http.client import HTTPException
+from typing import Optional
 
 from sqlalchemy import Enum
 from src.dtos.role_assignment_dtos import  RoleAssignmentDto, RoleAssignmentOutgoingDto
@@ -21,7 +22,7 @@ class RoleAssignmentService:
     def __init__(self, async_engine: AsyncEngine):
         self.async_engine = async_engine
 
-    async def assign_roles(self, dtos: RoleAssignmentDto, current_user: UserIncomingDto) -> RoleAssignmentOutgoingDto:
+    async def assign_roles(self, dtos: RoleAssignmentDto, current_user: UserIncomingDto) -> Optional[RoleAssignmentOutgoingDto]:
         if not dtos or not current_user:
             return None
         async with session_handler(self.async_engine) as session:
