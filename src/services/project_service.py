@@ -35,10 +35,9 @@ from src.dtos.scenario_dtos import (
 from src.repositories.project_repository import ProjectRepository
 from src.repositories.user_repository import UserRepository
 from src.repositories.scenario_repository import ScenarioRepository
-from src.repositories.user_repository import UserRepository
 from src.repositories.opportunity_repository import OpportunityRepository
 from src.repositories.objective_repository import ObjectiveRepository
-from src.models.filters.project_filter import ProjectFilter, project_access_conditions, project_conditions
+from src.models.filters.project_filter import ProjectFilter, project_conditions
 from src.services.session_handler import session_handler
 
 class ProjectService:
@@ -106,17 +105,20 @@ class ProjectService:
 
     async def check_accessible_projects(self, user_dto: UserIncomingDto) -> AccessibleProjectsDto:
         async with session_handler(self.engine) as session:
-            accessible_project_ids = await UserRepository(session).get_accessible_projects_by_user(user_dto.id)
+            accessible_project_ids = await UserRepository(session).get_accessible_projects_by_user(user_dto.azure_id)
             return accessible_project_ids
         
     async def get_all(self, user_dto: UserIncomingDto, filter: Optional[ProjectFilter]=None, odata_query: Optional[str]=None) -> list[ProjectOutgoingDto]:
         async with session_handler(self.engine) as session:
+            model_filter = ProjectFilter.combine_conditions(project_conditions(filter)) if filter else []
             accessible_project_ids = await self.check_accessible_projects(user_dto)
             if not accessible_project_ids:
                 return []
-            model_filter=ProjectFilter.combine_conditions(project_conditions(filter)) if filter else None
-            project_access_model_filter=ProjectFilter.combine_conditions(project_access_conditions(filter)) if filter else None
-            projects: list[Project] = await ProjectRepository(session).get_all(model_filter=[model_filter,project_access_model_filter], odata_query=odata_query)
+            else:
+                model_filter.extend(project_conditions(ProjectFilter(
+                    project_ids =[*accessible_project_ids.owner_projects_ids, *accessible_project_ids.contributor_projects_ids],
+                )))
+            projects: list[Project] = await ProjectRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
             result = ProjectMapper.to_outgoing_dtos(projects)
         return result
 

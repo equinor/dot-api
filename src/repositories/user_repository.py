@@ -35,8 +35,10 @@ class UserRepository(BaseRepository[User, int]):
         await self.session.flush()
         return entities_to_update
 
-    async def get_accessible_projects_by_user(self, id: int) -> AccessibleProjectsDto:
-        user_with_roles = self.query_extension_method().where(User.id == id)
+    async def get_accessible_projects_by_user(self, azure_id: str) -> AccessibleProjectsDto:
+        user_with_roles = select(User).where(User.azure_id == azure_id).options(
+            *self.query_extension_method()
+        )
         user = (await self.session.scalars(user_with_roles)).first()
         if user is None:
             return AccessibleProjectsDto(contributor_projects_ids=[], owner_projects_ids=[])

@@ -26,16 +26,15 @@ class RoleAssignmentService:
         if not dtos or not current_user:
             return None
         async with session_handler(self.async_engine) as session:
-            user = await UserRepository(session).get_by_azure_id(current_user.azure_id)
-            accessible_project_ids = await UserRepository(session).get_accessible_projects_by_user(user.id)
+            accessible_project_ids = await UserRepository(session).get_accessible_projects_by_user(current_user.azure_id)
             if not accessible_project_ids:
                 return None
-            if dtos.project_id not in accessible_project_ids.get("owner"):
+            if dtos.project_id not in accessible_project_ids.owner_projects_ids:
                 raise HTTPException(status_code=403, detail="You do not have permission to assign roles for this project.")
             projects: list[Project] = await ProjectRepository(session).get([dtos.project_id])
-            if dtos.role == ProjectRole.CONTRIBUTOR.value:
+            if dtos.role == ProjectRole.CONTRIBUTOR:
                 await ProjectContributorsRepository(session).create(ProjectContributorMapper.from_role_to_entity(dtos))
-            elif dtos.role == ProjectRole.OWNER.value:
+            elif dtos.role == ProjectRole.OWNER:
                 await ProjectOwnersRepository(session).create(ProjectOwnersMapper.from_role_to_entity(dtos))
             else:
                 return None

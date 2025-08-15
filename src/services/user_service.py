@@ -1,4 +1,5 @@
 from typing import  Optional
+from src.models.filters.user_filter import UserFilter, user_conditions
 from src.auth.auth import verify_token
 from fastapi import Depends
 
@@ -27,10 +28,11 @@ class UserService:
             users: list[User] = await UserRepository(session).get(ids)
             result=UserMapper.to_outgoing_dtos(users)
         return result
-    
-    async def get_all(self) -> list[UserOutgoingDto]:
+
+    async def get_all(self, filter: Optional[UserFilter] = None,odata_query: Optional[str]=None) -> list[UserOutgoingDto]:
         async with session_handler(self.engine) as session:
-            users: list[User] = await UserRepository(session).get_all()
+            model_filter=UserFilter.combine_conditions(user_conditions(filter)) if filter else []
+            users: list[User] = await UserRepository(session).get_all(model_filter=model_filter,odata_query=odata_query)
             result=UserMapper.to_outgoing_dtos(users)
         return result
     

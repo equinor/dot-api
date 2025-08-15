@@ -1,9 +1,13 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.params import Query
 from src.auth.graph_api import call_ms_graph_api
 from src.auth.auth import verify_token
 from src.services.user_service import (
     UserService,
 )
+from src.constants import SwaggerDocumentationConstants
+
 from src.dtos.user_dtos import (
     UserOutgoingDto,
     UserIncomingDto
@@ -24,9 +28,10 @@ async def get_me(
 @router.get("/users")
 async def get_users(
     user_service: UserService = Depends(get_user_service),
+    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[UserOutgoingDto]:
     try:
-        return await user_service.get_all()
+        return await user_service.get_all(filter=filter)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
