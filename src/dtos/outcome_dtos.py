@@ -1,16 +1,18 @@
 
 import uuid
+from typing import Annotated
 from pydantic import BaseModel, Field
 from src.models.outcome import (
     Outcome
 )
+from src.constants import DatabaseConstants
 
 class OutcomeDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    name: str
+    name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
     uncertainty_id: uuid.UUID
-    probability: float
-    utility: float
+    probability: float = 0.
+    utility: float = 0.
     
 
 class OutcomeIncomingDto(OutcomeDto):
