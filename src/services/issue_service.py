@@ -127,7 +127,7 @@ class IssueService:
     
     async def get_all(self, filter: Optional[IssueFilter]=None, odata_query: Optional[str]=None) -> list[IssueOutgoingDto]:
         async with session_handler(self.engine) as session:
-            model_filter=IssueFilter.combine_conditions(issue_conditions(filter)) if filter else None
+            model_filter=IssueFilter.combine_conditions(issue_conditions(filter)) if filter else []
             issues: list[Issue] = await IssueRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
             result=IssueMapper.to_outgoing_dtos(issues)
         return result
