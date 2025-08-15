@@ -5,6 +5,7 @@ from tests.utils import (
     parse_response_to_dtos_test,
 )
 from src.dtos.decision_dtos import DecisionIncomingDto, DecisionOutgoingDto
+from src.dtos.option_dtos import OptionIncomingDto
 from src.seed_database import GenerateUuid
 
 @pytest.mark.asyncio
@@ -23,14 +24,16 @@ async def test_get_decision(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_update_decision(client: AsyncClient):
-    new_options = ["yes", "no", "this is testing"]
-    payload = [DecisionIncomingDto(id=GenerateUuid.as_uuid(1), issue_id=GenerateUuid.as_uuid(1), alternatives=new_options).model_dump(mode="json")]
+    decision_id = GenerateUuid.as_uuid(1)
+    new_alts = ["yes", "no", "this is testing"]
+    new_options = [OptionIncomingDto(name=x, utility=0, decision_id=decision_id) for x in new_alts]
+    payload = [DecisionIncomingDto(id=decision_id, issue_id=GenerateUuid.as_uuid(1), options=new_options).model_dump(mode="json")]
 
     response = await client.put("/decisions", json=payload)
     assert response.status_code == 200
 
     response_content = parse_response_to_dtos_test(response, DecisionOutgoingDto)
-    assert response_content[0].alternatives == new_options
+    assert [x.name for x in response_content[0].options] == new_alts
 
 @pytest.mark.asyncio
 async def test_delete_decision(client: AsyncClient):
