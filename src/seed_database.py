@@ -15,6 +15,8 @@ from src.models import (
     ValueMetric,
     Decision,
     Edge,
+    Option,
+    Outcome,
 )
 from typing import Protocol, TypeVar, Any
 
@@ -94,14 +96,20 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
                 decision = Decision(
                     id=issue_node_id,
                     issue_id=issue_node_id,
-                    alternatives="yes,no"
+                    options=[
+                        Option(id = issue_node_id, decision_id=issue_node_id, name="yes", utility=-3),
+                        Option(id = uuid4(), decision_id=issue_node_id, name="no", utility=30),
+                    ]
                 )
                 entities.append(decision)
 
                 uncertainty = Uncertainty(
                     id=issue_node_id,
                     issue_id=issue_node_id,
-                    probabilities="0.5,0.5"
+                    outcomes=[
+                        Outcome(id=issue_node_id,uncertainty_id=issue_node_id,name="outcome 1",probability=0.4,utility=4),
+                        Outcome(id=uuid4(),uncertainty_id=issue_node_id,name="outcome 2",probability=0.6,utility=2),
+                    ]
                 )
                 entities.append(uncertainty)
 

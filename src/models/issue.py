@@ -23,7 +23,7 @@ class Issue(Base, BaseEntity, BaseAuditableEntity):
     __tablename__ = "issue"
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
-    scenario_id: Mapped[uuid.UUID] = mapped_column(ForeignKey(Scenario.id))
+    scenario_id: Mapped[uuid.UUID] = mapped_column(ForeignKey(Scenario.id), index=True)
 
     type: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="Undecided")
     boundary: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="out")
