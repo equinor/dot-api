@@ -5,24 +5,30 @@ from src.models.uncertainty import (
     Uncertainty
 )
 
+from src.dtos.outcome_dtos import (
+    OutcomeIncomingDto,
+    OutcomeOutgoingDto,
+    OutcomeMapper,
+)
+
 class UncertaintyDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     issue_id: uuid.UUID
-    probabilities: List[float]
 
 class UncertaintyIncomingDto(UncertaintyDto):
-    pass
+    outcomes: List[OutcomeIncomingDto]
 
 class UncertaintyOutgoingDto(UncertaintyDto):
-    pass
+    outcomes: List[OutcomeOutgoingDto]
 
+    
 class UncertaintyMapper:
     @staticmethod
     def to_outgoing_dto(entity: Uncertainty) -> UncertaintyOutgoingDto:
         return UncertaintyOutgoingDto(
             id=entity.id,
-            probabilities = [float(p) for p in entity.probabilities.split(",") if p.strip()] if entity.probabilities else [],
             issue_id=entity.issue_id,
+            outcomes=OutcomeMapper.to_outgoing_dtos(entity.outcomes),
         )
 
     @staticmethod
@@ -30,7 +36,7 @@ class UncertaintyMapper:
         return Uncertainty(
             id=dto.id,
             issue_id=dto.issue_id,
-            probabilities=",".join(map(str, dto.probabilities))
+            outcomes=OutcomeMapper.to_entities(dto.outcomes)
         )
     
     @staticmethod

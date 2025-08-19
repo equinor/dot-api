@@ -16,6 +16,8 @@ from src.services.edge_service import EdgeService
 from src.services.node_service import NodeService
 from src.services.node_style_service import NodeStyleService
 from src.services.issue_service import IssueService
+from src.services.outcome_service import OutcomeService
+from src.services.option_service import OptionService
 from src.services.user_service import UserService
 from src.database import DatabaseConnectionStrings
 from src.models.base import Base
@@ -81,6 +83,12 @@ async def get_role_service() -> RoleAssignmentService:
 
 async def get_decision_service() -> DecisionService:
     return DecisionService(await get_async_engine())
+
+async def get_outcome_service() -> OutcomeService:
+    return OutcomeService(await get_async_engine())
+
+async def get_option_service() -> OptionService:
+    return OptionService(await get_async_engine())
 
 async def get_objective_service() -> ObjectiveService:
     return ObjectiveService(await get_async_engine())

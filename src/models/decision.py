@@ -1,6 +1,6 @@
 import uuid
 from typing import TYPE_CHECKING
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import ForeignKey
 from src.models.guid import GUID
 from sqlalchemy.orm import (
     Mapped, 
@@ -9,7 +9,7 @@ from sqlalchemy.orm import (
 )
 from src.models.base import Base
 from src.models.base_entity import BaseEntity
-from src.constants import DatabaseConstants
+from src.models.option import Option
 if TYPE_CHECKING:
     from src.models.issue import Issue
 
@@ -18,10 +18,10 @@ class Decision(Base, BaseEntity):
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
     issue_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("issue.id"))
 
-    alternatives: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="")
     issue: Mapped["Issue"] = relationship("Issue", back_populates="decision")
+    options: Mapped[list[Option]] = relationship("Option", cascade="all, delete-orphan")
 
-    def __init__(self, id: uuid.UUID, alternatives: str, issue_id: uuid.UUID):
+    def __init__(self, id: uuid.UUID, options: list[Option], issue_id: uuid.UUID):
         self.id = id
         self.issue_id=issue_id
-        self.alternatives = alternatives
+        self.options=options
