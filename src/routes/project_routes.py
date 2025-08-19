@@ -76,9 +76,11 @@ async def get_all_populated_project(
 async def get_all_project(
     project_service: ProjectService = Depends(get_project_service),
     filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    current_user: UserIncomingDto = Depends(get_current_user)
 ) -> list[ProjectOutgoingDto]:
     try:
-        projects: list[ProjectOutgoingDto] = await project_service.get_all(odata_query=filter)
+   
+        projects: list[ProjectOutgoingDto] = await project_service.get_all(odata_query=filter,user_dto=current_user)
         return projects
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -86,10 +88,11 @@ async def get_all_project(
 @router.delete("/projects/{id}")
 async def delete_project(
     id: uuid.UUID,
-    project_service: ProjectService = Depends(get_project_service)
+    project_service: ProjectService = Depends(get_project_service),
+    current_user: UserIncomingDto = Depends(get_current_user)
 ):
     try:
-        await project_service.delete([id])
+        await project_service.delete([id],current_user)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
@@ -103,4 +106,8 @@ async def update_projects(
         return list(await project_service.update(dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+    
+
     
