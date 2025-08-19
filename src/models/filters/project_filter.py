@@ -3,7 +3,6 @@ from typing import Optional
 from sqlalchemy.sql._typing import _ColumnExpressionArgument  # type: ignore
 from src.models.filters.base_filter import BaseFilter
 from src.models import Project
-from src.models import User
 
 class ProjectFilter(BaseFilter):
     project_id: Optional[uuid.UUID] = None
@@ -24,7 +23,12 @@ def project_conditions(filter: ProjectFilter) -> list[_ColumnExpressionArgument[
 
 def project_access_conditions(filter: ProjectFilter) -> list[_ColumnExpressionArgument[bool]]:
     conditions: list[_ColumnExpressionArgument[bool]] = []
-    BaseFilter.add_condition(conditions, Project.project_contributors.any(User.id == filter.accessing_user_id) if filter.accessing_user_id else None)
-
-    BaseFilter.add_condition(conditions, Project.project_owners.any(User.id == filter.accessing_user_id) if filter.accessing_user_id else None)
+    BaseFilter.add_condition(
+        conditions,
+        Project.project_owners.any(user_id=filter.accessing_user_id) if filter.accessing_user_id else None
+    )
+    BaseFilter.add_condition(
+        conditions,
+        Project.project_contributors.any(user_id=filter.accessing_user_id) if filter.accessing_user_id else None
+    )
     return conditions

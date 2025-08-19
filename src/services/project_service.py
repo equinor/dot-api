@@ -2,7 +2,7 @@ import uuid
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
-from src.dtos.project_owners_dtos import ProjectOwnersDto, ProjectOwnersMapper
+from src.dtos.project_owners_dtos import ProjectOwnersDto, ProjectOwnersMapper, ProjectsOwnerCreateDto
 from src.repositories.project_owners_repository import ProjectOwnersRepository
 from src.models import (
     Project,
@@ -62,11 +62,11 @@ class ProjectService:
             user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
             entities: list[Project] = await ProjectRepository(session).create(ProjectMapper.from_create_to_entities(dtos, user.id))
             entity_ids = [entity.id for entity in entities]
-            project_owners_dto: ProjectOwnersDto = ProjectOwnersDto(
-                user_ids=[user.id],
-                project_id=entity_ids[0]
+            projects_owner_dto: ProjectsOwnerCreateDto = ProjectsOwnerCreateDto(
+                user_id=user.id,
+                project_ids=entity_ids
             )
-            await ProjectOwnersRepository(session).create(ProjectOwnersMapper.from_role_to_entity(project_owners_dto))
+            await ProjectOwnersRepository(session).create(ProjectOwnersMapper.from_role_to_entities(projects_owner_dto))
 
             for entity, dto in zip(entities, dtos):
                 scenarios=await self._create_scenarios_for_project(session, dto.scenarios, user, entity.id)
@@ -116,7 +116,7 @@ class ProjectService:
                 return []
             project_access_filter= ProjectFilter.combine_conditions(project_access_conditions(ProjectFilter(
                 accessing_user_id=user.id,
-            )))
+            )),use_and=False)
             model_filter = ProjectFilter.combine_conditions(project_conditions(filter)) if filter else []
             if len(model_filter) == 0:
                 model_filter = [project_access_filter] 
