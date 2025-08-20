@@ -1,10 +1,12 @@
 import os
 from typing import List
 from pydantic import Field
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
 class Config(BaseSettings):
-
+    
+    load_dotenv()
     ORIGINS: List[str] = [
     "http://localhost:5004",
     "https://frontend-dot-web-dev.radix.equinor.com",
