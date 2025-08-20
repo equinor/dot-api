@@ -11,6 +11,19 @@ This API follows a service/repositories pattern. The main components are entitie
 1. Each entity should have one or more DTOs representing versions that can be processed in the code.
 1. Transformation between entities and DTOs should be managed by a DTO mapper specific to each entity.
 
+## Get Started
+
+### Add Secrets
+
+The secrets for this application are managed as environment variables. To add secrets locally, follow these steps:
+
+1. Create a `.env` file in the root of this repository.
+2. Add your secrets to the file. For example:
+   ```
+   CLIENT_SECRET=your_key
+   ```
+
+Environment variables used can be found in ``src/config.py``
 ## Alembic
 
 ### Usefull commands
