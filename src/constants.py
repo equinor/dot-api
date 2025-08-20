@@ -10,6 +10,12 @@ class Type(str, Enum):
     OTHER="Other"
     ACTION_ITEM="Action Item"
 
+class ProjectRoleType(str, Enum):
+    OWNER="Owner"
+    CONTRIBUTOR="Contributor"
+
+
+
 class Boundary(str, Enum):
     IN="in"
     ON="on"

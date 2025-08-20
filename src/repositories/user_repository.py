@@ -1,12 +1,10 @@
 from typing import Optional
 import uuid
-from src.dtos.project_contributors_dtos import ProjectContributorMapper
 from src.models.user import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import  select
 from src.repositories.base_repository import BaseRepository
 from src.repositories.query_extensions import QueryExtensions
-from sqlalchemy.orm import selectinload
 from src.dtos.project_dtos import AccessibleProjectsDto
 
 class UserRepository(BaseRepository[User, int]):

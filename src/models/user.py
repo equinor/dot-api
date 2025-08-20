@@ -9,26 +9,22 @@ from sqlalchemy.orm import (
     relationship, 
     mapped_column,
 )
+
 if TYPE_CHECKING:
-    from models.project_contributors import ProjectContributors
-    from models.project_owners import ProjectOwners
+    from src.models.project_role import ProjectRole
+
 class User(Base, BaseEntity):
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value))
     azure_id: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), unique=True)
-    project_contributors: Mapped[list["ProjectContributors"]] = relationship(
-        "ProjectContributors",
+
+    project_role: Mapped[list["ProjectRole"]] = relationship(
+        "ProjectRole",
         back_populates="user",
         cascade="all, delete-orphan",
-        foreign_keys='ProjectContributors.user_id'
-    )
-    project_owners: Mapped[list["ProjectOwners"]] = relationship(
-        "ProjectOwners",
-        back_populates="user",
-        cascade="all, delete-orphan",
-        foreign_keys='ProjectOwners.user_id'
+        foreign_keys='ProjectRole.user_id'
     )
     def __init__(self, id: Optional[int], name: str, azure_id: str):
         if id is not None:

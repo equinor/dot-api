@@ -10,8 +10,7 @@ from src.models.base_auditable_entity import BaseAuditableEntity
 from src.constants import DatabaseConstants
 if TYPE_CHECKING:
     from models.scenario import Scenario
-    from src.models.project_contributors import ProjectContributors
-    from src.models.project_owners import ProjectOwners
+    from models.project_role import ProjectRole
 
 class Project(Base, BaseEntity, BaseAuditableEntity):
     __tablename__ = "project"
@@ -25,13 +24,8 @@ class Project(Base, BaseEntity, BaseAuditableEntity):
         back_populates="project",
         cascade="all, delete-orphan",
     )
-    project_contributors: Mapped[list["ProjectContributors"]] = relationship(
-        "ProjectContributors", 
-        back_populates="project",
-        cascade="all, delete-orphan",
-    )
-    project_owners: Mapped[list["ProjectOwners"]] = relationship(
-        "ProjectOwners", 
+    project_role: Mapped[list["ProjectRole"]] = relationship(
+        "ProjectRole", 
         back_populates="project",
         cascade="all, delete-orphan",
     )

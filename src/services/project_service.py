@@ -2,8 +2,7 @@ import uuid
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
-from src.dtos.project_owners_dtos import ProjectOwnersMapper, ProjectsOwnerCreateDto
-from src.repositories.project_owners_repository import ProjectOwnersRepository
+from src.repositories.project_role_repository import  ProjectRoleRepository
 from src.models import (
     Project,
     User,
@@ -15,6 +14,7 @@ from src.dtos.project_dtos import (
     ProjectOutgoingDto,
     ProjectCreateDto,
     PopulatedProjectDto,
+    ProjectRoleMapper,
 )
 from src.dtos.user_dtos import (
     UserMapper,
@@ -60,18 +60,12 @@ class ProjectService:
     async def create(self, dtos: list[ProjectCreateDto], user_dto: UserIncomingDto) -> list[ProjectOutgoingDto]:
         async with session_handler(self.engine) as session:
             user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
-            entities: list[Project] = await ProjectRepository(session).create(ProjectMapper.from_create_to_entities(dtos, user.id))
-            entity_ids = [entity.id for entity in entities]
-            projects_owner_dto: ProjectsOwnerCreateDto = ProjectsOwnerCreateDto(
-                user_id=user.id,
-                project_ids=entity_ids
-            )
-            await ProjectOwnersRepository(session).create(ProjectOwnersMapper.from_role_to_entities(projects_owner_dto))
-
+            entities: list[Project] = await ProjectRepository(session).create(ProjectMapper.from_create_to_project_entities(dtos, user.id))
+            # entity_ids = [entity.id for entity in entities]
+            await ProjectRoleRepository(session).create(ProjectRoleMapper.to_project_role_entity(dtos, user.id))
             for entity, dto in zip(entities, dtos):
                 scenarios=await self._create_scenarios_for_project(session, dto.scenarios, user, entity.id)
                 entity.scenarios=scenarios
-
             # get the dtos while the entities are still connected to the session
             result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(entities)
         return result
@@ -79,7 +73,7 @@ class ProjectService:
     async def update(self, dtos: list[ProjectIncomingDto], user_dto: UserIncomingDto) -> list[ProjectOutgoingDto]:
         async with session_handler(self.engine) as session:
             user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
-            entities: list[Project] = await ProjectRepository(session).update(ProjectMapper.to_entities(dtos, user.id))
+            entities: list[Project] = await ProjectRepository(session).update(ProjectMapper.to_project_entities(dtos, user.id))
             # get the dtos while the entities are still connected to the session
             result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(entities)
         return result

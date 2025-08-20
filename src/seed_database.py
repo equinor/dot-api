@@ -1,8 +1,8 @@
 import uuid
 from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
-from src.models.project_contributors import ProjectContributors
-from src.models.project_owners import ProjectOwners
+from src.constants import ProjectRoleType
+from src.models.project_role import ProjectRole
 from src.models import (
     User,
     Project,
@@ -60,18 +60,13 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
         )
         project = add_auditable_fields(project, user)
         entities.append(project)
-        project_contributors = ProjectContributors(
+        project_role = ProjectRole(
             project_id=project_id,
-            user_id=user.id
+            user_id=user.id,
+            role=ProjectRoleType.OWNER
         )
-        project_contributors = add_auditable_fields(project_contributors, user)
-        entities.append(project_contributors)
-        project_owners = ProjectOwners(
-            project_id=project_id,
-            user_id= user.id
-        )
-        project_owners = add_auditable_fields(project_owners, user)
-        entities.append(project_owners)
+        project_role = add_auditable_fields(project_role, user)
+        entities.append(project_role)
 
         objective=Objective(
             id=project_id,
