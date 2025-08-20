@@ -2,6 +2,7 @@ import urllib.parse
 from typing import Optional, Any
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
 from sqlalchemy import create_engine, Engine
+from src.services.role_assignment_service import RoleAssignmentService
 from src.auth.db_auth import DatabaseAuthenticator
 from src.services.decision_service import DecisionService
 from src.services.project_service import ProjectService
@@ -77,6 +78,8 @@ async def get_sync_engine(envionment: str = config.APP_ENV) -> Engine:
 
 async def get_project_service() -> ProjectService:
     return ProjectService(await get_async_engine())
+async def get_role_service() -> RoleAssignmentService:
+    return RoleAssignmentService(await get_async_engine())
 
 async def get_decision_service() -> DecisionService:
     return DecisionService(await get_async_engine())
