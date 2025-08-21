@@ -42,7 +42,7 @@ async def get_all_nodes_from_project(
     filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[NodeOutgoingDto]:
     try:
-        nodes: list[NodeOutgoingDto] = await node_service.get_all(NodeFilter(project_id=project_id), odata_query=filter)
+        nodes: list[NodeOutgoingDto] = await node_service.get_all(NodeFilter(project_ids=[project_id]), odata_query=filter)
         return nodes
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -54,7 +54,7 @@ async def get_all_nodes_from_scenario(
     filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[NodeOutgoingDto]:
     try:
-        nodes: list[NodeOutgoingDto] = await node_service.get_all(NodeFilter(scenario_id=scenario_id), odata_query=filter)
+        nodes: list[NodeOutgoingDto] = await node_service.get_all(NodeFilter(scenario_ids=[scenario_id]), odata_query=filter)
         return nodes
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
