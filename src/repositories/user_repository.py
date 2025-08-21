@@ -1,15 +1,13 @@
 from typing import Optional
-import uuid
 from src.models.user import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import  select
 from src.repositories.base_repository import BaseRepository
 from src.repositories.query_extensions import QueryExtensions
-from src.dtos.project_dtos import AccessibleProjectsDto
 
 class UserRepository(BaseRepository[User, int]):
     def __init__(self, session: AsyncSession):
-        super().__init__(session, User, query_extension_method=QueryExtensions.load_user_with_roles)
+        super().__init__(session, User, query_extension_method=QueryExtensions.empty_load)
 
     async def get_or_create(self, entity: User) -> User:
         user=await self.get_by_azure_id(entity.azure_id)
@@ -33,16 +31,4 @@ class UserRepository(BaseRepository[User, int]):
         await self.session.flush()
         return entities_to_update
 
-    async def get_accessible_projects_by_user(self, azure_id: str) -> AccessibleProjectsDto:
-        user_with_roles = select(User).where(User.azure_id == azure_id).options(
-            *self.query_extension_method()
-        )
-        user = (await self.session.scalars(user_with_roles)).first()
-        if user is None:
-            return AccessibleProjectsDto(contributor_projects_ids=[], owner_projects_ids=[])
-        contributor_projects_ids: list[uuid.UUID] = [project.project_id for project in user.project_contributors]
-        owner_projects_ids: list[uuid.UUID] = [project.project_id for project in user.project_owners]
-        return AccessibleProjectsDto(
-            contributor_projects_ids=contributor_projects_ids,
-            owner_projects_ids=owner_projects_ids
-        )
+        
