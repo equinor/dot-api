@@ -90,7 +90,7 @@ async def get_all_scenario_from_project(
     filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[ScenarioOutgoingDto]:
     try:
-        scenarios: list[ScenarioOutgoingDto] = await scenario_service.get_all(ScenarioFilter(project_id=project_id), odata_query=filter)
+        scenarios: list[ScenarioOutgoingDto] = await scenario_service.get_all(ScenarioFilter(project_ids=[project_id]), odata_query=filter)
         return scenarios
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -102,7 +102,7 @@ async def get_all_scenarios_populated_from_project(
     filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
 ) -> list[PopulatedScenarioDto]:
     try:
-        scenarios: list[PopulatedScenarioDto] = await scenario_service.get_all_populated(ScenarioFilter(project_id=project_id), odata_query=filter)
+        scenarios: list[PopulatedScenarioDto] = await scenario_service.get_all_populated(ScenarioFilter(project_ids=[project_id]), odata_query=filter)
         return scenarios
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

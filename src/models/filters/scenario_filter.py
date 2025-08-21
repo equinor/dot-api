@@ -3,15 +3,29 @@ from typing import Optional
 from sqlalchemy.sql._typing import _ColumnExpressionArgument  # type: ignore
 from src.models.filters.base_filter import BaseFilter
 from src.models import Scenario
+from sqlalchemy.sql import ColumnElement
 
 class ScenarioFilter(BaseFilter):
-    scenario_id: Optional[uuid.UUID] = None
-    project_id: Optional[uuid.UUID] = None
-    name: Optional[str] = None
+    scenario_ids: Optional[list[uuid.UUID]] = None
+    project_ids: Optional[list[uuid.UUID]] = None
+    names: Optional[list[str]] = None
 
-def scenario_conditions(filter: ScenarioFilter) -> list[_ColumnExpressionArgument[bool]]:
-    conditions: list[_ColumnExpressionArgument[bool]] = []
-    BaseFilter.add_condition(conditions, Scenario.id == filter.scenario_id if filter.scenario_id else None)
-    BaseFilter.add_condition(conditions, Scenario.project_id == filter.project_id if filter.project_id else None)
-    BaseFilter.add_condition(conditions, Scenario.name.ilike(f"%{filter.name}%") if filter.name else None)
-    return conditions
+    def construct_filters(self) -> list[ColumnElement[bool]]:
+        conditions: list[ColumnElement[bool]] = []
+        self.add_condition_for_property(self.scenario_ids, self._scenario_id_condition, conditions)
+        self.add_condition_for_property(self.project_ids, self._project_id_condition, conditions)
+        self.add_condition_for_property(self.names, self._name_condition, conditions)
+        return conditions
+
+    # Static helper methods to encapsulate condition logic
+    @staticmethod
+    def _scenario_id_condition(scenario_id: uuid.UUID) -> ColumnElement[bool]:
+        return Scenario.id == scenario_id
+
+    @staticmethod
+    def _project_id_condition(project_id: uuid.UUID) -> ColumnElement[bool]:
+        return Scenario.project_id == project_id
+
+    @staticmethod
+    def _name_condition(name: str) -> ColumnElement[bool]:
+        return Scenario.name.ilike(f"%{name}%")
