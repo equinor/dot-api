@@ -38,7 +38,7 @@ from src.repositories.scenario_repository import ScenarioRepository
 from src.repositories.user_repository import UserRepository
 from src.repositories.opportunity_repository import OpportunityRepository
 from src.repositories.objective_repository import ObjectiveRepository
-from src.models.filters.project_filter import ProjectFilter, project_access_conditions, project_conditions
+from src.models.filters.project_filter import ProjectFilter
 from src.services.session_handler import session_handler
 
 class ProjectService:
@@ -114,16 +114,16 @@ class ProjectService:
             user = await UserRepository(session).get_by_azure_id(user_dto.azure_id)
             if not user:
                 return []
-
-            project_access_filter = ProjectFilter.combine_conditions(project_access_conditions(ProjectFilter(
-                accessing_user_id=user.id,
-            )),use_and=False)
+            if filter is None:
+                filter = ProjectFilter()
             
-            model_filter = [project_access_filter]
-            if filter:
-                user_filter_conditions = ProjectFilter.combine_conditions(project_conditions(filter))
-                model_filter.append(user_filter_conditions)
-                
+            filter.accessing_user_id = user.id
+            project_access_filter = filter.construct_access_conditions()
+            
+            # Construct model filters
+            model_filter = filter.construct_filters() if filter else []
+            model_filter.append(project_access_filter)
+            
             projects: list[Project] = await ProjectRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
             result = ProjectMapper.to_outgoing_dtos(projects)
         return result
@@ -136,7 +136,7 @@ class ProjectService:
     
     async def get_all_populated_projects(self, filter: Optional[ProjectFilter]=None, odata_query: Optional[str]=None) -> list[PopulatedProjectDto]:
         async with session_handler(self.engine) as session:
-            model_filter=[ProjectFilter.combine_conditions(project_conditions(filter))] if filter else []
+            model_filter=filter.construct_filters() if filter else []
             projects: list[Project] = await ProjectRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
             result=ProjectMapper.to_populated_dtos(projects)
         return result
