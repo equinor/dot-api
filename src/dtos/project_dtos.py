@@ -35,9 +35,6 @@ class ProjectOutgoingDto(ProjectDto):
 class PopulatedProjectDto(ProjectDto):
     scenarios: list[PopulatedScenarioDto]
 
-class AccessibleProjectsDto(BaseModel):
-    contributor_projects_ids: list[uuid.UUID]
-    owner_projects_ids: list[uuid.UUID]
 
 class ProjectMapper:
     @staticmethod
@@ -123,7 +120,7 @@ class ProjectRoleMapper:
                     ProjectRole(
                         user_id=user.user_id,
                         project_id=dto.id,
-                        role=user.role
+                        role=ProjectRoleType(user.role),
                     ) for user in dto.users
                 ])
         return project_roles

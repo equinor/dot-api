@@ -8,7 +8,6 @@ from src.models import (
     User,
 )
 from src.dtos.project_dtos import (
-    AccessibleProjectsDto,
     ProjectMapper,
     ProjectIncomingDto,
     ProjectOutgoingDto,
@@ -79,17 +78,9 @@ class ProjectService:
         return result
 
     async def delete(self, ids: list[uuid.UUID], user_dto: UserIncomingDto) -> None:
-        async with session_handler(self.engine) as session:
-            accessible_project_ids = await self.check_accessible_projects(user_dto)
-            # Filter ids to only those the user owns
-            project_owner_ids = accessible_project_ids.owner_projects_ids
-            if len(project_owner_ids) == 0:
-                return
-            ids_to_delete = [pid for pid in ids if pid in project_owner_ids]
-            if not ids_to_delete:
-                return
-            await ProjectRepository(session).delete(ids_to_delete)
-    
+        async with session_handler(self.engine) as session:            
+            await ProjectRepository(session).delete(ids=  ids)
+
     async def get(self, ids: list[uuid.UUID]) -> list[ProjectOutgoingDto]:
         async with session_handler(self.engine) as session:
             if not ids:
@@ -97,11 +88,6 @@ class ProjectService:
             projects: list[Project] = await ProjectRepository(session).get(ids)
             result=ProjectMapper.to_outgoing_dtos(projects)
         return result
-
-    async def check_accessible_projects(self, user_dto: UserIncomingDto) -> AccessibleProjectsDto:
-        async with session_handler(self.engine) as session:
-            accessible_project_ids = await UserRepository(session).get_accessible_projects_by_user(user_dto.azure_id)
-            return accessible_project_ids
         
     async def get_all(self, user_dto: UserIncomingDto, filter: Optional[ProjectFilter]=None, odata_query: Optional[str]=None) -> list[ProjectOutgoingDto]:
         async with session_handler(self.engine) as session:

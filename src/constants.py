@@ -11,8 +11,8 @@ class Type(str, Enum):
     ACTION_ITEM="Action Item"
 
 class ProjectRoleType(str, Enum):
-    OWNER="Owner"
-    CONTRIBUTOR="Contributor"
+    OWNER="owner"
+    CONTRIBUTOR="contributor"
 
 
 
