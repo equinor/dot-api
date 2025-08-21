@@ -1,4 +1,5 @@
 import uuid
+from src.models.guid import GUID
 from src.models.base_entity import BaseEntity
 from src.models.base_auditable_entity import BaseAuditableEntity
 from sqlalchemy import  ForeignKey, String
@@ -16,9 +17,10 @@ from src.models.user import User
 class ProjectRole(Base,BaseEntity, BaseAuditableEntity):
     __tablename__ = "project_role"
 
-    project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("project.id"), primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
-    role: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
+    project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("project.id"),index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"),index=True)
+    role: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), nullable=False,index=True)
     project: Mapped[Project] = relationship("Project", back_populates="project_role", )
     user: Mapped[User] = relationship("User", back_populates="project_role", foreign_keys=[user_id])
 
