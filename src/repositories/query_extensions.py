@@ -8,23 +8,11 @@ from src.models import (
     Scenario,
     Decision,
     Uncertainty,
-    User
+    User,
+    Edge,
 )
 
 class QueryExtensions:
-
-    @staticmethod
-    def load_decision_with_relationships() -> list[_AbstractLoad]:
-        return [
-            selectinload(Decision.options)
-        ]
-    
-    @staticmethod
-    def load_uncertainty_with_relationships() -> list[_AbstractLoad]:
-        return [
-            selectinload(Uncertainty.outcomes)
-        ]
-
 
     @staticmethod
     def load_decision_with_relationships() -> list[_AbstractLoad]:
@@ -80,6 +68,17 @@ class QueryExtensions:
             selectinload(Scenario.edges),
             selectinload(Scenario.issues).options(
                 *QueryExtensions.load_issue_with_relationships()
+            ),
+        ]
+    
+    @staticmethod
+    def load_edge_with_relationships() -> list[_AbstractLoad]:
+        return [
+            selectinload(Edge.tail_node).options(
+                *QueryExtensions.load_node_with_relationships()
+            ),
+            selectinload(Edge.head_node).options(
+                *QueryExtensions.load_node_with_relationships()
             ),
         ]
     
