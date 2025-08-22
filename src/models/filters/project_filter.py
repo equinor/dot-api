@@ -24,11 +24,7 @@ class ProjectFilter(BaseFilter):
             user_id = self.accessing_user_id
             self.add_condition(
                 conditions,
-                lambda: Project.project_owners.any(user_id=user_id)
-            )
-            self.add_condition(
-                conditions,
-                lambda: Project.project_contributors.any(user_id=user_id)
+                lambda: Project.project_role.any(user_id=user_id)
             )
         return or_(*conditions)
 

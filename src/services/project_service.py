@@ -2,7 +2,10 @@ import uuid
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
-from src.repositories.project_role_repository import  ProjectRoleRepository
+from src.constants import ProjectRoleType
+from src.dtos.project_roles_dtos import ProjectRoleDto, ProjectRoleMapper
+from src.models.project_role import ProjectRole
+from src.repositories.project_role_repository import ProjectRoleRepository
 from src.models import (
     Project,
     User,
@@ -13,7 +16,6 @@ from src.dtos.project_dtos import (
     ProjectOutgoingDto,
     ProjectCreateDto,
     PopulatedProjectDto,
-    ProjectRoleMapper,
 )
 from src.dtos.user_dtos import (
     UserMapper,
@@ -50,6 +52,10 @@ class ProjectService:
             objectives, opportunities = await self._create_opportunities_and_objectives_for_scenario(session, scenario_dto.objectives, scenario_dto.opportunities, user, scenario.id)
             scenario.objectives, scenario.opportunities = objectives, opportunities
         return scenarios
+    
+    async def _create_role_for_project(self, session: AsyncSession, project_role_dtos: list[ProjectRoleDto], user: User, project_id: uuid.UUID):
+        project_user_roles = await ProjectRoleRepository(session).create(ProjectRoleMapper.from_create_via_project_to_entities(project_role_dtos, user.id, project_id))
+        return project_user_roles
 
     async def _create_opportunities_and_objectives_for_scenario(self, session: AsyncSession, objective_dtos: list[ObjectiveViaScenarioDto], opportunities_dtos: list[OpportunityViaProjectDto], user: User, scenario_id: uuid.UUID):
         objectives=await ObjectiveRepository(session).create(ObjectiveMapper.via_scenario_to_entities(objective_dtos, user.id, scenario_id))
@@ -59,14 +65,15 @@ class ProjectService:
     async def create(self, dtos: list[ProjectCreateDto], user_dto: UserIncomingDto) -> list[ProjectOutgoingDto]:
         async with session_handler(self.engine) as session:
             user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
-            entities: list[Project] = await ProjectRepository(session).create(ProjectMapper.from_create_to_project_entities(dtos, user.id))
+            project_entities: list[Project] = await ProjectRepository(session).create(ProjectMapper.from_create_to_project_entities(dtos, user.id))
             # entity_ids = [entity.id for entity in entities]
-            await ProjectRoleRepository(session).create(ProjectRoleMapper.to_project_role_entity(dtos, user.id))
-            for entity, dto in zip(entities, dtos):
-                scenarios=await self._create_scenarios_for_project(session, dto.scenarios, user, entity.id)
-                entity.scenarios=scenarios
+            for project_entity, dto in zip(project_entities, dtos):
+                project_role_entities: list[ProjectRole] = await self._create_role_for_project(session, dto.users, user, project_entity.id)
+                scenarios=await self._create_scenarios_for_project(session, dto.scenarios, user, project_entity.id)
+                project_entity.scenarios=scenarios
+                project_entity.project_role=project_role_entities
             # get the dtos while the entities are still connected to the session
-            result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(entities)
+            result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(project_entities)
         return result
     
     async def update(self, dtos: list[ProjectIncomingDto], user_dto: UserIncomingDto) -> list[ProjectOutgoingDto]:
@@ -78,8 +85,10 @@ class ProjectService:
         return result
 
     async def delete(self, ids: list[uuid.UUID], user_dto: UserIncomingDto) -> None:
-        async with session_handler(self.engine) as session:            
-            await ProjectRepository(session).delete(ids=  ids)
+        async with session_handler(self.engine) as session:
+            user_role = await ProjectRoleRepository(session).get_accessible_projects_by_user(azure_id=user_dto.azure_id)
+            ids_to_delete = [project_role.project_id for project_role in user_role if project_role.role == ProjectRoleType.OWNER and project_role.project_id in ids]
+            await ProjectRepository(session).delete(ids=ids_to_delete)
 
     async def get(self, ids: list[uuid.UUID]) -> list[ProjectOutgoingDto]:
         async with session_handler(self.engine) as session:

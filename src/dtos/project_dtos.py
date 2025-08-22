@@ -1,8 +1,7 @@
 import uuid
 from pydantic import BaseModel, Field
 from typing import Annotated
-from src.dtos.project_roles_dtos import ProjectRoleDto
-from src.models.project_role import ProjectRole
+from src.dtos.project_roles_dtos import ProjectRoleDto, ProjectRoleMapper
 from src.models.project import (
     Project
 )
@@ -13,7 +12,9 @@ from src.dtos.scenario_dtos import (
     ScenarioOutgoingDto,
     PopulatedScenarioDto,
 )
-from src.constants import DatabaseConstants, ProjectRoleType
+from src.constants import DatabaseConstants
+
+from src.dtos.project_roles_dtos import ProjectRoleOutgoingDto
 
 class ProjectDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
@@ -28,8 +29,9 @@ class ProjectIncomingDto(ProjectDto):
     users:list[ProjectRoleDto]
     scenarios: list[ScenarioIncomingDto]
 
+
 class ProjectOutgoingDto(ProjectDto):
-    users:list[ProjectRoleDto]
+    users_role: list[ProjectRoleOutgoingDto]
     scenarios: list[ScenarioOutgoingDto]
 
 class PopulatedProjectDto(ProjectDto):
@@ -44,6 +46,7 @@ class ProjectMapper:
             name=dto.name,
             description=dto.description,
             user_id=user_id,
+            project_role=[],
             scenarios=[], # must create the project first
         )
 
@@ -53,7 +56,7 @@ class ProjectMapper:
             id=entity.id,
             name=entity.name,
             description=entity.description,
-            users=[ProjectRoleDto.model_validate(role) for role in entity.project_role],
+            users_role=ProjectRoleMapper.to_outgoing_dtos(entity.project_role),
             scenarios=ScenarioMapper.to_outgoing_dtos(entity.scenarios),
         )
     
@@ -73,20 +76,10 @@ class ProjectMapper:
             name=dto.name,
             description=dto.description,
             user_id=user_id,
+            project_role=[],
             scenarios=ScenarioMapper.to_entities(dto.scenarios, user_id),
         )
-    
-    @staticmethod
-    def to_project_role_entity(dto: ProjectIncomingDto, user_id: int) -> Project:
-        if(not dto.users):
-            dto.scenarios = []
-        return Project(
-            id=dto.id,
-            name=dto.name,
-            description=dto.description,
-            user_id=user_id,
-            scenarios=ScenarioMapper.to_entities(dto.scenarios, user_id),
-        )
+
     
     @staticmethod
     def from_create_to_project_entities(dtos: list[ProjectCreateDto], user_id: int) -> list[Project]:
@@ -104,24 +97,6 @@ class ProjectMapper:
     def to_project_entities(dtos: list[ProjectIncomingDto], user_id: int) -> list[Project]:
         return [ProjectMapper.to_project_entity(dto, user_id) for dto in dtos]
 
-class ProjectRoleMapper:
-    @staticmethod
-    def to_project_role_entity(dtos: list[ProjectCreateDto], user_id: int) -> list[ProjectRole]:
-        project_roles: list[ProjectRole] = []
-        for dto in dtos:
-            if not dto.users:
-                project_roles.append(ProjectRole(
-                    user_id=user_id,
-                    project_id=dto.id,
-                    role=ProjectRoleType.OWNER
-                ))
-            else:
-                project_roles.extend([
-                    ProjectRole(
-                        user_id=user.user_id,
-                        project_id=dto.id,
-                        role=ProjectRoleType(user.role),
-                    ) for user in dto.users
-                ])
-        return project_roles
+
+
     

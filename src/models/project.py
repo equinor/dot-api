@@ -30,11 +30,14 @@ class Project(Base, BaseEntity, BaseAuditableEntity):
         cascade="all, delete-orphan",
     )
 
-    def __init__(self, id: uuid.UUID, description: str, name: str, user_id: int, scenarios: Optional[list["Scenario"]]):
+    def __init__(self, id: uuid.UUID, description: str, name: str, project_role: Optional[list["ProjectRole"]], user_id: int, scenarios: Optional[list["Scenario"]]):
         self.id = id
             
         if scenarios is not None:
-            self.scenarios=scenarios
+            self.scenarios = scenarios
+
+        if project_role is not None:
+            self.project_role = project_role
 
         self.name = name
         self.description = description
