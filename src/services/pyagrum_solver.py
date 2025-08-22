@@ -22,10 +22,14 @@ class PyagrumSolver:
         self.add_utilities(issues)
 
         ie=gum.ShaferShenoyLIMIDInference(self.diagram)
-        ie.addNoForgettingAssumption([x.name for x in issues if x.type==Type.DECISION])
+        decision_names = [x.name for x in issues if x.type==Type.DECISION]
+        ie.addNoForgettingAssumption(decision_names)
 
         ie.makeInference()
-        return ie.optimalDecision(*[x.name for x in issues if x.type==Type.DECISION])
+
+        solutions = [ie.optimalDecision(x).argmax() for x in decision_names]
+
+        return solutions
 
     def add_node(self, issue: IssueOutgoingDto):
         if issue.type == Type.DECISION:
