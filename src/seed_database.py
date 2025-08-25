@@ -1,6 +1,8 @@
 import uuid
 from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
+from src.models.project_contributors import ProjectContributors
+from src.models.project_owners import ProjectOwners
 from src.models import (
     User,
     Project,
@@ -15,6 +17,8 @@ from src.models import (
     ValueMetric,
     Decision,
     Edge,
+    Option,
+    Outcome,
 )
 from typing import Protocol, TypeVar, Any
 
@@ -46,6 +50,7 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
         user = user1 if project_index % 2 == 0 else user2
         # Create a project with a UUID name and description
         project_id=GenerateUuid.as_uuid(project_index)
+
         project = Project(
             id=project_id,
             name=str(uuid4()),
@@ -55,6 +60,18 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
         )
         project = add_auditable_fields(project, user)
         entities.append(project)
+        project_contributors = ProjectContributors(
+            project_id=project_id,
+            user_id=user.id
+        )
+        project_contributors = add_auditable_fields(project_contributors, user)
+        entities.append(project_contributors)
+        project_owners = ProjectOwners(
+            project_id=project_id,
+            user_id= user.id
+        )
+        project_owners = add_auditable_fields(project_owners, user)
+        entities.append(project_owners)
 
         objective=Objective(
             id=project_id,
@@ -94,14 +111,20 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
                 decision = Decision(
                     id=issue_node_id,
                     issue_id=issue_node_id,
-                    alternatives="yes,no"
+                    options=[
+                        Option(id = issue_node_id, decision_id=issue_node_id, name="yes", utility=-3),
+                        Option(id = uuid4(), decision_id=issue_node_id, name="no", utility=30),
+                    ]
                 )
                 entities.append(decision)
 
                 uncertainty = Uncertainty(
                     id=issue_node_id,
                     issue_id=issue_node_id,
-                    probabilities="0.5,0.5"
+                    outcomes=[
+                        Outcome(id=issue_node_id,uncertainty_id=issue_node_id,name="outcome 1",probability=0.4,utility=4),
+                        Outcome(id=uuid4(),uncertainty_id=issue_node_id,name="outcome 2",probability=0.6,utility=2),
+                    ]
                 )
                 entities.append(uncertainty)
 

@@ -7,11 +7,11 @@ from typing import Optional, TYPE_CHECKING
 from src.models.base import Base
 from src.models.base_entity import BaseEntity
 from src.models.base_auditable_entity import BaseAuditableEntity
-from src.models.base import Base
 from src.constants import DatabaseConstants
 if TYPE_CHECKING:
     from models.scenario import Scenario
-from src.models.guid import GUID
+    from src.models.project_contributors import ProjectContributors
+    from src.models.project_owners import ProjectOwners
 
 class Project(Base, BaseEntity, BaseAuditableEntity):
     __tablename__ = "project"
@@ -22,6 +22,16 @@ class Project(Base, BaseEntity, BaseAuditableEntity):
 
     scenarios: Mapped[list["Scenario"]] = relationship(
         "Scenario", 
+        back_populates="project",
+        cascade="all, delete-orphan",
+    )
+    project_contributors: Mapped[list["ProjectContributors"]] = relationship(
+        "ProjectContributors", 
+        back_populates="project",
+        cascade="all, delete-orphan",
+    )
+    project_owners: Mapped[list["ProjectOwners"]] = relationship(
+        "ProjectOwners", 
         back_populates="project",
         cascade="all, delete-orphan",
     )

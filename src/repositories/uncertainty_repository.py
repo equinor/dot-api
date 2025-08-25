@@ -6,7 +6,7 @@ from src.repositories.query_extensions import QueryExtensions
 
 class UncertaintyRepository(BaseRepository[Uncertainty, uuid.UUID]):
     def __init__(self, session: AsyncSession):
-        super().__init__(session, Uncertainty, query_extension_method=QueryExtensions.empty_load)
+        super().__init__(session, Uncertainty, query_extension_method=QueryExtensions.load_uncertainty_with_relationships)
 
     async def update(self, entities: list[Uncertainty]) -> list[Uncertainty]:
         entities_to_update=await self.get([entity.id for entity in entities])
@@ -15,7 +15,7 @@ class UncertaintyRepository(BaseRepository[Uncertainty, uuid.UUID]):
 
         for n, entity_to_update in enumerate(entities_to_update):
             entity=entities[n]
-            entity_to_update.probabilities=entity.probabilities
+            entity_to_update.outcomes=[await self.session.merge(outcome) for outcome in entity.outcomes]
             if entity.issue_id:
                 entity_to_update=entity.issue_id
             

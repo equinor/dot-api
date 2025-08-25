@@ -1,18 +1,39 @@
 from sqlalchemy.orm.strategy_options import _AbstractLoad # type: ignore
 from sqlalchemy.orm import selectinload
+from sqlalchemy import select
 from src.models import (
     Issue,
     Node,
     Project,
     Scenario,
+    Decision,
+    Uncertainty,
+    User
 )
 
 class QueryExtensions:
+
+    @staticmethod
+    def load_decision_with_relationships() -> list[_AbstractLoad]:
+        return [
+            selectinload(Decision.options)
+        ]
+    
+    @staticmethod
+    def load_uncertainty_with_relationships() -> list[_AbstractLoad]:
+        return [
+            selectinload(Uncertainty.outcomes)
+        ]
+
     @staticmethod
     def load_issue_with_relationships() -> list[_AbstractLoad]:
         return [
-            selectinload(Issue.decision),
-            selectinload(Issue.uncertainty),
+            selectinload(Issue.decision).options(
+                *QueryExtensions.load_decision_with_relationships()
+            ),
+            selectinload(Issue.uncertainty).options(
+                *QueryExtensions.load_uncertainty_with_relationships()
+            ),
             selectinload(Issue.utility),
             selectinload(Issue.value_metric),
             selectinload(Issue.node).options(
@@ -24,8 +45,12 @@ class QueryExtensions:
     def load_node_with_relationships() -> list[_AbstractLoad]:
         return [
             selectinload(Node.issue).options(
-                selectinload(Issue.decision),
-                selectinload(Issue.uncertainty),
+                selectinload(Issue.decision).options(
+                *QueryExtensions.load_decision_with_relationships()
+            ),
+                selectinload(Issue.uncertainty).options(
+                *QueryExtensions.load_uncertainty_with_relationships()
+            ),
                 selectinload(Issue.utility),
                 selectinload(Issue.value_metric),
             ),
@@ -50,7 +75,9 @@ class QueryExtensions:
         return [
             selectinload(Project.scenarios).options(
                 *QueryExtensions.load_scenario_with_relationships()
-            )
+            ),
+            selectinload(Project.project_contributors),
+            selectinload(Project.project_owners)
         ]
 
     @staticmethod
@@ -59,3 +86,12 @@ class QueryExtensions:
         To be used as input for generic repositories when there are no relationships to be loaded.
         """
         return []
+    @staticmethod
+    def load_user_with_roles() -> list[_AbstractLoad]:
+        """
+        To be used as input for generic repositories to load user relationships.
+        """
+        return [
+            selectinload(User.project_contributors),
+            selectinload(User.project_owners)
+        ]

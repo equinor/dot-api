@@ -1,10 +1,12 @@
 import os
 from typing import List
 from pydantic import Field
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
 class Config(BaseSettings):
-
+    load_dotenv()
+    
     ORIGINS: List[str] = [
     "http://localhost:5004",
     "https://frontend-dot-web-dev.radix.equinor.com",
@@ -37,6 +39,9 @@ class Config(BaseSettings):
     ISSUER: str = f"https://sts.windows.net/{TENANT_ID}/"
     APP_ENV: str = Field(
         default=os.getenv("APP_ENV", "local")
+    )
+    DATABASE_CONN_LOCAL: str = Field(
+        default=os.getenv("DATABASE_CONN_LOCAL", "DRIVER={ODBC Driver 18 for SQL Server};Server=127.0.0.1,1433;Database=;UIDsa;PWD=;")
     )
     DATABASE_CONN_DEV: str = Field(
         default=os.getenv("DATABASE_CONN_DEV", "DRIVER={ODBC Driver 18 for SQL Server};Server=decision-optimization-sqlserver-dev.database.windows.net;Database=decision-optimization-sqldb-dev;")

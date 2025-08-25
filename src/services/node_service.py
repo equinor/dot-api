@@ -9,7 +9,7 @@ from src.dtos.node_dtos import (
     NodeMapper
 )
 from src.repositories.node_repository import NodeRepository
-from src.models.filters.node_filter import NodeFilter, node_conditions
+from src.models.filters.node_filter import NodeFilter
 from src.services.session_handler import session_handler
 
 class NodeService:
@@ -42,7 +42,7 @@ class NodeService:
     
     async def get_all(self, filter: Optional[NodeFilter]=None, odata_query: Optional[str]=None) -> list[NodeOutgoingDto]:
         async with session_handler(self.engine) as session:
-            model_filter = NodeFilter.combine_conditions(node_conditions(filter)) if filter else None
+            model_filter = filter.construct_filters() if filter else []
             nodes: list[Node] = await NodeRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
             result=NodeMapper.to_outgoing_dtos(nodes)
         return result

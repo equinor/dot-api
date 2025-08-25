@@ -13,3 +13,5 @@ from src.models.value_metric import ValueMetric # type: ignore
 from src.models.node import Node # type: ignore
 from src.models.edge import Edge # type: ignore
 from src.models.node_style import NodeStyle # type: ignore
+from src.models.outcome import Outcome # type: ignore
+from src.models.option import Option # type: ignore

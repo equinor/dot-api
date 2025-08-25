@@ -2,6 +2,7 @@ import urllib.parse
 from typing import Optional, Any
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
 from sqlalchemy import create_engine, Engine
+from src.services.role_assignment_service import RoleAssignmentService
 from src.auth.db_auth import DatabaseAuthenticator
 from src.services.decision_service import DecisionService
 from src.services.project_service import ProjectService
@@ -15,6 +16,8 @@ from src.services.edge_service import EdgeService
 from src.services.node_service import NodeService
 from src.services.node_style_service import NodeStyleService
 from src.services.issue_service import IssueService
+from src.services.outcome_service import OutcomeService
+from src.services.option_service import OptionService
 from src.services.user_service import UserService
 from src.services.structure_service import StructureService
 from src.database import DatabaseConnectionStrings
@@ -77,9 +80,17 @@ async def get_sync_engine(envionment: str = config.APP_ENV) -> Engine:
 
 async def get_project_service() -> ProjectService:
     return ProjectService(await get_async_engine())
+async def get_role_service() -> RoleAssignmentService:
+    return RoleAssignmentService(await get_async_engine())
 
 async def get_decision_service() -> DecisionService:
     return DecisionService(await get_async_engine())
+
+async def get_outcome_service() -> OutcomeService:
+    return OutcomeService(await get_async_engine())
+
+async def get_option_service() -> OptionService:
+    return OptionService(await get_async_engine())
 
 async def get_objective_service() -> ObjectiveService:
     return ObjectiveService(await get_async_engine())
