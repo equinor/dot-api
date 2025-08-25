@@ -15,6 +15,10 @@ if TYPE_CHECKING:
     from src.dtos.issue_dtos import (
         IssueViaNodeOutgoingDto
     )
+    from src.dtos.edge_dtos import (
+        EdgeOutgoingDto,
+        EdgeMapper
+    )
 
 class NodeDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
@@ -27,6 +31,8 @@ class NodeIncomingDto(NodeDto):
 
 class NodeOutgoingDto(NodeDto):
     issue: "IssueViaNodeOutgoingDto"
+    head_edges: list[EdgeOutgoingDto]
+    tail_edges: list[EdgeOutgoingDto]
     node_style: NodeStyleOutgoingDto
 
 class NodeViaIssueOutgoingDto(NodeDto):
@@ -42,6 +48,8 @@ class NodeMapper:
             scenario_id=entity.scenario_id,
             name=entity.name,
             issue=IssueMapper.to_outgoing_dto_via_node(entity.issue),
+            head_edges=EdgeMapper.to_outgoing_dtos(entity.head_edges),
+            tail_edges=EdgeMapper.to_outgoing_dtos(entity.tail_edges),
             node_style=NodeStyleMapper.to_outgoing_dto(entity.node_style),
         )
     

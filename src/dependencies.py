@@ -16,10 +16,12 @@ from src.services.node_service import NodeService
 from src.services.node_style_service import NodeStyleService
 from src.services.issue_service import IssueService
 from src.services.user_service import UserService
+from src.services.structure_service import StructureService
 from src.database import DatabaseConnectionStrings
 from src.models.base import Base
 from src.seed_database import seed_database
 from src.config import Config
+from fastapi import Depends
 import urllib
 
 config = Config()
@@ -111,3 +113,8 @@ async def get_issue_service() -> IssueService:
 
 async def get_user_service() -> UserService:
     return UserService(await get_async_engine())
+
+async def get_structure_service(
+        issue_service: IssueService = Depends(get_issue_service),
+        edge_service: EdgeService = Depends(get_edge_service)) -> StructureService:
+    return StructureService(issue_service, edge_service)

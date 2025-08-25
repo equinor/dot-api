@@ -43,6 +43,15 @@ class IssueDto(BaseModel):
     description: Annotated[str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)] = ""
     order: int
 
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, other):
+        return isinstance(other, IssueOutgoingDto) and self.id == other.id
+
+    def __repr__(self):
+        return f"IssueOutgoingDto(id={self.id}, description='{self.description}')"  
+
 class IssueIncomingDto(IssueDto):
     model_config=ConfigDict(use_enum_values=True)
 
