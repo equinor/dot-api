@@ -1,12 +1,11 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
-from typing import TYPE_CHECKING, Optional
+from typing import  Optional
 from src.models.base import Base
 from src.constants import DatabaseConstants
 from src.models.base_entity import BaseEntity
 from sqlalchemy.orm import (
     Mapped, 
-    relationship, 
     mapped_column,
 )
 

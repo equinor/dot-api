@@ -47,6 +47,8 @@ spec:
             SCOPE: '4251833c-b9c3-4013-afda-cbfd2cc50f3f/Read'
             APP_ENV: 'production'
             DATABASE_CONN_PROD: 'DRIVER={ODBC Driver 18 for SQL Server};Server=decision-optimization-sqlserver-prod.database.windows.net;Database=decision-optimization-sqldb-prod;'
+          azure:
+              clientId: c0d1f6a5-93b5-432b-8c2e-bf26583a7626
         - environment: test
           replicas: 1
           variables:
@@ -56,6 +58,9 @@ spec:
             APP_ENV: 'test'
             SCOPE: '945882c1-69f4-41cd-a42a-22516ca01868/Read'
             DATABASE_CONN_TEST: 'DRIVER={ODBC Driver 18 for SQL Server};Server=decision-optimization-sqlserver-test.database.windows.net;Database=decision-optimization-sqldb-test;'
+          identity:
+            azure:
+              clientId: c0d1f6a5-93b5-432b-8c2e-bf26583a7626
         - environment: dev  
           replicas: 1
           variables:
