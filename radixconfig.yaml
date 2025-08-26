@@ -48,7 +48,7 @@ spec:
             APP_ENV: 'production'
             DATABASE_CONN_PROD: 'DRIVER={ODBC Driver 18 for SQL Server};Server=decision-optimization-sqlserver-prod.database.windows.net;Database=decision-optimization-sqldb-prod;'
           azure:
-              clientId: c0d1f6a5-93b5-432b-8c2e-bf26583a7626
+              clientId: 250cbdac-bb6d-42f2-a9f2-a8b312d3cf12
         - environment: test
           replicas: 1
           variables:
