@@ -114,6 +114,11 @@ class ProjectService:
             model_filter.append(project_access_filter)
             
             projects: list[Project] = await ProjectRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
+            for project in projects:
+                for project_role in project.project_role:
+                    user_info = await UserRepository(session).get_by_id(project_role.user_id)
+                    if user_info:
+                        project_role.user_name = user_info.name
             result = ProjectMapper.to_outgoing_dtos(projects)
         return result
 

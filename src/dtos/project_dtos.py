@@ -31,7 +31,7 @@ class ProjectIncomingDto(ProjectDto):
 
 
 class ProjectOutgoingDto(ProjectDto):
-    users_role: list[ProjectRoleOutgoingDto]
+    users: list[ProjectRoleOutgoingDto]
     scenarios: list[ScenarioOutgoingDto]
 
 class PopulatedProjectDto(ProjectDto):
@@ -56,7 +56,7 @@ class ProjectMapper:
             id=entity.id,
             name=entity.name,
             description=entity.description,
-            users_role=ProjectRoleMapper.to_outgoing_dtos(entity.project_role),
+            users=ProjectRoleMapper.to_outgoing_dtos(entity.project_role),
             scenarios=ScenarioMapper.to_outgoing_dtos(entity.scenarios),
         )
     

@@ -6,6 +6,7 @@ from src.constants import ProjectRoleType
 
 
 class ProjectRoleDto(BaseModel):
+    user_name: str
     user_id: int
     project_id: uuid.UUID
     azure_id: uuid.UUID
@@ -15,6 +16,7 @@ class ProjectRoleIncomingDto(ProjectRoleDto):
   pass
 
 class ProjectRoleOutgoingDto(BaseModel):
+    user_name: str
     user_id: int
     project_id: uuid.UUID
     role: str
@@ -31,8 +33,9 @@ class ProjectRoleMapper:
             role=dto.role
         )
     @staticmethod
-    def to_outgoing_dto(dto: ProjectRole) -> ProjectRoleOutgoingDto:
+    def to_outgoing_dto(dto: ProjectRoleDto) -> ProjectRoleOutgoingDto:
         return ProjectRoleOutgoingDto(
+            user_name=dto.user_name,
             user_id=dto.user_id,
             project_id=dto.project_id,
             role=dto.role
