@@ -1,15 +1,32 @@
+from pydantic import BaseModel
+from typing import List
 import pyagrum as gum
 from itertools import product
 from uuid import UUID
 from src.constants import Type
 from src.dtos.issue_dtos import (IssueOutgoingDto, IssueViaNodeOutgoingDto)
 from src.dtos.edge_dtos import EdgeOutgoingDto
+from src.dtos.option_dtos import OptionOutgoingDto
 
 # get only data relevant to solving the problem as list of issue and list of edges
 
+class SolutionItem(BaseModel):
+    issue_id: str
+    optimal_decision_index: int
+
+class Solution(BaseModel):
+    optimal_options: List[OptionOutgoingDto]
+    utility_mean: float
+    utility_variance: float
+
 class PyagrumSolver:
-    node_lookup: dict[UUID, int] = {}
-    diagram = gum.InfluenceDiagram()
+
+    def __init__(self):
+        self.node_lookup: dict[UUID, int] = {}
+        self.diagram = gum.InfluenceDiagram()
+
+    def _reset_diagram(self):
+        self.diagram=gum.InfluenceDiagram()
 
     def add_to_lookup(self, issue: IssueOutgoingDto, node_id: int) -> None:
         self.node_lookup[issue.id] = node_id
@@ -17,32 +34,49 @@ class PyagrumSolver:
     def find_optimal_decisions(self, issues: list[IssueOutgoingDto], edges: list[EdgeOutgoingDto]):
         # validation
         # build influance diagram
+        # self._reset_diagram()
         self.add_nodes(issues)
         self.add_edges(edges)
         self.add_utilities(issues)
 
         ie=gum.ShaferShenoyLIMIDInference(self.diagram)
-        decision_names = [x.name for x in issues if x.type==Type.DECISION]
-        ie.addNoForgettingAssumption(decision_names)
+        decision_issue_ids = [x.id.__str__() for x in issues if x.type==Type.DECISION]
+        ie.addNoForgettingAssumption(decision_issue_ids)
 
         ie.makeInference()
 
-        solutions = [ie.optimalDecision(x).argmax() for x in decision_names]
+        data: list[tuple[list[dict[str, int]], float]] = [ie.optimalDecision(x).argmax() for x in decision_issue_ids]
 
-        return solutions
+
+        solution_items: List[SolutionItem] = []
+        for item in data:
+            decision_dict: dict[str, int] = item[0][0]  # Extract the dictionary from the list
+            for issue_id, optimal_decision_index in decision_dict.items():
+                solution_items.append(SolutionItem(issue_id=issue_id, optimal_decision_index=optimal_decision_index))
+        optimal_options: list[OptionOutgoingDto] = []
+
+        for item in solution_items:
+            issue: IssueOutgoingDto = [x for x in issues if x.id.__str__()==item.issue_id][0]
+            assert issue.decision is not None
+            optimal_options.append(issue.decision.options[item.optimal_decision_index])
+
+
+        solution = Solution(utility_mean=ie.MEU()['mean'], utility_variance=ie.MEU()['variance'],optimal_options = optimal_options)
+
+        return solution
 
     def add_node(self, issue: IssueOutgoingDto):
         if issue.type == Type.DECISION:
             assert issue.decision != None
             node_id = self.diagram.addDecisionNode(
-                gum.LabelizedVariable(issue.name, issue.description, [option.name for option in issue.decision.options])
+                gum.LabelizedVariable(issue.id.__str__(), issue.description, [option.id.__str__() for option in issue.decision.options])
             )
             self.add_to_lookup(issue, node_id)
 
         if issue.type == Type.UNCERTAINTY:
             assert issue.uncertainty != None
             node_id = self.diagram.addChanceNode(
-                gum.LabelizedVariable(issue.name, issue.description, [outcome.name for outcome in issue.uncertainty.outcomes])
+                gum.LabelizedVariable(issue.id.__str__(), issue.description, [outcome.id.__str__() for outcome in issue.uncertainty.outcomes])
             )
             self.add_to_lookup(issue, node_id)
 
@@ -78,21 +112,21 @@ class PyagrumSolver:
 
 
         node_id = self.diagram.addUtilityNode(
-            gum.LabelizedVariable(f"{issue.name} utility", f"{issue.name} utility", 1)
+            gum.LabelizedVariable(f"{issue.id.__str__()} utility", f"{issue.id.__str__()} utility", 1)
         )
-        self.diagram.addArc(self.diagram.idFromName(issue.name), node_id)
+        self.diagram.addArc(self.diagram.idFromName(issue.id.__str__()), node_id)
 
         if issue.type == Type.DECISION:
             assert issue.decision != None
 
             for n, x in enumerate(issue.decision.options):
-                self.diagram.utility(node_id)[{issue.name: n}] = x.utility
+                self.diagram.utility(node_id)[{issue.id.__str__(): n}] = x.utility
 
         if issue.type == Type.UNCERTAINTY:
             assert issue.uncertainty != None
 
             for n, x in enumerate(issue.uncertainty.outcomes):
-                self.diagram.utility(node_id)[{issue.name: n}] = x.utility
+                self.diagram.utility(node_id)[{issue.id.__str__(): n}] = x.utility
 
     def add_edges(self, edges: list[EdgeOutgoingDto]):
         [self.add_edge(x) for x in edges]

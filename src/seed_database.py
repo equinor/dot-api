@@ -40,6 +40,7 @@ class GenerateUuid:
     @staticmethod
     def as_uuid(x: int|str) -> uuid.UUID:
         return uuid.uuid5(uuid.NAMESPACE_DNS, f"{x}")
+
     
 async def create_single_project_with_scenario(conn: AsyncConnection):
     # Define all IDs at the beginning of the function
@@ -48,18 +49,69 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
     scenario_id = GenerateUuid.as_uuid("test_scenario_1")
     decision_issue_id = GenerateUuid.as_uuid("test_decision_issue_1")
     decision_issue_id_2 = GenerateUuid.as_uuid("test_decision_issue_2")
+    decision_issue_id_3 = GenerateUuid.as_uuid("test_decision_issue_3")
     uncertainty_issue_id = GenerateUuid.as_uuid("test_uncertainty_issue_1")
-    decision_option_yes_id = GenerateUuid.as_uuid("test_decision_option_yes")
-    decision_option_no_id = GenerateUuid.as_uuid("test_decision_option_no")
-    decision_option_2_yes_id = GenerateUuid.as_uuid("test_decision_option_yes_2")
-    decision_option_2_no_id = GenerateUuid.as_uuid("test_decision_option_no_2")
-    uncertainty_outcome_1_id = GenerateUuid.as_uuid("test_uncertainty_outcome_1")
-    uncertainty_outcome_2_id = GenerateUuid.as_uuid("test_uncertainty_outcome_2")
-    decision_node_id = GenerateUuid.as_uuid("test_decision_node_1")
-    decision_node_id_2 = GenerateUuid.as_uuid("test_decision_node_2")
-    uncertainty_node_id = GenerateUuid.as_uuid("test_uncertainty_node_1")
+    
     edge_id = GenerateUuid.as_uuid("test_edge_1")
     edge_id_2 = GenerateUuid.as_uuid("test_edge_2")
+
+    def create_decision_issue(
+        decision_id: uuid.UUID,
+        issue_id: uuid.UUID,
+        name: str,
+        order: int,
+    ):
+        """Helper function to create a decision issue and its related entities."""
+        decision = Decision(id=decision_id, issue_id=issue_id, options=[])
+        node = Node(
+            id=issue_id,
+            scenario_id=scenario_id,
+            issue_id=issue_id,
+            name=name,
+            node_style=None,
+        )
+        node_style = NodeStyle(id=issue_id, node_id=node.id)
+        issue = Issue(
+            id=issue_id,
+            scenario_id=scenario_id,
+            type="Decision",
+            order=order,
+            boundary="on",
+            name=name,
+            description=str(uuid.uuid4()),  # Example description
+            user_id=user_id,
+            node=node,
+        )
+        return [decision, node, node_style, issue]
+
+    def create_uncertainty_issue(
+        uncertainty_id: uuid.UUID,
+        issue_id: uuid.UUID,
+        name: str,
+        order: int,
+    ):
+        """Helper function to create an uncertainty issue and its related entities."""
+        uncertainty = Uncertainty(id=uncertainty_id, issue_id=issue_id, outcomes=[])
+        node = Node(
+            id=issue_id,
+            scenario_id=scenario_id,
+            issue_id=issue_id,
+            name=name,
+            node_style=None,
+        )
+        node_style = NodeStyle(id=issue_id, node_id=node.id)
+        issue = Issue(
+            id=issue_id,
+            scenario_id=scenario_id,
+            type="Uncertainty",
+            order=order,
+            boundary="in",
+            name=name,
+            description=str(uuid.uuid4()),  # Example description
+            user_id=user_id,
+            node=node,
+        )
+        return [uncertainty, node, node_style, issue]
 
     # Create a user
     user = User(id=user_id, name="test_user_3", azure_id="28652cc8-c5ed-43c7-a6b0-c2a4ce3d7185")
@@ -88,150 +140,43 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
     scenario = add_auditable_fields(scenario, user)
     entities.append(scenario)
 
-    # Create a decision issue
-    decision = Decision(
-        id=decision_issue_id,
-        issue_id=decision_issue_id,
-        options=[
-            Option(id=decision_option_yes_id, decision_id=decision_issue_id, name="yes", utility=10),
-            Option(id=decision_option_no_id, decision_id=decision_issue_id, name="no", utility=-5),
-        ],
-    )
-    entities.append(decision)
+    # Add decision issues
+    entities.extend(create_decision_issue(decision_issue_id, decision_issue_id, "Decision Issue 1", order=0))
+    entities.extend(create_decision_issue(decision_issue_id_2, decision_issue_id_2, "Decision Issue 2", order=1))
+    entities.extend(create_decision_issue(decision_issue_id_3, decision_issue_id_3, "Decision Issue 3", order=1))
 
-    decision_2 = Decision(
-        id=decision_issue_id_2,
-        issue_id=decision_issue_id_2,
-        options=[
-            Option(id=decision_option_2_yes_id, decision_id=decision_issue_id_2, name="yes2", utility=-100),
-            Option(id=decision_option_2_no_id, decision_id=decision_issue_id_2, name="no2", utility=1.1),
-        ],
-    )
-    entities.append(decision_2)
+    # Add uncertainty issues
+    entities.extend(create_uncertainty_issue(uncertainty_issue_id, uncertainty_issue_id, "Uncertainty Issue 1", order=2))
 
-    # Create an uncertainty issue
-    uncertainty = Uncertainty(
-        id=uncertainty_issue_id,
-        issue_id=uncertainty_issue_id,
-        outcomes=[
-            Outcome(id=uncertainty_outcome_1_id, uncertainty_id=uncertainty_issue_id, name="Outcome 1", probability=0.7, utility=15),
-            Outcome(id=uncertainty_outcome_2_id, uncertainty_id=uncertainty_issue_id, name="Outcome 2", probability=0.3, utility=5),
-        ],
-    )
-    entities.append(uncertainty)
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_issue_id, name="yes", utility=10))
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_issue_id, name="no", utility=-5))
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_issue_id_2, name="yes2", utility=-100))
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_issue_id_2, name="no2", utility=1.1))
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_issue_id_3, name="yes", utility=-100))
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_issue_id_3, name="no", utility=1.1))
+    entities.append(Outcome(id=uuid.uuid4(), uncertainty_id=uncertainty_issue_id, name="Outcome 1", probability=0.7, utility=15))
+    entities.append(Outcome(id=uuid.uuid4(), uncertainty_id=uncertainty_issue_id, name="Outcome 2", probability=0.3, utility=5))
 
-    # Create a node for the decision issue
-    decision_node = Node(
-        id=decision_node_id,
-        scenario_id=scenario.id,
-        issue_id=decision_issue_id,
-        name="Decision Node 1",
-        node_style=None,
-    )
-    decision_node_style = NodeStyle(
-        id=decision_node_id,
-        node_id=decision_node.id,
-        x_position=40,
-        y_position=50,
-    )
-    entities.append(decision_node)
-    entities.append(decision_node_style)
-
-    # Create a node for the decision issue
-    decision_node_2 = Node(
-        id=decision_node_id_2,
-        scenario_id=scenario.id,
-        issue_id=decision_issue_id_2,
-        name="Decision Node 1",
-        node_style=None,
-    )
-    decision_node_style_2 = NodeStyle(
-        id=decision_node_id_2,
-        node_id=decision_node_2.id,
-        x_position=50,
-        y_position=40,
-    )
-    entities.append(decision_node_2)
-    entities.append(decision_node_style_2)
-
-
-    # Create a node for the uncertainty issue
-    uncertainty_node = Node(
-        id=uncertainty_node_id,
-        scenario_id=scenario.id,
-        issue_id=uncertainty_issue_id,
-        name="Uncertainty Node 1",
-        node_style=None,
-    )
-    uncertainty_node_style = NodeStyle(
-        id=uncertainty_node_id,
-        node_id=uncertainty_node.id,
-        x_position=40,
-        y_position=50,
-    )
-    entities.append(uncertainty_node)
-    entities.append(uncertainty_node_style)
-
-    # Create an edge between the decision node and the uncertainty node
-    edge = Edge(
+    # Add edges
+    edge_1 = Edge(
         id=edge_id,
-        tail_node_id=decision_node.id,
-        head_node_id=uncertainty_node.id,
-        scenario_id=scenario.id,
+        tail_node_id=decision_issue_id,
+        head_node_id=uncertainty_issue_id,
+        scenario_id=scenario_id,
     )
-    entities.append(edge)
-
     edge_2 = Edge(
         id=edge_id_2,
-        tail_node_id=uncertainty_node.id,
-        head_node_id=decision_node_2.id,
-        scenario_id=scenario.id,
+        tail_node_id=uncertainty_issue_id,
+        head_node_id=decision_issue_id_2,
+        scenario_id=scenario_id,
     )
-    entities.append(edge_2)
-
-    # Create the decision issue entity
-    decision_issue = Issue(
-        id=decision_issue_id,
-        scenario_id=scenario.id,
-        name="Decision Issue 1",
-        description="A test decision issue",
-        node=decision_node,
-        type="Decision",
-        boundary="on",
-        order=0,
-        user_id=scenario.created_by_id,
+    edge_3=Edge(
+        id=uuid.uuid4(),
+        tail_node_id=uncertainty_issue_id,
+        head_node_id=decision_issue_id_3,
+        scenario_id=scenario_id
     )
-    decision_issue = add_auditable_fields(decision_issue, user)
-    entities.append(decision_issue)
-
-    decision_issue_2 = Issue(
-        id=decision_issue_id_2,
-        scenario_id=scenario.id,
-        name="Decision Issue 2",
-        description="A test decision issue",
-        node=decision_node_2,
-        type="Decision",
-        boundary="on",
-        order=1,
-        user_id=scenario.created_by_id,
-    )
-    decision_issue = add_auditable_fields(decision_issue_2, user)
-    entities.append(decision_issue_2)
-
-    # Create the uncertainty issue entity
-    uncertainty_issue = Issue(
-        id=uncertainty_issue_id,
-        scenario_id=scenario.id,
-        name="Uncertainty Issue 1",
-        description="A test uncertainty issue",
-        node=uncertainty_node,
-        type="Uncertainty",
-        boundary="in",
-        order=1,
-        user_id=scenario.created_by_id,
-    )
-    uncertainty_issue = add_auditable_fields(uncertainty_issue, user)
-    entities.append(uncertainty_issue)
+    entities.extend([edge_1, edge_2, edge_3])
 
     # Commit all entities to the database
     async with AsyncSession(conn) as session:
