@@ -17,7 +17,6 @@ import src.routes.outcome_routes as outcome_routes
 import src.routes.option_routes as option_routes
 from src.config import Config
 from fastapi.middleware.cors import CORSMiddleware
-import src.routes.roles_assignment_routes  as role_assignment_router
 
 config = Config()
 
@@ -48,7 +47,6 @@ async def root():
     return {"message": "Welcome to the DOT api"}
 
 app.include_router(user_routes.router, dependencies=[Depends(verify_token)])
-app.include_router(role_assignment_router.router, dependencies=[Depends(verify_token)])
 app.include_router(project_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(scenario_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(issue_routes.router, dependencies=[Depends(verify_token)])
