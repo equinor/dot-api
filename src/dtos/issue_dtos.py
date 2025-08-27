@@ -34,7 +34,7 @@ from src.dtos.node_dtos import (
     NodeOutgoingDto,
     NodeViaIssueOutgoingDto,
 )
-from src.constants import DatabaseConstants
+from src.constants import DatabaseConstants, DepricatedIssueTypes, Type
 
 class IssueDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
@@ -46,7 +46,7 @@ class IssueDto(BaseModel):
 class IssueIncomingDto(IssueDto):
     model_config=ConfigDict(use_enum_values=True)
 
-    type: Type = Type.UNDECIDED
+    type: Type = Type.UNASSIGNED
     boundary: Boundary = Boundary.OUT
     node: Optional[NodeIncomingDto]
     decision: Optional[DecisionIncomingDto]
@@ -74,6 +74,9 @@ class IssueViaNodeOutgoingDto(IssueDto):
 class IssueMapper:
     @staticmethod
     def to_outgoing_dto(entity: Issue) -> IssueOutgoingDto:
+        if entity.type in DepricatedIssueTypes._value2member_map_:
+            entity.type=Type.UNASSIGNED.value
+        
         return IssueOutgoingDto(
             id=entity.id,
             scenario_id=entity.scenario_id,
@@ -91,6 +94,9 @@ class IssueMapper:
 
     @staticmethod
     def to_outgoing_dto_via_node(entity: Issue) -> IssueViaNodeOutgoingDto:
+        if entity.type in DepricatedIssueTypes._value2member_map_:
+            entity.type=Type.UNASSIGNED.value
+
         return IssueViaNodeOutgoingDto(
             id=entity.id,
             scenario_id=entity.scenario_id,
