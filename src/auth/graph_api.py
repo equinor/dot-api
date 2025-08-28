@@ -7,7 +7,7 @@ from src.dtos.user_dtos import (
 from src.config import Config
 config = Config()
 
-async def call_ms_graph_api (token: str) -> UserIncomingDto:
+async def call_ms_graph_api (token: str) -> UserIncomingDto :
     """
     Calls the Microsoft Graph API to get user information.
     """

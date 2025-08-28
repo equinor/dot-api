@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, status,Depends
+from src.routes import project_role_routes
 from src.auth.auth import verify_token
 import src.routes.decision_routes as decision_routes
 import src.routes.edge_routes as edge_routes
@@ -48,6 +49,7 @@ async def root():
 
 app.include_router(user_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(project_routes.router, dependencies=[Depends(verify_token)])
+app.include_router(project_role_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(scenario_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(issue_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(objective_routes.router, dependencies=[Depends(verify_token)])
