@@ -133,6 +133,15 @@ class ProjectService:
             
             filter.accessing_user_id = user.id
             project_access_filter = filter.construct_access_conditions()
+            if filter is None:
+                filter = ProjectFilter()
+            
+            filter.accessing_user_id = user.id
+            project_access_filter = filter.construct_access_conditions()
+            
+            # Construct model filters
+            model_filter = filter.construct_filters() if filter else []
+            model_filter.append(project_access_filter)
             
             # Construct model filters
             model_filter = filter.construct_filters() if filter else []
