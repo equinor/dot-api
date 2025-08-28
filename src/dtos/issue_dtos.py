@@ -120,6 +120,8 @@ class IssueMapper:
             node=NodeMapper.to_entity(dto.node) if dto.node else None,
             decision=DecisionMapper.to_entity(dto.decision) if dto.decision else None,
             uncertainty=UncertaintyMapper.to_entity(dto.uncertainty) if dto.uncertainty else None,
+            utility=UtilityMapper.to_entity(dto.utility) if dto.utility else None,
+            value_metric=ValueMetricMapper.to_entity(dto.value_metric) if dto.value_metric else None,
         )
     
     @staticmethod
