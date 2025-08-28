@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
 from src.constants import ProjectRoleType
-from src.dtos.project_roles_dtos import ProjectRoleDto, ProjectRoleMapper
+from src.dtos.project_roles_dtos import ProjectRoleCreateDto, ProjectRoleMapper
 from src.models.project_role import ProjectRole
 from src.repositories.project_role_repository import ProjectRoleRepository
 from src.models import (
@@ -53,8 +53,13 @@ class ProjectService:
             scenario.objectives, scenario.opportunities = objectives, opportunities
         return scenarios
     
-    async def _create_role_for_project(self, session: AsyncSession, project_role_dtos: list[ProjectRoleDto], user: User, project_id: uuid.UUID):
+    async def _create_role_for_project(self, session: AsyncSession, project_role_dtos: list[ProjectRoleCreateDto], user: User, project_id: uuid.UUID):
         project_user_roles = await ProjectRoleRepository(session).create(ProjectRoleMapper.from_create_via_project_to_entities(project_role_dtos, user.id, project_id))
+        for project_role in project_user_roles:
+            user_info = await UserRepository(session).get_by_id(project_role.user_id)
+            if user_info:
+                project_role.user_name = user_info.name
+                project_role.azure_id = user_info.azure_id
         return project_user_roles
 
     async def _create_opportunities_and_objectives_for_scenario(self, session: AsyncSession, objective_dtos: list[ObjectiveViaScenarioDto], opportunities_dtos: list[OpportunityViaProjectDto], user: User, scenario_id: uuid.UUID):
@@ -65,13 +70,24 @@ class ProjectService:
     async def create(self, dtos: list[ProjectCreateDto], user_dto: UserIncomingDto) -> list[ProjectOutgoingDto]:
         async with session_handler(self.engine) as session:
             user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
+            for dto in dtos:
+                owner_role = ProjectRoleCreateDto(
+                    id=dto.id, # will be overwritten in the loop below
+                    user_name=user.name,
+                    user_id=user.id,
+                    azure_id= user.azure_id,
+                    project_id=dto.id, # will be overwritten in the loop below
+                    role=ProjectRoleType.OWNER
+                )
+                dto.users.append(owner_role)
+
             project_entities: list[Project] = await ProjectRepository(session).create(ProjectMapper.from_create_to_project_entities(dtos, user.id))
-            # entity_ids = [entity.id for entity in entities]
             for project_entity, dto in zip(project_entities, dtos):
-                project_role_entities: list[ProjectRole] = await self._create_role_for_project(session, dto.users, user, project_entity.id)
+                if len(dto.users) > 0:
+                    project_role_entities: list[ProjectRole] = await self._create_role_for_project(session, dto.users, user, project_entity.id)
+                    project_entity.project_role=project_role_entities
                 scenarios=await self._create_scenarios_for_project(session, dto.scenarios, user, project_entity.id)
                 project_entity.scenarios=scenarios
-                project_entity.project_role=project_role_entities
             # get the dtos while the entities are still connected to the session
             result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(project_entities)
         return result
@@ -79,9 +95,18 @@ class ProjectService:
     async def update(self, dtos: list[ProjectIncomingDto], user_dto: UserIncomingDto) -> list[ProjectOutgoingDto]:
         async with session_handler(self.engine) as session:
             user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
-            entities: list[Project] = await ProjectRepository(session).update(ProjectMapper.to_project_entities(dtos, user.id))
-            # get the dtos while the entities are still connected to the session
-            result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(entities)
+            entities_project: list[Project] = await ProjectRepository(session).update(ProjectMapper.to_project_entities(dtos, user.id))
+            for dto, entity in zip(dtos, entities_project):
+                entities_project_role: list[ProjectRole] | None = await ProjectRoleRepository(session).get_or_create(ProjectRoleMapper.to_project_role_entities(dto.users))
+                # entities_project_role: list[ProjectRole] = await ProjectRoleRepository(session).update(ProjectRoleMapper.to_project_role_entities(dto.users, user.id))
+                if entities_project_role is not None:
+                    for project_role in entities_project_role:
+                        user_info = await UserRepository(session).get_by_id(project_role.user_id)
+                        if user_info:
+                            project_role.user_name = user_info.name
+                            project_role.azure_id = user_info.azure_id
+                    entity.project_role = entities_project_role
+            result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(entities_project)
         return result
 
     async def delete(self, ids: list[uuid.UUID], user_dto: UserIncomingDto) -> None:
@@ -119,6 +144,7 @@ class ProjectService:
                     user_info = await UserRepository(session).get_by_id(project_role.user_id)
                     if user_info:
                         project_role.user_name = user_info.name
+                        project_role.azure_id = user_info.azure_id
             result = ProjectMapper.to_outgoing_dtos(projects)
         return result
 

@@ -1,7 +1,7 @@
 import uuid
 from pydantic import BaseModel, Field
 from typing import Annotated
-from src.dtos.project_roles_dtos import ProjectRoleDto, ProjectRoleMapper
+from src.dtos.project_roles_dtos import ProjectRoleCreateDto, ProjectRoleIncomingDto, ProjectRoleMapper
 from src.models.project import (
     Project
 )
@@ -22,11 +22,11 @@ class ProjectDto(BaseModel):
     description: Annotated[str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)] = ""
 
 class ProjectCreateDto(ProjectDto):
-    users:list[ProjectRoleDto]
+    users:list[ProjectRoleCreateDto]
     scenarios: list[ScenarioCreateViaProjectDto]
 
 class ProjectIncomingDto(ProjectDto):
-    users:list[ProjectRoleDto]
+    users:list[ProjectRoleIncomingDto]
     scenarios: list[ScenarioIncomingDto]
 
 

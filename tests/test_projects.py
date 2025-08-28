@@ -1,6 +1,7 @@
 import pytest
 from uuid import uuid4
 from httpx import AsyncClient
+from src.dtos.project_roles_dtos import ProjectRoleCreateDto, ProjectRoleType
 from tests.utils import (
     parse_response_to_dto_test,
     parse_response_to_dtos_test,
@@ -38,7 +39,17 @@ async def test_get_project_populated(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_create_project(client: AsyncClient):
-    payload = [ProjectCreateDto(id=uuid4(), name=str(uuid4()), description=str(uuid4()), scenarios=[]).model_dump(mode="json")]
+    # Assuming ProjectRoleIncomingDto is the correct DTO for user roles
+    test_project_id = uuid4()
+    user = ProjectRoleCreateDto(
+        id=uuid4(),
+        user_id=1,
+        project_id=test_project_id,
+        role=ProjectRoleType.OWNER,
+        user_name="test_user_1",
+        azure_id=str(uuid4())
+    )
+    payload = [ProjectCreateDto(id=test_project_id, name=str(uuid4()), description=str(uuid4()), scenarios=[], users=[user]).model_dump(mode="json")]
 
     response=await client.post("/projects", json=payload)
     assert response.status_code == 200
@@ -49,7 +60,7 @@ async def test_create_project(client: AsyncClient):
 async def test_create_project_with_objectives(client: AsyncClient):
     objectives=[ObjectiveViaScenarioDto(name=str(uuid4()), description=str(uuid4())), ObjectiveViaScenarioDto(name=str(uuid4()), description=str(uuid4()))]
     scenarios=[ScenarioCreateViaProjectDto(name=str(uuid4()), objectives=objectives, opportunities=[])]
-    project=ProjectCreateDto(name=str(uuid4()), description=str(uuid4()),scenarios=scenarios)
+    project=ProjectCreateDto(name=str(uuid4()), description=str(uuid4()),scenarios=scenarios,users=[])
     payload = [project.model_dump(mode="json")]
 
     response=await client.post("/projects", json=payload)
@@ -62,7 +73,7 @@ async def test_create_project_with_objectives(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_update_project(client: AsyncClient):
     new_name=str(uuid4())
-    payload=[ProjectIncomingDto(id=GenerateUuid.as_uuid(3), name=new_name, description="", scenarios=[]).model_dump(mode="json")]
+    payload=[ProjectIncomingDto(id=GenerateUuid.as_uuid(3), name=new_name, description="", scenarios=[],users=[]).model_dump(mode="json")]
 
     response=await client.put("/projects", json=payload)
     assert response.status_code == 200

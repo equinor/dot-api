@@ -15,7 +15,7 @@ app.dependency_overrides[verify_token] = mock_verify_token
 
 async def mock_get_current_user():
     return UserIncomingDto(
-        id=None,  # Assuming the ID is not needed for the test
+        id=1,  # Assuming the ID is not needed for the test
         name="test_user_1",
         azure_id=str(uuid.uuid4())  
     )
