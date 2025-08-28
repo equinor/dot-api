@@ -265,14 +265,14 @@ tests-mypy = ["mypy (>=1.11.1) ; platform_python_implementation == \"CPython\" a
 
 [[package]]
 name = "authlib"
-version = "1.6.1"
+version = "1.6.2"
 description = "The ultimate Python library in building OAuth and OpenID Connect servers and clients."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "authlib-1.6.1-py2.py3-none-any.whl", hash = "sha256:e9d2031c34c6309373ab845afc24168fe9e93dc52d252631f52642f21f5ed06e"},
-    {file = "authlib-1.6.1.tar.gz", hash = "sha256:4dffdbb1460ba6ec8c17981a4c67af7d8af131231b5a36a88a1e8c80c111cdfd"},
+    {file = "authlib-1.6.2-py2.py3-none-any.whl", hash = "sha256:2dd5571013cacf6b15f7addce03ed057ffdf629e9e81bacd9c08455a190e9b57"},
+    {file = "authlib-1.6.2.tar.gz", hash = "sha256:3bde83ac0392683eeef589cd5ab97e63cbe859e552dd75dca010548e79202cb1"},
 ]
 
 [package.dependencies]
@@ -2121,4 +2121,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "64b04c596ca84fbdc75a0dcddc552dfc27705bc021251744eb3bbac6cd0fa3a9"
+content-hash = "f5b9cd4cb011521c50fa6297f5c081b28653586488f0bbc6b57670d044a416cf"
