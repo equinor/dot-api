@@ -22,6 +22,7 @@ from src.database import DatabaseConnectionStrings
 from src.models.base import Base
 from src.seed_database import seed_database
 from src.config import Config
+from src.database import database_start_task
 import urllib
 
 config = Config()
@@ -57,8 +58,11 @@ async def get_async_engine() -> AsyncEngine:
                 async_engine = create_async_engine(
                     conn_str,
                     echo=False,
-                    connect_args={"attrs_before": token_dict}
+                    connect_args={"attrs_before": token_dict},
+                    pool_size=10,
+                    max_overflow=20,
                 )
+                await database_start_task(async_engine)
     assert async_engine is not None
     return async_engine
 

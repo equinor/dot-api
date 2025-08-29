@@ -17,6 +17,7 @@ class ScenarioRepository(BaseRepository[Scenario, uuid.UUID]):
         for n, entity_to_update in enumerate(entities_to_update):
             entity=entities[n]
             entity_to_update.name=entity.name
+            entity_to_update.is_default=entity.is_default
             entity_to_update.project_id=entity.project_id
             entity_to_update.objectives=entity.objectives
             entity_to_update.opportunities=entity.opportunities

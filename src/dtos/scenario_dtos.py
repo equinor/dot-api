@@ -29,6 +29,7 @@ from src.constants import DatabaseConstants
 class ScenarioDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
+    is_default: bool = False
 
 class ScenarioCreateViaProjectDto(ScenarioDto):
     objectives: list[ObjectiveViaScenarioDto]
@@ -60,6 +61,7 @@ class ScenarioMapper:
         return Scenario(
             id=dto.id,
             name=dto.name,
+            is_default=dto.is_default,
             project_id=project_id,
             user_id=user_id,
             opportunities=[], # must create the scenario first
@@ -71,6 +73,7 @@ class ScenarioMapper:
         return Scenario(
             id=dto.id,
             name=dto.name,
+            is_default=dto.is_default,
             project_id=dto.project_id,
             user_id=user_id,
             opportunities=[], # must create the scenario first
@@ -83,6 +86,7 @@ class ScenarioMapper:
             id=entity.id,
             project_id=entity.project_id,
             name=entity.name,
+            is_default=entity.is_default,
             objectives=ObjectiveMapper.to_outgoing_dtos(entity.objectives),
             opportunities=OpportunityMapper.to_outgoing_dtos(entity.opportunities),
         )
@@ -93,6 +97,7 @@ class ScenarioMapper:
             id=entity.id,
             project_id=entity.project_id,
             name=entity.name,
+            is_default=entity.is_default,
             objectives=ObjectiveMapper.to_outgoing_dtos(entity.objectives),
             opportunities=OpportunityMapper.to_outgoing_dtos(entity.opportunities),
             issues=IssueMapper.to_outgoing_dtos(entity.issues),
@@ -104,6 +109,7 @@ class ScenarioMapper:
         return Scenario(
             id=dto.id,
             name=dto.name,
+            is_default=dto.is_default,
             project_id=dto.project_id,
             user_id=user_id,
             opportunities=OpportunityMapper.to_entities(dto.opportunities, user_id),
