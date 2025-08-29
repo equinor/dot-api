@@ -48,7 +48,7 @@ async def test_create_project(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_create_project_with_objectives(client: AsyncClient):
     objectives=[ObjectiveViaScenarioDto(name=str(uuid4()), description=str(uuid4())), ObjectiveViaScenarioDto(name=str(uuid4()), description=str(uuid4()))]
-    scenarios=[ScenarioCreateViaProjectDto(name=str(uuid4()), objectives=objectives, opportunities=[])]
+    scenarios=[ScenarioCreateViaProjectDto(name=str(uuid4()), objectives=objectives, opportunities=[], is_default=True)]
     project=ProjectCreateDto(name=str(uuid4()), description=str(uuid4()),scenarios=scenarios)
     payload = [project.model_dump(mode="json")]
 
