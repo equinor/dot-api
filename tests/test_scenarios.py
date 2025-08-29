@@ -49,6 +49,17 @@ async def test_create_scenario(client: AsyncClient):
     assert response_content[0].objectives.__len__() == 2
 
 @pytest.mark.asyncio
+async def test_create_scenario_is_default_failes(client: AsyncClient):
+    objectives = [
+        ObjectiveViaScenarioDto(name=str(uuid4()), description=str(uuid4())),
+        ObjectiveViaScenarioDto(name=str(uuid4()), description=str(uuid4()))
+    ]
+    payload = [ScenarioCreateDto(project_id=GenerateUuid.as_uuid(1), name=str(uuid4()), objectives=objectives, opportunities=[], is_default=True).model_dump(mode="json")]
+
+    response = await client.post("/scenarios", json=payload)
+    assert response.status_code == 500
+
+@pytest.mark.asyncio
 async def test_update_scenario(client: AsyncClient):
     new_name = str(uuid4())
     new_project_id = GenerateUuid.as_uuid(3)
@@ -62,6 +73,15 @@ async def test_update_scenario(client: AsyncClient):
     assert response.status_code == 200
     response_content = parse_response_to_dtos_test(response, ScenarioOutgoingDto)
     assert response_content[0].name == new_name and response_content[0].project_id == new_project_id and response_content[0].objectives[0].name == objectives[0].name
+
+@pytest.mark.asyncio
+async def test_update_scenario_is_default_fails(client: AsyncClient):
+    new_name = str(uuid4())
+
+    payload = [ScenarioIncomingDto(id=GenerateUuid.as_uuid(3), name=new_name, project_id=GenerateUuid.as_uuid(3), objectives=[], opportunities=[], is_default=True).model_dump(mode="json")]
+
+    response = await client.put("/scenarios", json=payload)
+    assert response.status_code == 500
 
 @pytest.mark.asyncio
 async def test_delete_scenario(client: AsyncClient):
