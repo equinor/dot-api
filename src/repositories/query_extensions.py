@@ -3,6 +3,7 @@ from sqlalchemy.orm import selectinload
 from src.models import (
     Issue,
     Node,
+    Edge,
     Project,
     Scenario,
     Decision,
@@ -65,6 +66,17 @@ class QueryExtensions:
             selectinload(Scenario.edges),
             selectinload(Scenario.issues).options(
                 *QueryExtensions.load_issue_with_relationships()
+            ),
+        ]
+    
+    @staticmethod
+    def load_edge_with_relationships() -> list[_AbstractLoad]:
+        return [
+            selectinload(Edge.tail_node).options(
+                *QueryExtensions.load_node_with_relationships()
+            ),
+            selectinload(Edge.head_node).options(
+                *QueryExtensions.load_node_with_relationships()
             ),
         ]
     
