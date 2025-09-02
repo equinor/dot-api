@@ -124,4 +124,4 @@ async def get_user_service() -> UserService:
     return UserService(await get_async_engine())
 
 async def get_solver_service() -> SolverService:
-    return SolverService(await get_issue_service(), await get_edge_service())
+    return SolverService(await get_scenario_service())
