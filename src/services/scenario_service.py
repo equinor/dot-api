@@ -2,6 +2,7 @@ import uuid
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncEngine
 
+from src.constants import Boundary, Type
 from src.models.scenario import Scenario
 from src.dtos.scenario_dtos import (
     ScenarioMapper,
@@ -20,7 +21,14 @@ from src.dtos.user_dtos import (
     UserIncomingDto,
     UserMapper,
 )
+from src.models.filters.edge_filter import EdgeFilter
+from src.models.filters.issues_filter import IssueFilter
+from src.dtos.issue_dtos import IssueOutgoingDto, IssueMapper
+from src.dtos.edge_dtos import EdgeOutgoingDto, EdgeMapper
+
 from src.repositories.scenario_repository import ScenarioRepository
+from src.repositories.issue_repository import IssueRepository
+from src.repositories.edge_repository import EdgeRepository
 from src.repositories.user_repository import UserRepository
 from src.repositories.objective_repository import ObjectiveRepository
 from src.repositories.opportunity_repository import OpportunityRepository
@@ -86,3 +94,25 @@ class ScenarioService:
             scenarios: list[Scenario] = await ScenarioRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
             result=ScenarioMapper.to_populated_dtos(scenarios)
         return result
+
+    async def get_influence_diagram_data(self, scenario_id: uuid.UUID) -> tuple[list[IssueOutgoingDto], list[EdgeOutgoingDto]]:
+        issue_filter = IssueFilter(
+            scenario_ids=[scenario_id],
+            boundaries=[Boundary.ON.value, Boundary.IN.value],
+            types=[Type.DECISION.value, Type.UNCERTAINTY.value]
+        )
+        edge_filter = EdgeFilter(
+            scenario_ids=[scenario_id],
+            issue_boundaries=[Boundary.ON.value, Boundary.IN.value],
+            issue_types=[Type.DECISION.value, Type.UNCERTAINTY.value]
+        )
+
+        async with session_handler(self.engine) as session:
+            issues_entities = await IssueRepository(session).get_all(model_filter=issue_filter.construct_filters())
+            edges_entities = await EdgeRepository(session).get_all(model_filter=edge_filter.construct_filters())
+
+            issue_dtos=IssueMapper.to_outgoing_dtos(issues_entities)
+            edge_dtos=EdgeMapper.to_outgoing_dtos(edges_entities)
+
+        return issue_dtos, edge_dtos
+    
