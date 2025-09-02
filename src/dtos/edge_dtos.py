@@ -8,6 +8,11 @@ from src.dtos.node_dtos import (
     NodeOutgoingDto
 )
 
+from src.dtos.node_dtos import (
+    NodeMapper,
+    NodeOutgoingDto
+)
+
 class EdgeDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     tail_id: uuid.UUID

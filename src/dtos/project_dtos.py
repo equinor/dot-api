@@ -30,10 +30,6 @@ class ProjectOutgoingDto(ProjectDto):
 class PopulatedProjectDto(ProjectDto):
     scenarios: list[PopulatedScenarioDto]
 
-class AccessibleProjectsDto(BaseModel):
-    contributor_projects_ids: list[uuid.UUID]
-    owner_projects_ids: list[uuid.UUID]
-
 class ProjectMapper:
     @staticmethod
     def from_create_to_entity(dto: ProjectCreateDto, user_id: int) -> Project:

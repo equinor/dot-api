@@ -2,14 +2,11 @@ import uuid
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine
-from src.dtos.project_owners_dtos import ProjectOwnersMapper, ProjectsOwnerCreateDto
-from src.repositories.project_owners_repository import ProjectOwnersRepository
 from src.models import (
     Project,
     User,
 )
 from src.dtos.project_dtos import (
-    AccessibleProjectsDto,
     ProjectMapper,
     ProjectIncomingDto,
     ProjectOutgoingDto,
@@ -61,13 +58,6 @@ class ProjectService:
         async with session_handler(self.engine) as session:
             user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
             entities: list[Project] = await ProjectRepository(session).create(ProjectMapper.from_create_to_entities(dtos, user.id))
-            entity_ids = [entity.id for entity in entities]
-            projects_owner_dto: ProjectsOwnerCreateDto = ProjectsOwnerCreateDto(
-                user_id=user.id,
-                project_ids=entity_ids
-            )
-            await ProjectOwnersRepository(session).create(ProjectOwnersMapper.from_role_to_entities(projects_owner_dto))
-
             for entity, dto in zip(entities, dtos):
                 scenarios=await self._create_scenarios_for_project(session, dto.scenarios, user, entity.id)
                 entity.scenarios=scenarios
@@ -86,16 +76,8 @@ class ProjectService:
 
     async def delete(self, ids: list[uuid.UUID], user_dto: UserIncomingDto) -> None:
         async with session_handler(self.engine) as session:
-            accessible_project_ids = await self.check_accessible_projects(user_dto)
-            # Filter ids to only those the user owns
-            project_owner_ids = accessible_project_ids.owner_projects_ids
-            if len(project_owner_ids) == 0:
-                return
-            ids_to_delete = [pid for pid in ids if pid in project_owner_ids]
-            if not ids_to_delete:
-                return
-            await ProjectRepository(session).delete(ids_to_delete)
-    
+            await ProjectRepository(session).delete(ids=ids)
+
     async def get(self, ids: list[uuid.UUID]) -> list[ProjectOutgoingDto]:
         async with session_handler(self.engine) as session:
             if not ids:
@@ -104,10 +86,6 @@ class ProjectService:
             result=ProjectMapper.to_outgoing_dtos(projects)
         return result
 
-    async def check_accessible_projects(self, user_dto: UserIncomingDto) -> AccessibleProjectsDto:
-        async with session_handler(self.engine) as session:
-            accessible_project_ids = await UserRepository(session).get_accessible_projects_by_user(user_dto.azure_id)
-            return accessible_project_ids
         
     async def get_all(self, user_dto: UserIncomingDto, filter: Optional[ProjectFilter]=None, odata_query: Optional[str]=None) -> list[ProjectOutgoingDto]:
         async with session_handler(self.engine) as session:
