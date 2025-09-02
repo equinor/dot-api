@@ -8,6 +8,8 @@ from src.models import (
     Scenario,
     Decision,
     Uncertainty,
+    User,
+    Edge,
 )
 
 class QueryExtensions:
