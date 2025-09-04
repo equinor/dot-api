@@ -1,5 +1,6 @@
 from sqlalchemy.orm.strategy_options import _AbstractLoad # type: ignore
 from sqlalchemy.orm import selectinload
+from src.models.user import User
 from src.models import (
     Issue,
     Node,
@@ -86,7 +87,7 @@ class QueryExtensions:
             selectinload(Project.scenarios).options(
                 *QueryExtensions.load_scenario_with_relationships()
             ),
-
+            selectinload(Project.project_role)
         ]
 
     @staticmethod
@@ -95,3 +96,11 @@ class QueryExtensions:
         To be used as input for generic repositories when there are no relationships to be loaded.
         """
         return []
+    @staticmethod
+    def load_user_with_roles() -> list[_AbstractLoad]:
+        """
+        To be used as input for generic repositories to load user relationships.
+        """
+        return [
+            selectinload(User.project_role),
+        ]
