@@ -27,12 +27,11 @@ import urllib
 config = Config()
 async_engine: AsyncEngine|None = None
 
-async def get_connection_string_and_token(env: str) -> tuple[str, Optional[dict[Any, Any]]]:
-    db_connection_string = DatabaseConnectionStrings.get_connection_string(env)
+async def get_token() -> Optional[dict[Any, Any]]:
     database_authenticator = DatabaseAuthenticator()
     token_dict = await database_authenticator.authenticate_db_connection_string()
     await database_authenticator.close()
-    return db_connection_string, token_dict
+    return token_dict
 
 def build_connection_url(db_connection_string: str, driver: str) -> str:
     params = urllib.parse.quote_plus(db_connection_string.replace('"', ""))
@@ -40,9 +39,10 @@ def build_connection_url(db_connection_string: str, driver: str) -> str:
 
 async def get_async_engine() -> AsyncEngine:
     global async_engine
+    db_connection_string = DatabaseConnectionStrings.get_connection_string(config.APP_ENV)
     if async_engine is None:
         # create all tables in the in memory database
-        if config.APP_ENV == "local":
+        if ":memory:" in db_connection_string:
             async_engine = create_async_engine(
                 DatabaseConnectionStrings.get_connection_string(config.APP_ENV), 
                 echo=False
@@ -51,22 +51,38 @@ async def get_async_engine() -> AsyncEngine:
                 await conn.run_sync(Base.metadata.create_all)
                 await seed_database(conn, num_projects=10, num_scenarios=10, num_nodes=50)
         else:
-            db_connection_string, token_dict = await get_connection_string_and_token(config.APP_ENV)
+            token_dict = await get_token()
             conn_str = build_connection_url(db_connection_string, driver="aioodbc")
-            if token_dict:
+            if config.APP_ENV=="local":
                 async_engine = create_async_engine(
                     conn_str,
                     echo=False,
-                    connect_args={"attrs_before": token_dict}
+                    pool_size=10,
+                    max_overflow=20,
+                )
+
+            elif token_dict:
+                async_engine = create_async_engine(
+                    conn_str,
+                    echo=False,
+                    connect_args={"attrs_before": token_dict},
+                    pool_size=10,
+                    max_overflow=20,
                 )
     assert async_engine is not None
     return async_engine
 
 async def get_sync_engine(envionment: str = config.APP_ENV) -> Engine:
     sync_engine: Engine|None=None
-    db_connection_string, token_dict = await get_connection_string_and_token(envionment)
+    db_connection_string = DatabaseConnectionStrings.get_connection_string(envionment)
+    token_dict = await get_token()
     conn_str = build_connection_url(db_connection_string, driver="pyodbc")
-    if token_dict:
+    if envionment=="local":
+        sync_engine = create_engine(
+            conn_str,
+            echo=False,
+        )
+    elif token_dict:
         sync_engine = create_engine(
             conn_str,
             echo=False,
