@@ -7,8 +7,15 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 from src.models.base import Base
-from src.models.node import Node
-from src.models.scenario import Scenario
+from src.models import (
+    Node,
+    Scenario,
+    OptionToOption,
+    OptionToOutcome, 
+    OutcomeToOutcome,
+    OutcomeToOption,
+)
+
 from src.models.base_entity import BaseEntity
 
 class Edge(Base, BaseEntity):
@@ -33,6 +40,31 @@ class Edge(Base, BaseEntity):
         primaryjoin=head_id == Node.id, 
         back_populates="head_edges", 
     )
+
+    option_to_options: Mapped[list["OptionToOption"]] = relationship(
+        "OptionToOption",
+        back_populates="edge",
+        cascade="all, delete-orphan",
+    )
+
+    option_to_outcomes: Mapped[list["OptionToOutcome"]] = relationship(
+        "OptionToOutcome",
+        back_populates="edge",
+        cascade="all, delete-orphan",
+    )
+
+    outcome_to_outcomes: Mapped[list["OutcomeToOutcome"]] = relationship(
+        "OutcomeToOutcome",
+        back_populates="edge",
+        cascade="all, delete-orphan",
+    )
+
+    outcome_to_options: Mapped[list["OutcomeToOption"]] = relationship(
+        "OutcomeToOption",
+        back_populates="edge",
+        cascade="all, delete-orphan",
+    )
+
 
     def __init__(self, id: uuid.UUID, tail_node_id: uuid.UUID, head_node_id: uuid.UUID, scenario_id: uuid.UUID):
         self.id = id

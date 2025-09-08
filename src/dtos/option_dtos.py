@@ -1,9 +1,19 @@
 
 import uuid
-from typing import Annotated
+from typing import Annotated, List, Any
 from pydantic import BaseModel, Field
-from src.models.option import (
-    Option
+from src.models import (
+    Option,
+    OptionToOption,
+    OptionToOutcome
+)
+from src.dtos.option_to_option_dtos import (
+    OptionToOptionMapper,
+    OptionToOptionIncomingDto,
+)
+from src.dtos.option_to_outcome_dtos import (
+    OptionToOutcomeIncomingDto,
+    OptionToOutcomeMapper
 )
 from src.constants import DatabaseConstants
 
@@ -15,7 +25,16 @@ class OptionDto(BaseModel):
     
 
 class OptionIncomingDto(OptionDto):
-    pass
+    parent_outcome_dto_ids: List[uuid.UUID]
+    parent_option_dto_ids: List[uuid.UUID]
+
+    @property
+    def parent_outcome_dtos(self) -> List[OptionToOutcomeIncomingDto]:
+        return [OptionToOutcomeIncomingDto(child_option_id=self.id, parent_outcome_id=x) for x in self.parent_outcome_dto_ids]        
+
+    @property
+    def parent_option_dtos(self) -> List[OptionToOptionIncomingDto]:
+        return [OptionToOptionIncomingDto(child_option_id=self.id, parent_option_id=x) for x in self.parent_option_dto_ids]
 
 class OptionOutgoingDto(OptionDto):
     pass
@@ -37,6 +56,8 @@ class OptionMapper:
             name=dto.name,
             decision_id=dto.decision_id,
             utility=dto.utility,
+            parent_options=OptionToOptionMapper.to_entities(dto.parent_option_dtos),
+            parent_outcomes=OptionToOutcomeMapper.to_entities(dto.parent_outcome_dtos)
         )
     
     @staticmethod

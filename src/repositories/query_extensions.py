@@ -10,20 +10,40 @@ from src.models import (
     Uncertainty,
     User,
     Edge,
+    Option,
+    Outcome
 )
 
 class QueryExtensions:
 
     @staticmethod
+    def load_option_with_relationships() -> list[_AbstractLoad]:
+        return [
+            selectinload(Option.parent_options),
+            selectinload(Option.parent_outcomes),
+        ]
+    
+    @staticmethod
+    def load_outcome_with_relationships() -> list[_AbstractLoad]:
+        return [
+            selectinload(Outcome.parent_options),
+            selectinload(Outcome.parent_outcomes),
+        ]
+
+    @staticmethod
     def load_decision_with_relationships() -> list[_AbstractLoad]:
         return [
-            selectinload(Decision.options)
+            selectinload(Decision.options).options(
+                *QueryExtensions.load_option_with_relationships()
+            )
         ]
     
     @staticmethod
     def load_uncertainty_with_relationships() -> list[_AbstractLoad]:
         return [
-            selectinload(Uncertainty.outcomes)
+            selectinload(Uncertainty.outcomes).options(
+                *QueryExtensions.load_outcome_with_relationships()
+            )
         ]
 
     @staticmethod

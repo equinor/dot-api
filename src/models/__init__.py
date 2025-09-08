@@ -15,3 +15,7 @@ from src.models.edge import Edge # type: ignore
 from src.models.node_style import NodeStyle # type: ignore
 from src.models.outcome import Outcome # type: ignore
 from src.models.option import Option # type: ignore
+from src.models.option_to_option import OptionToOption # type: ignore
+from src.models.option_to_outcome import OptionToOutcome # type: ignore
+from src.models.outcome_to_outcome import OutcomeToOutcome # type: ignore
+from src.models.outcome_to_option import OutcomeToOption # type: ignore

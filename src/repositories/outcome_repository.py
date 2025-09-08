@@ -6,7 +6,7 @@ from src.repositories.query_extensions import QueryExtensions
 
 class OutcomeRepository(BaseRepository[Outcome, uuid.UUID]):
     def __init__(self, session: AsyncSession):
-        super().__init__(session, Outcome, query_extension_method=QueryExtensions.empty_load)
+        super().__init__(session, Outcome, query_extension_method=QueryExtensions.load_outcome_with_relationships)
 
     async def update(self, entities: list[Outcome]) -> list[Outcome]:
         entities_to_update=await self.get([outcome.id for outcome in entities])
@@ -19,6 +19,9 @@ class OutcomeRepository(BaseRepository[Outcome, uuid.UUID]):
             entity_to_update.name=entity.name
             entity_to_update.probability=entity.probability
             entity_to_update.utility=entity.utility
+
+            entity_to_update.parent_outcomes = [await self.session.merge(item) for item in entity.parent_outcomes]
+            entity_to_update.parent_options = [await self.session.merge(item) for item in entity.parent_options]
 
         await self.session.flush()
         return entities_to_update
