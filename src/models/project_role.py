@@ -2,7 +2,7 @@ import uuid
 from src.models.guid import GUID
 from src.models.base_entity import BaseEntity
 from src.models.base_auditable_entity import BaseAuditableEntity
-from sqlalchemy import  ForeignKey, String
+from sqlalchemy import   ForeignKey, String
 from sqlalchemy.orm import (
     Mapped, 
     relationship, 
@@ -18,10 +18,10 @@ class ProjectRole(Base,BaseEntity, BaseAuditableEntity):
     __tablename__ = "project_role"
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
-    project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("project.id"),index=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"),index=False)
-    role: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), nullable=False,index=False)
-    project: Mapped[Project] = relationship("Project", back_populates="project_role", )
+    project_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("project.id"), index=True) 
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), index=True)  
+    role: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), nullable=False)
+    project: Mapped[Project] = relationship("Project", back_populates="project_role", foreign_keys=[project_id])
     user: Mapped[User] = relationship("User", back_populates="project_role", foreign_keys=[user_id])
 
     def __init__(self,id: uuid.UUID, project_id: uuid.UUID, user_id: int, role: str):

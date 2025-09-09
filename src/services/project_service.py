@@ -56,10 +56,10 @@ class ProjectService:
     async def _create_role_for_project(self, session: AsyncSession, project_role_dtos: list[ProjectRoleCreateDto], user: User, project_id: uuid.UUID):
         project_user_roles = await ProjectRoleRepository(session).create(ProjectRoleMapper.from_create_via_project_to_entities(project_role_dtos, user.id, project_id))
         for project_role in project_user_roles:
-            user_info = await UserRepository(session).get_by_id(project_role.user_id)
+            user_info = await UserRepository(session).get([project_role.user_id])
             if user_info:
-                project_role.user_name = user_info.name
-                project_role.azure_id = user_info.azure_id
+                project_role.user_name = user_info[0].name
+                project_role.azure_id = user_info[0].azure_id
         return project_user_roles
 
     async def _create_opportunities_and_objectives_for_scenario(self, session: AsyncSession, objective_dtos: list[ObjectiveViaScenarioDto], opportunities_dtos: list[OpportunityViaProjectDto], user: User, scenario_id: uuid.UUID):
@@ -88,7 +88,6 @@ class ProjectService:
                     project_entity.project_role=project_role_entities
                 scenarios=await self._create_scenarios_for_project(session, dto.scenarios, user, project_entity.id)
                 project_entity.scenarios=scenarios
-            # get the dtos while the entities are still connected to the session
             result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(project_entities)
         return result
     
@@ -96,16 +95,12 @@ class ProjectService:
         async with session_handler(self.engine) as session:
             user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
             entities_project: list[Project] = await ProjectRepository(session).update(ProjectMapper.to_project_entities(dtos, user.id))
-            for dto, entity in zip(dtos, entities_project):
-                entities_project_role: list[ProjectRole] | None = await ProjectRoleRepository(session).get_or_create(ProjectRoleMapper.to_project_role_entities(dto.users))
-                # entities_project_role: list[ProjectRole] = await ProjectRoleRepository(session).update(ProjectRoleMapper.to_project_role_entities(dto.users, user.id))
-                if entities_project_role is not None:
-                    for project_role in entities_project_role:
-                        user_info = await UserRepository(session).get_by_id(project_role.user_id)
-                        if user_info:
-                            project_role.user_name = user_info.name
-                            project_role.azure_id = user_info.azure_id
-                    entity.project_role = entities_project_role
+            for entity_project in entities_project:
+                for project_role in entity_project.project_role:
+                    user_info = await UserRepository(session).get([project_role.user_id])
+                    if user_info:
+                        project_role.user_name = user_info[0].name
+                        project_role.azure_id = user_info[0].azure_id
             result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(entities_project)
         return result
 
@@ -133,15 +128,6 @@ class ProjectService:
             
             filter.accessing_user_id = user.id
             project_access_filter = filter.construct_access_conditions()
-            if filter is None:
-                filter = ProjectFilter()
-            
-            filter.accessing_user_id = user.id
-            project_access_filter = filter.construct_access_conditions()
-            
-            # Construct model filters
-            model_filter = filter.construct_filters() if filter else []
-            model_filter.append(project_access_filter)
             
             # Construct model filters
             model_filter = filter.construct_filters() if filter else []
@@ -150,10 +136,10 @@ class ProjectService:
             projects: list[Project] = await ProjectRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
             for project in projects:
                 for project_role in project.project_role:
-                    user_info = await UserRepository(session).get_by_id(project_role.user_id)
-                    if user_info:
-                        project_role.user_name = user_info.name
-                        project_role.azure_id = user_info.azure_id
+                        user_info = await UserRepository(session).get([project_role.user_id])
+                        if user_info:
+                            project_role.user_name = user_info[0].name
+                            project_role.azure_id = user_info[0].azure_id
             result = ProjectMapper.to_outgoing_dtos(projects)
         return result
 

@@ -25,32 +25,32 @@ class ProjectRoleRepository(BaseRepository[ProjectRole, uuid.UUID]):
 
         return project_roles
 
-    async def get_or_create(self, entities: list[ProjectRole]) -> list[ProjectRole] | None:
-        project_roles: list[ProjectRole] = []
+    # async def get_or_create(self, entities: list[ProjectRole]) -> list[ProjectRole] | None:
+    #     project_roles: list[ProjectRole] = []
 
-        # Step 1: Fetch all existing ProjectRole instances
-        scalar_result = await self.session.scalars(select(ProjectRole).where(ProjectRole.project_id == entities[0].project_id))
-        all_roles = scalar_result.all()  # Get all ProjectRole instances
-        existing_ids = {role.id for role in all_roles}  # Create a set of existing IDs
+    #     # Step 1: Fetch all existing ProjectRole instances
+    #     scalar_result = await self.session.scalars(select(ProjectRole).where(ProjectRole.project_id == entities[0].project_id))
+    #     all_roles = scalar_result.all()  # Get all ProjectRole instances
+    #     existing_ids = {role.id for role in all_roles}  # Create a set of existing IDs
 
-        # Step 2: Create a set of IDs from the input entities
-        entity_ids = {entity.id for entity in entities}
+    #     # Step 2: Create a set of IDs from the input entities
+    #     entity_ids = {entity.id for entity in entities}
 
-        # Step 3: Delete roles that are not in the input entities
-        ids_to_delete = existing_ids - entity_ids  # Find IDs to delete
-        if len(ids_to_delete) > 0:
-            await self.delete(list(ids_to_delete))
+    #     # Step 3: Delete roles that are not in the input entities
+    #     ids_to_delete = existing_ids - entity_ids  # Find IDs to delete
+    #     if len(ids_to_delete) > 0:
+    #         await self.delete(list(ids_to_delete))
 
-        # Step 4: Process the entities to get or create roles
-        for entity in entities:
-            scalar_result = await self.session.scalars(select(ProjectRole).where(ProjectRole.id == entity.id and ProjectRole.project_id == entity.project_id))
-            project_role = scalar_result.first()
-            if project_role is None:
-                project_role = await self.create_single(entity)
-                project_roles.append(project_role)
-        if(len(entities) > 0):
-            project_roles.extend(entities)
-        return project_roles if len(project_roles) > 0 else None
+    #     # Step 4: Process the entities to get or create roles
+    #     for entity in entities:
+    #         scalar_result = await self.session.scalars(select(ProjectRole).where(ProjectRole.id == entity.id and ProjectRole.project_id == entity.project_id))
+    #         project_role = scalar_result.first()
+    #         if project_role is None:
+    #             project_role = await self.create_single(entity)
+    #             project_roles.append(project_role)
+    #     if(len(entities) > 0):
+    #         project_roles.extend(entities)
+    #     return project_roles if len(project_roles) > 0 else None
 
     async def update(self, entities: list[ProjectRole]) -> list[ProjectRole]:
         entities_to_update=await self.get([entity.id for entity in entities])

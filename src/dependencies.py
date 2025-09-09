@@ -44,13 +44,10 @@ async def get_async_engine() -> AsyncEngine:
     if async_engine is None:
         # create all tables in the in memory database
         if config.APP_ENV == "local":
-            async_engine = create_async_engine(
-                DatabaseConnectionStrings.get_connection_string(config.APP_ENV), 
-                echo=False
-            )
-            async with async_engine.begin() as conn:
-                await conn.run_sync(Base.metadata.create_all)
-                await seed_database(conn, num_projects=10, num_scenarios=10, num_nodes=50)
+                conn_str = build_connection_url(DatabaseConnectionStrings.get_connection_string(config.APP_ENV), driver="aioodbc")
+                async_engine = create_async_engine(
+                    conn_str,
+                    echo=False)
         else:
             db_connection_string, token_dict = await get_connection_string_and_token(config.APP_ENV)
             conn_str = build_connection_url(db_connection_string, driver="aioodbc")
@@ -65,14 +62,11 @@ async def get_async_engine() -> AsyncEngine:
 
 async def get_sync_engine(envionment: str = config.APP_ENV) -> Engine:
     sync_engine: Engine|None=None
-    db_connection_string, token_dict = await get_connection_string_and_token(envionment)
-    conn_str = build_connection_url(db_connection_string, driver="pyodbc")
-    if token_dict:
-        sync_engine = create_engine(
-            conn_str,
-            echo=False,
-            connect_args={"attrs_before": token_dict}
-        )
+    conn_str = build_connection_url(DatabaseConnectionStrings.get_connection_string(config.APP_ENV), driver="pyodbc")
+    sync_engine = create_engine(
+        conn_str,
+        echo=False,
+    )
     assert sync_engine is not None
     return sync_engine
 

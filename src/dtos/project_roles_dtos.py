@@ -1,39 +1,34 @@
 import uuid
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from src.models.project_role import ProjectRole
 from src.constants import ProjectRoleType
 
+class UserInfoDto(BaseModel):
+    user_name: str
+    azure_id: str
 
 class ProjectRoleDto(BaseModel):
-    id: uuid.UUID
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
     user_id: int
     project_id: uuid.UUID
     role: ProjectRoleType
 
-class ProjectRoleIncomingDto(ProjectRoleDto):
-    id: uuid.UUID
-    user_name: str
-    azure_id: str
+class ProjectRoleIncomingDto(ProjectRoleDto, UserInfoDto):
+    pass
 
-class ProjectRoleCreateDto(ProjectRoleDto):
-    user_name: str
-    azure_id: str
+class ProjectRoleCreateDto(ProjectRoleDto, UserInfoDto):
+    pass
 
-class ProjectRoleOutgoingDto(BaseModel):
-    id: uuid.UUID
-    user_name: str
-    user_id: int
-    project_id: uuid.UUID
-    azure_id: str
-    role: str
+class ProjectRoleOutgoingDto(ProjectRoleDto, UserInfoDto):
+    pass
 
 
 class ProjectRoleMapper:
     @staticmethod
     def from_create_to_entity(dto: ProjectRoleCreateDto, user_id: int) -> ProjectRole:
         return ProjectRole(
-            id=uuid.uuid4(),
+            id=dto.id,
             user_id=dto.user_id,
             project_id=dto.project_id,
             role=dto.role

@@ -8,7 +8,6 @@ from src.repositories.query_extensions import QueryExtensions
 class UserRepository(BaseRepository[User, int]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, User, query_extension_method=QueryExtensions.empty_load)
-        super().__init__(session, User, query_extension_method=QueryExtensions.empty_load)
 
     async def get_or_create(self, entity: User) -> User:
         user=await self.get_by_azure_id(entity.azure_id)
@@ -18,9 +17,6 @@ class UserRepository(BaseRepository[User, int]):
     
     async def get_by_azure_id(self, azure_id: str) -> Optional[User]:
         return (await self.session.scalars(select(User).where(User.azure_id==azure_id))).first()
-
-    async def get_by_id(self, id: int) -> Optional[User]:
-        return (await self.session.scalars(select(User).where(User.id==id))).first()
 
     async def update(self, entities: list[User]) -> list[User]:
         entities_to_update=await self.get([decision.id for decision in entities])
@@ -34,5 +30,3 @@ class UserRepository(BaseRepository[User, int]):
 
         await self.session.flush()
         return entities_to_update
-
-        

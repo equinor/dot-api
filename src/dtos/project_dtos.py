@@ -76,7 +76,7 @@ class ProjectMapper:
             name=dto.name,
             description=dto.description,
             user_id=user_id,
-            project_role=[],
+            project_role=ProjectRoleMapper.to_project_role_entities(dto.users),
             scenarios=ScenarioMapper.to_entities(dto.scenarios, user_id),
         )
 

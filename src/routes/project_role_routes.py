@@ -7,8 +7,22 @@ from src.dtos.user_dtos import UserIncomingDto
 
 router = APIRouter(tags=["project-roles"])
 
+@router.get("/project-roles/{project_id}/{id}")
+async def get_project_role(
+    id: uuid.UUID,
+    project_id: uuid.UUID,
+    project_role_service: ProjectRoleService = Depends(get_project_role_service),
+    current_user: UserIncomingDto = Depends(get_current_user)
+
+):
+    try:
+        await project_role_service.delete(id, project_id, current_user)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
 @router.delete("/project-roles/{project_id}/{id}")
-async def delete_opportunity(
+async def delete_project_role(
     id: uuid.UUID,
     project_id: uuid.UUID,
     project_role_service: ProjectRoleService = Depends(get_project_role_service),
