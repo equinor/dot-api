@@ -5,7 +5,7 @@ from src.models.project_role import ProjectRole
 from src.constants import ProjectRoleType
 
 class UserInfoDto(BaseModel):
-    user_name: str
+    user_name: str = Field(max_length=30)
     azure_id: str
 
 class ProjectRoleDto(BaseModel):
