@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, status,Depends
+from contextlib import asynccontextmanager
 from src.auth.auth import verify_token
 import src.routes.decision_routes as decision_routes
 import src.routes.edge_routes as edge_routes
@@ -16,7 +17,15 @@ import src.routes.user_routes as user_routes
 import src.routes.outcome_routes as outcome_routes
 import src.routes.option_routes as option_routes
 from src.config import Config
+from src.session_manager import sessionmanager
 from fastapi.middleware.cors import CORSMiddleware
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+   await sessionmanager.init_db()
+   yield
+   await sessionmanager.close()
 
 config = Config()
 
@@ -28,10 +37,9 @@ app = FastAPI(swagger_ui_init_oauth={
     },
     swagger_ui_parameters={
         "syntaxHighlight": False
-    }
+    },
+    lifespan=lifespan
 )
-
-
 
 # Adding CORS middleware to the FastAPI application
 app.add_middleware(

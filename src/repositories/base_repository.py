@@ -38,7 +38,8 @@ class BaseRepository(Generic[T, IDType]):
         query = select(self.model).where(self.model.id.in_(ids)).options(
             *self.query_extension_method()
         )
-        return list((await self.session.scalars(query)).all())
+        results = await self.session.scalars(query)
+        return list(results.fetchall())
 
     async def get_all(self, model_filter: List[ColumnElement[bool]] = [], odata_query: Optional[str]=None, skip: int=0, take: int=PageSize.DEFAULT) -> List[T]:
         query = select(self.model).options(
@@ -49,7 +50,8 @@ class BaseRepository(Generic[T, IDType]):
         if odata_query is not None:
             query = cast(Select[Tuple[T]], apply_odata_query(query, odata_query))
         query=query.order_by(desc(self.model.created_at)).offset(skip).limit(take)
-        return list((await self.session.scalars(query)).all())
+        results = await self.session.scalars(query)
+        return list(results.fetchall())
 
     async def delete(self, ids: List[IDType]) -> None:
         entities = await self.get(ids)
