@@ -1,6 +1,6 @@
 import uuid
 from typing import Optional
-from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.value_metric import ValueMetric
 from src.dtos.value_metric_dtos import (
@@ -9,38 +9,29 @@ from src.dtos.value_metric_dtos import (
     ValueMetricMapper
 )
 from src.repositories.value_metric_repository import ValueMetricRepository
-from src.services.session_handler import session_handler
 
 class ValueMetricService:
-    def __init__(self, engine: AsyncEngine):
-        self.engine=engine
-
-    async def create(self, dtos: list[ValueMetricIncomingDto]) -> list[ValueMetricOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            entities: list[ValueMetric] = await ValueMetricRepository(session).create(ValueMetricMapper.to_entities(dtos))
-            # get the dtos while the entities are still connected to the session
-            result: list[ValueMetricOutgoingDto] = ValueMetricMapper.to_outgoing_dtos(entities)
+    async def create(self, session: AsyncSession, dtos: list[ValueMetricIncomingDto]) -> list[ValueMetricOutgoingDto]:
+        entities: list[ValueMetric] = await ValueMetricRepository(session).create(ValueMetricMapper.to_entities(dtos))
+        # get the dtos while the entities are still connected to the session
+        result: list[ValueMetricOutgoingDto] = ValueMetricMapper.to_outgoing_dtos(entities)
         return result
     
-    async def update(self, dtos: list[ValueMetricIncomingDto]) -> list[ValueMetricOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            entities: list[ValueMetric] = await ValueMetricRepository(session).update(ValueMetricMapper.to_entities(dtos))
-            # get the dtos while the entities are still connected to the session
-            result: list[ValueMetricOutgoingDto] = ValueMetricMapper.to_outgoing_dtos(entities)
+    async def update(self, session: AsyncSession, dtos: list[ValueMetricIncomingDto]) -> list[ValueMetricOutgoingDto]:
+        entities: list[ValueMetric] = await ValueMetricRepository(session).update(ValueMetricMapper.to_entities(dtos))
+        # get the dtos while the entities are still connected to the session
+        result: list[ValueMetricOutgoingDto] = ValueMetricMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[uuid.UUID]):
-        async with session_handler(self.engine) as session:
-            await ValueMetricRepository(session).delete(ids)
+    async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):
+        await ValueMetricRepository(session).delete(ids)
     
-    async def get(self, ids: list[uuid.UUID]) -> list[ValueMetricOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            entities: list[ValueMetric] = await ValueMetricRepository(session).get(ids)
-            result=ValueMetricMapper.to_outgoing_dtos(entities)
+    async def get(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[ValueMetricOutgoingDto]:
+        entities: list[ValueMetric] = await ValueMetricRepository(session).get(ids)
+        result = ValueMetricMapper.to_outgoing_dtos(entities)
         return result
     
-    async def get_all(self, odata_query: Optional[str]=None) -> list[ValueMetricOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            entities: list[ValueMetric] = await ValueMetricRepository(session).get_all(odata_query=odata_query)
-            result=ValueMetricMapper.to_outgoing_dtos(entities)
+    async def get_all(self, session: AsyncSession, odata_query: Optional[str] = None) -> list[ValueMetricOutgoingDto]:
+        entities: list[ValueMetric] = await ValueMetricRepository(session).get_all(odata_query=odata_query)
+        result = ValueMetricMapper.to_outgoing_dtos(entities)
         return result

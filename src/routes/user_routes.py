@@ -1,17 +1,14 @@
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
+
+from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth.graph_api import call_ms_graph_api
 from src.auth.auth import verify_token
-from src.services.user_service import (
-    UserService,
-)
+from src.services.user_service import UserService
 from src.constants import SwaggerDocumentationConstants
-
-from src.dtos.user_dtos import (
-    UserOutgoingDto,
-    UserIncomingDto
-)
+from src.dtos.user_dtos import UserOutgoingDto, UserIncomingDto
 from src.dependencies import get_user_service
+from src.dependencies import get_db
 
 router = APIRouter(tags=["user"])
 
@@ -27,10 +24,11 @@ async def get_me(
 @router.get("/users")
 async def get_users(
     user_service: UserService = Depends(get_user_service),
-    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    session: AsyncSession = Depends(get_db),
 ) -> list[UserOutgoingDto]:
     try:
-        return await user_service.get_all(odata_query=filter)
+        return await user_service.get_all(session, odata_query=filter)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
@@ -38,9 +36,10 @@ async def get_users(
 async def get_user(
     id: int,
     user_service: UserService = Depends(get_user_service),
+    session: AsyncSession = Depends(get_db),
 ) -> UserOutgoingDto:
     try:
-        result = await user_service.get([id])
+        result = await user_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
@@ -53,9 +52,10 @@ async def get_user(
 async def get_user_by_azure_id(
     azure_id: str,
     user_service: UserService = Depends(get_user_service),
+    session: AsyncSession = Depends(get_db),
 ) -> UserOutgoingDto:
     try:
-        result=await user_service.get_by_azure_id(azure_id)
+        result = await user_service.get_by_azure_id(session, azure_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -63,4 +63,3 @@ async def get_user_by_azure_id(
         raise HTTPException(status_code=404)
     else:
         return result
-    

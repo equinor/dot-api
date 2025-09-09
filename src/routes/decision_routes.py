@@ -1,10 +1,13 @@
 import uuid
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
+
+from sqlalchemy.ext.asyncio import AsyncSession
 from src.dtos.decision_dtos import DecisionIncomingDto, DecisionOutgoingDto
 from src.services.decision_service import DecisionService
 from src.dependencies import get_decision_service
 from src.constants import SwaggerDocumentationConstants
+from src.dependencies import get_db
 
 router = APIRouter(tags=["decisions"])
 
@@ -12,9 +15,10 @@ router = APIRouter(tags=["decisions"])
 async def get_decision(
     id: uuid.UUID,
     decision_service: DecisionService = Depends(get_decision_service),
+    session: AsyncSession = Depends(get_db),
 ) -> DecisionOutgoingDto:
     try:
-        decisions: list[DecisionOutgoingDto] = await decision_service.get([id])
+        decisions: list[DecisionOutgoingDto] = await decision_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
@@ -27,9 +31,10 @@ async def get_decision(
 async def get_all_decision(
     decision_service: DecisionService = Depends(get_decision_service),
     filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    session: AsyncSession = Depends(get_db),
 ) -> list[DecisionOutgoingDto]:
     try:
-        decisions: list[DecisionOutgoingDto] = await decision_service.get_all(odata_query=filter)
+        decisions: list[DecisionOutgoingDto] = await decision_service.get_all(session, odata_query=filter)
         return decisions
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -37,20 +42,21 @@ async def get_all_decision(
 @router.delete("/decisions/{id}")
 async def delete_decision(
     id: uuid.UUID,
-    decision_service: DecisionService = Depends(get_decision_service)
+    decision_service: DecisionService = Depends(get_decision_service),
+    session: AsyncSession = Depends(get_db),
 ):
     try:
-        await decision_service.delete([id])
+        await decision_service.delete(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
 @router.put("/decisions")
 async def update_decisions(
     dtos: list[DecisionIncomingDto],
-    decision_service: DecisionService = Depends(get_decision_service)
-)-> list[DecisionOutgoingDto]:
+    decision_service: DecisionService = Depends(get_decision_service),
+    session: AsyncSession = Depends(get_db),
+) -> list[DecisionOutgoingDto]:
     try:
-        return list(await decision_service.update(dtos))
+        return list(await decision_service.update(session, dtos))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
