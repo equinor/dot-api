@@ -1,12 +1,15 @@
 from enum import Enum
 
 class Type(str, Enum):
-    UNDECIDED="Undecided"
+    UNASSIGNED="Unassigned"
     DECISION="Decision"
     UNCERTAINTY="Uncertainty"
     VALUE_METRIC="Value Metric"
     FACT="Fact"
     UTILITY="Utility"
+
+class DepricatedIssueTypes(str, Enum):
+    UNDECIDED="Undecided"
     OTHER="Other"
     ACTION_ITEM="Action Item"
 

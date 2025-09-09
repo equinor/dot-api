@@ -88,11 +88,13 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
         opportunity = add_auditable_fields(opportunity, user)
         entities.append(opportunity)
         former_node_id=None
+        default_scenario=True
         for scenario_index in range(num_scenarios):
             scenario_id=GenerateUuid.as_uuid(project_index * num_scenarios + scenario_index + 1)
             scenario = Scenario(
                 id=scenario_id,
                 name=str(uuid4()),
+                is_default=default_scenario,
                 project_id=project.id,
                 user_id=project.created_by_id,
                 objectives=[],
@@ -100,7 +102,8 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
             )
             scenario = add_auditable_fields(scenario, user)
             entities.append(scenario)
-
+            default_scenario=False
+            
             for issue_node_index in range(num_nodes):
                 issue_node_id=GenerateUuid.as_uuid(project_index * num_scenarios*num_nodes + scenario_index * num_nodes + issue_node_index + 1)
                 decision = Decision(
@@ -179,6 +182,6 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
                     entities.append(edge)
                 former_node_id=issue_node_id
 
-    async with AsyncSession(conn) as session:
+    async with AsyncSession(conn, autoflush=True) as session:
         session.add_all(entities)    
         await session.commit()

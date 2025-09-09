@@ -1,5 +1,8 @@
+from sqlalchemy.sql import select, asc
 from enum import Enum
-
+from src.models import Project, Scenario
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+from src.services.session_handler import session_handler
 from src.config import Config
 
 
@@ -19,3 +22,33 @@ class DatabaseConnectionStrings(Enum):
             return config.DATABASE_CONN_PROD
         else:
             raise ValueError(f"Unknown environment: {app_env}")
+        
+async def database_start_task(engine: AsyncEngine):
+    async with session_handler(engine) as session:
+        await validate_default_scenarios(session)
+
+async def validate_default_scenarios(session: AsyncSession):
+    projects = list((await session.scalars(select(Project))).all())
+
+    for project in projects:
+        scenarios = list((await session.scalars(
+            select(Scenario).where(Scenario.project_id==project.id).order_by(asc(Scenario.created_at))
+        )).all())
+
+        if len(scenarios)==0:
+            continue
+        number_of_default_scenarios=sum([x.is_default for x in scenarios])
+        if number_of_default_scenarios == 1:
+            continue                
+        if number_of_default_scenarios == 0:
+            scenarios[0].is_default=True
+            await session.flush()
+        if number_of_default_scenarios > 1:
+            # Keep the first `is_default` as True, set all others to False
+            first_default_found = False
+            for scenario in scenarios:
+                if scenario.is_default and not first_default_found:
+                    first_default_found = True
+                else:
+                    scenario.is_default = False
+            await session.flush()
