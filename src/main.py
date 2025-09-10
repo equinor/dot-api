@@ -16,7 +16,7 @@ import src.routes.issue_routes as issue_routes
 import src.routes.user_routes as user_routes
 import src.routes.outcome_routes as outcome_routes
 import src.routes.option_routes as option_routes
-from src.config import Config
+from src.config import config
 from src.session_manager import sessionmanager
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -26,8 +26,6 @@ async def lifespan(app: FastAPI):
    await sessionmanager.init_db()
    yield
    await sessionmanager.close()
-
-config = Config()
 
 app = FastAPI(swagger_ui_init_oauth={
         "usePkceWithAuthorizationCodeGrant": True,

@@ -17,11 +17,9 @@ from src.services.issue_service import IssueService
 from src.services.outcome_service import OutcomeService
 from src.services.option_service import OptionService
 from src.services.user_service import UserService
-from src.config import Config
+from src.config import config
 from src.database import get_connection_string_and_token, build_connection_url
 
-
-config = Config()
 
 async def get_sync_engine(envionment: str = config.APP_ENV) -> Engine:
     sync_engine: Engine|None=None

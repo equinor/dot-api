@@ -3,14 +3,12 @@ from enum import Enum
 from src.models import Project, Scenario
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from src.services.session_handler import session_handler
-from src.config import Config
+from src.config import config
 
 from src.auth.db_auth import DatabaseAuthenticator
 import urllib.parse
 from typing import Optional, Any
 
-
-config = Config()
 class DatabaseConnectionStrings(Enum):
     local = "sqlite+aiosqlite:///:memory:"
     @classmethod
