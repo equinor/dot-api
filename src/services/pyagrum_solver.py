@@ -1,23 +1,14 @@
-from pydantic import BaseModel
-from typing import List
 import pyagrum as gum
+import numpy as np
+from numpy.typing import NDArray
 from itertools import product
 from uuid import UUID
 from src.constants import Type
 from src.dtos.issue_dtos import (IssueOutgoingDto, IssueViaNodeOutgoingDto)
 from src.dtos.edge_dtos import EdgeOutgoingDto
 from src.dtos.option_dtos import OptionOutgoingDto
+from src.dtos.model_solution_dtos import SolutionDto
 
-# get only data relevant to solving the problem as list of issue and list of edges
-
-class SolutionItem(BaseModel):
-    issue_id: str
-    optimal_decision_index: int
-
-class Solution(BaseModel):
-    optimal_options: List[OptionOutgoingDto]
-    utility_mean: float
-    utility_variance: float
 
 class PyagrumSolver:
 
@@ -32,36 +23,27 @@ class PyagrumSolver:
         self.node_lookup[issue.id] = node_id
 
     def find_optimal_decisions(self, issues: list[IssueOutgoingDto], edges: list[EdgeOutgoingDto]):
-        # validation
-        # build influance diagram
-        # self._reset_diagram()
         self.add_nodes(issues)
         self.add_edges(edges)
         self.add_utilities(issues)
 
         ie=gum.ShaferShenoyLIMIDInference(self.diagram)
+        if not ie.isSolvable():
+            raise RuntimeError("Influence diagram is not solvable")
+        
         decision_issue_ids = [x.id.__str__() for x in issues if x.type==Type.DECISION]
         ie.addNoForgettingAssumption(decision_issue_ids)
 
         ie.makeInference()
 
-        data: list[tuple[list[dict[str, int]], float]] = [ie.optimalDecision(x).argmax() for x in decision_issue_ids]
+        data: list[NDArray[np.float64]] = [ie.optimalDecision(x).toarray() for x in decision_issue_ids]
 
-
-        solution_items: List[SolutionItem] = []
-        for item in data:
-            decision_dict: dict[str, int] = item[0][0]  # Extract the dictionary from the list
-            for issue_id, optimal_decision_index in decision_dict.items():
-                solution_items.append(SolutionItem(issue_id=issue_id, optimal_decision_index=optimal_decision_index))
         optimal_options: list[OptionOutgoingDto] = []
+        for array, decision_issue_id in zip(data, decision_issue_ids):
+            issue: IssueOutgoingDto = [x for x in issues if x.id.__str__()==decision_issue_id][0]
+            optimal_options.append(issue.decision.options[array.argmax()])
 
-        for item in solution_items:
-            issue: IssueOutgoingDto = [x for x in issues if x.id.__str__()==item.issue_id][0]
-            assert issue.decision is not None
-            optimal_options.append(issue.decision.options[item.optimal_decision_index])
-
-
-        solution = Solution(utility_mean=ie.MEU()['mean'], utility_variance=ie.MEU()['variance'],optimal_options = optimal_options)
+        solution = SolutionDto(utility_mean=ie.MEU()['mean'], utility_variance=ie.MEU()['variance'],optimal_options = optimal_options)
 
         return solution
 
