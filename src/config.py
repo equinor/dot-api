@@ -41,14 +41,14 @@ class Config(BaseSettings):
         default=os.getenv("APP_ENV", "local")
     )
     DATABASE_CONN_LOCAL: str = Field(
-        default=os.getenv("DATABASE_CONN_LOCAL", "DRIVER={ODBC Driver 18 for SQL Server};Server=127.0.0.1,1433;Database=;UIDsa;PWD=;")
+        default=os.getenv("DATABASE_CONN_LOCAL", "DRIVER={ODBC Driver 18 for SQL Server};MARS_Connection=Yes;Server=127.0.0.1,1433;Database=;UIDsa;PWD=;")
     )
     DATABASE_CONN_DEV: str = Field(
-        default=os.getenv("DATABASE_CONN_DEV", "DRIVER={ODBC Driver 18 for SQL Server};Server=decision-optimization-sqlserver-dev.database.windows.net;Database=decision-optimization-sqldb-dev;")
+        default=os.getenv("DATABASE_CONN_DEV", "DRIVER={ODBC Driver 18 for SQL Server};MARS_Connection=Yes;Server=decision-optimization-sqlserver-dev.database.windows.net;Database=decision-optimization-sqldb-dev;")
     )
     DATABASE_CONN_TEST: str = Field(
-        default=os.getenv("DATABASE_CONN_TEST", "DRIVER={ODBC Driver 18 for SQL Server};Server=decision-optimization-sqlserver-test.database.windows.net;Database=decision-optimization-sqldb-test;")
+        default=os.getenv("DATABASE_CONN_TEST", "DRIVER={ODBC Driver 18 for SQL Server};MARS_Connection=Yes;Server=decision-optimization-sqlserver-test.database.windows.net;Database=decision-optimization-sqldb-test;")
     )
     DATABASE_CONN_PROD: str = Field(
-        default=os.getenv("DATABASE_CONN_PROD", "DRIVER={ODBC Driver 18 for SQL Server};Server=decision-optimization-sqlserver-prod.database.windows.net;Database=decision-optimization-sqldb-prod;")
+        default=os.getenv("DATABASE_CONN_PROD", "DRIVER={ODBC Driver 18 for SQL Server};MARS_Connection=Yes;Server=decision-optimization-sqlserver-prod.database.windows.net;Database=decision-optimization-sqldb-prod;")
     )

@@ -19,17 +19,7 @@ class ProjectFilter(BaseFilter):
         return conditions
 
     def construct_access_conditions(self) -> ColumnElement[bool]:
-        conditions: list[_ColumnExpressionArgument[bool]] = []
-        if self.accessing_user_id:
-            user_id = self.accessing_user_id
-            self.add_condition(
-                conditions,
-                lambda: Project.project_owners.any(user_id=user_id)
-            )
-            self.add_condition(
-                conditions,
-                lambda: Project.project_contributors.any(user_id=user_id)
-            )
+        conditions: list[_ColumnExpressionArgument[bool]] = [] 
         return or_(*conditions)
 
     # Static helper methods to encapsulate condition logic
