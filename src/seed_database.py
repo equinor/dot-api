@@ -130,6 +130,7 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
     # Create a scenario
     scenario = Scenario(
         id=scenario_id,
+        is_default=True,
         name="Test Scenario 1",
         project_id=project.id,
         user_id=project.created_by_id,
