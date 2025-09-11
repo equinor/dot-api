@@ -20,6 +20,7 @@ from src.models import (
     Outcome,
 )
 from typing import Protocol, TypeVar, Any
+from src.constants import Type, Boundary
 
 class AuditableEntityProtocol(Protocol):
     created_by_id: int
@@ -73,9 +74,9 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
         issue = Issue(
             id=issue_id,
             scenario_id=scenario_id,
-            type="Decision",
+            type=Type.DECISION.value,
             order=order,
-            boundary="on",
+            boundary=Boundary.ON.value,
             name=name,
             description=str(uuid.uuid4()),  # Example description
             user_id=user_id,
@@ -102,9 +103,9 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
         issue = Issue(
             id=issue_id,
             scenario_id=scenario_id,
-            type="Uncertainty",
+            type=Type.UNCERTAINTY.value,
             order=order,
-            boundary="in",
+            boundary=Boundary.IN.value,
             name=name,
             description=str(uuid.uuid4()),  # Example description
             user_id=user_id,
@@ -297,8 +298,8 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
                     name=str(uuid4()),
                     description=str(uuid4()),
                     node=node,
-                    type="Decision",
-                    boundary="out",
+                    type=Type.DECISION.value,
+                    boundary=Boundary.OUT.value,
                     order=0,
                     user_id=scenario.created_by_id,
                 )

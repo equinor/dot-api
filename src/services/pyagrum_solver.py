@@ -36,6 +36,9 @@ class PyagrumSolver:
 
         ie.makeInference()
 
+        if len(decision_issue_ids) == 0:
+            return SolutionDto(utility_mean=ie.MEU()['mean'], utility_variance=ie.MEU()['variance'],optimal_options = [])
+
         data: list[NDArray[np.float64]] = [ie.optimalDecision(x).toarray() for x in decision_issue_ids]
 
         optimal_options: list[OptionOutgoingDto] = []
