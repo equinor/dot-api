@@ -6,6 +6,7 @@ from src.models.node import (
 )
 from src.constants import DatabaseConstants
 
+from src.dtos.edge_dtos import EdgeOutgoingDto
 from src.dtos.node_style_dtos import (
     NodeStyleMapper,
     NodeStyleIncomingDto,
@@ -36,6 +37,8 @@ class NodeOutgoingDto(NodeDto):
     node_style: NodeStyleOutgoingDto
 
 class NodeViaIssueOutgoingDto(NodeDto):
+    head_edges: list[EdgeOutgoingDto]
+    tail_edges: list[EdgeOutgoingDto]
     node_style: NodeStyleOutgoingDto
 
 class NodeMapper:

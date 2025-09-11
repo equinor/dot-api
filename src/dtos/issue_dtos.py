@@ -50,7 +50,7 @@ class IssueDto(BaseModel):
         return isinstance(other, IssueOutgoingDto) and self.id == other.id
 
     def __repr__(self):
-        return f"IssueOutgoingDto(id={self.id}, description='{self.description}')"  
+        return f"IssueOutgoingDto(id={self.id}, description='{self.description}')"
 
 class IssueIncomingDto(IssueDto):
     model_config=ConfigDict(use_enum_values=True)
@@ -71,6 +71,12 @@ class IssueOutgoingDto(IssueDto):
     uncertainty: Optional[UncertaintyOutgoingDto]
     utility: Optional[UtilityOutgoingDto]
     value_metric: Optional[ValueMetricOutgoingDto]
+
+    def get_dict(self):
+        return {"name": self.name,
+                "id": str(self.id),
+                "type": self.type,
+                "boundary": self.boundary}
 
 class IssueViaNodeOutgoingDto(IssueDto):
     type: str

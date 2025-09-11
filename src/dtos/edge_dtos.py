@@ -1,5 +1,6 @@
 import uuid
 from pydantic import BaseModel, Field
+from typing import Optional
 from src.models.edge import (
     Edge
 )
@@ -14,7 +15,7 @@ class EdgeIncomingDto(EdgeDto):
     pass
 
 class EdgeOutgoingDto(EdgeDto):
-    pass
+    name: Optional[str]=None
 
 class EdgeMapper:
     @staticmethod
