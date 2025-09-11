@@ -30,6 +30,7 @@ odata-query = "^0.10.0"
 greenlet = "^3.2.4"
 python-dotenv = "^1.1.1"
 pyagrum = "^2.2.1"
+networkx = "^3.5"
 
 [build-system]
 requires = ["poetry-core"]
