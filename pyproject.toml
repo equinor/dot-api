@@ -29,6 +29,7 @@ urllib3 ="2.5.0"
 odata-query = "^0.10.0"
 greenlet = "^3.2.4"
 python-dotenv = "^1.1.1"
+pyagrum = "^2.2.1"
 
 [build-system]
 requires = ["poetry-core"]
