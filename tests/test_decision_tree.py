@@ -1,13 +1,5 @@
-from src.dtos.edge_dtos import EdgeOutgoingDto
-from src.dtos.issue_dtos import IssueOutgoingDto
 import uuid
 from src.services.decision_tree.utils import Utils
-
-
-
-def create_edge_dto(edge_name, tail_node, head_node, scenario_id):
-    id = uuid.uuid4() #(namespace, edge_name)
-    return EdgeOutgoingDto(id=id, tail_id=tail_node.id, head_id=head_node.id, scenario_id=scenario_id, name=edge_name)
 
 def graph_as_dict(scenario_id:uuid.UUID):
     # options_dict1 = {"option 1": 1,
@@ -41,10 +33,10 @@ def graph_as_dict(scenario_id:uuid.UUID):
     print("d2", d2)
 
 
-    e1 = create_edge_dto("e1", d1, u1, scenario_id)
-    e2 = create_edge_dto("e2", d1, d2, scenario_id)
-    e3 = create_edge_dto("e3", u1, d2, scenario_id)
-    e4 = create_edge_dto("e4", d2, u2, scenario_id)
+    e1 = Utils.create_edge_dto("e1", d1, u1, scenario_id)
+    e2 = Utils.create_edge_dto("e2", d1, d2, scenario_id)
+    e3 = Utils.create_edge_dto("e3", u1, d2, scenario_id)
+    e4 = Utils.create_edge_dto("e4", d2, u2, scenario_id)
 
     return {
         "nodes": [           

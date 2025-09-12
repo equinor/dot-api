@@ -1,22 +1,20 @@
 import uuid
-from tests.test_decision_tree import graph_as_dict
+#from tests.test_decision_tree import graph_as_dict
+from src.services.decision_tree.utils import Utils
 from typing import TYPE_CHECKING, Tuple
 from src.services.decision_tree.networkx_wrapper import NetworkXWrapper
 
-if TYPE_CHECKING:
-    from src.services.edge_service import EdgeService
-    from src.services.issue_service import IssueService
-from src.dtos.edge_dtos import EdgeOutgoingDto
-from src.dtos.issue_dtos import IssueOutgoingDto
+from src.services.scenario_service import ScenarioService
 
 class StructureService:
-    def __init__(self, issue_service: 'IssueService', edge_service: 'EdgeService'):
-        self.issue_service = issue_service
-        self.edge_service = edge_service
+    def __init__(
+            self, 
+            scenario_service: ScenarioService,
+        ):
+        self.scenario_service=scenario_service
 
-    async def read_influence_diagram(self, scenario_uuid: uuid.UUID) -> Tuple[list[IssueOutgoingDto], list[EdgeOutgoingDto]]:
-        #issues, edges = SolverService.get_issues_and_edges(scenario_uuid)
-        graph_dict = graph_as_dict(scenario_id=scenario_uuid)
+    async def read_influence_diagram(self, scenario_uuid: uuid.UUID):
+        graph_dict = Utils.graph_as_dict(scenario_id=scenario_uuid)
         issues = graph_dict['nodes']
         edges = graph_dict['edges']
         return issues, edges
@@ -28,4 +26,8 @@ class StructureService:
         nx_wrapper = NetworkXWrapper()
         dt = await nx_wrapper.create_decision_tree(scenario_id, issues, edges)
         print(dt.to_json_stream())
+
+    async def find_optimal_decision_pyagrum(self, scenario_id: uuid.UUID):
+        issues, edges = await self.scenario_service.get_influence_diagram_data(scenario_id)
+
    

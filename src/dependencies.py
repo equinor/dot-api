@@ -131,7 +131,5 @@ async def get_user_service() -> UserService:
 async def get_solver_service() -> SolverService:
     return SolverService(await get_scenario_service())
 
-async def get_structure_service(
-        issue_service: IssueService = Depends(get_issue_service),
-        edge_service: EdgeService = Depends(get_edge_service)) -> StructureService:
-    return StructureService(issue_service, edge_service)
+async def get_structure_service() -> StructureService:
+    return StructureService(await get_scenario_service())
