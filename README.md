@@ -1,6 +1,7 @@
 # dot-api
 
 ## Architecture and Guidelines
+
 This API follows a service/repositories pattern. The main components are entities (SQLAlchemy declarative base) and Data Transfer Objects (DTOs, Pydantic classes). Here are some guidelines:
 
 1. Each entity should have a dedicated repository to manage SQL queries using SQLAlchemy.
@@ -19,21 +20,23 @@ The secrets for this application are managed as environment variables. To add se
 
 1. Create a `.env` file in the root of this repository.
 2. Add your secrets to the file. For example:
-   ```
-   CLIENT_SECRET=your_key
-   ```
+    ```
+    CLIENT_SECRET=your_key
+    ```
 
-Environment variables used can be found in ``src/config.py``
+Environment variables used can be found in `src/config.py`
+
 ## Alembic
 
 ### Usefull commands
 
-- Create migration: ``alembic revision --autogenerate -m "Create a baseline migrations"``
-- Display the current revision for a database: ``alembic current``
-- View migrations history: ``alembic history --verbose``
-- Revert all migrations: ``alembic downgrade base``
-- Apply all migrations:``alembic upgrade head``
-- Revert migrations one by one: ``alembic downgrade -1``
-- Apply migrations one by one: ``alembic upgrade +1``
-- Display all raw SQL: ``alembic upgrade head --sql``
-- Reset the database: ``alembic downgrade base && alembic upgrade head``
+-   Create migration: `alembic revision --autogenerate -m "Create a baseline migrations"`
+-   Display the current revision for a database: `alembic current`
+-   View migrations history: `alembic history --verbose`
+-   Revert all migrations: `alembic downgrade base`
+-   Apply all migrations:`alembic upgrade head`
+-   Revert migrations one by one: `alembic downgrade -1`
+-   Merge two migrations: `alembic merge head1 head2`
+-   Apply migrations one by one: `alembic upgrade +1`
+-   Display all raw SQL: `alembic upgrade head --sql`
+-   Reset the database: `alembic downgrade base && alembic upgrade head`

@@ -11,10 +11,9 @@ import uuid
 
 class ProjectRoleRepository(BaseRepository[ProjectRole, uuid.UUID]):
     def __init__(self, session: AsyncSession):
-        super().__init__(session, ProjectRole, query_extension_method=QueryExtensions.empty_load)
+        super().__init__(session, ProjectRole, query_extension_method=QueryExtensions.load_user_with_roles)
 
     async def get_accessible_projects_by_user(self, azure_id: str) -> list[ProjectRole] :
-        self.query_extension_method = QueryExtensions.load_user_with_roles
         user_with_roles_stmt = select(User).where(User.azure_id == azure_id).options(
             *self.query_extension_method()
         )

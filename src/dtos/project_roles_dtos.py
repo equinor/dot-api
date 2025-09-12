@@ -12,21 +12,23 @@ class ProjectRoleDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     user_id: int
     project_id: uuid.UUID
-    role: ProjectRoleType
 
 class ProjectRoleIncomingDto(ProjectRoleDto, UserInfoDto):
-    pass
+    role: ProjectRoleType
+    
 
 class ProjectRoleCreateDto(ProjectRoleDto, UserInfoDto):
-    pass
+    role: ProjectRoleType
+    
 
 class ProjectRoleOutgoingDto(ProjectRoleDto, UserInfoDto):
-    pass
+    role: str
+    
 
 
 class ProjectRoleMapper:
     @staticmethod
-    def from_create_to_entity(dto: ProjectRoleCreateDto, user_id: int) -> ProjectRole:
+    def from_create_to_entity(dto: ProjectRoleCreateDto) -> ProjectRole:
         return ProjectRole(
             id=dto.id,
             user_id=dto.user_id,
@@ -42,27 +44,20 @@ class ProjectRoleMapper:
             role=dto.role
         )
     @staticmethod
-    def to_outgoing_dto(dto: ProjectRoleOutgoingDto) -> ProjectRoleOutgoingDto:
+    def to_outgoing_dto(entity: ProjectRole) -> ProjectRoleOutgoingDto:
         return ProjectRoleOutgoingDto(
-            id=dto.id,
-            user_name=dto.user_name,
-            user_id=dto.user_id,
-            project_id=dto.project_id,
-            azure_id=dto.azure_id,
-            role=dto.role
+            id=entity.id,
+            user_name=entity.user.name,
+            user_id=entity.user_id,
+            project_id=entity.project_id,
+            azure_id=entity.user.azure_id,
+            role=entity.role
         )
 
     @staticmethod
     def from_create_via_project_to_entities(dtos: list[ProjectRoleCreateDto], user_id: int, project_id: uuid.UUID) -> list[ProjectRole]:
-        if len(dtos) == 0:
-            return [ProjectRole(
-                id=uuid.uuid4(),
-                user_id=user_id,
-                project_id=project_id,
-                role=ProjectRoleType.OWNER.value
-            )]
-        else:
-            return [ProjectRoleMapper.from_create_to_entity(dto, user_id) for dto in dtos]
+   
+        return [ProjectRoleMapper.from_create_to_entity(dto,) for dto in dtos]
         
     @staticmethod
     def to_outgoing_dtos(entities: list[ProjectRole]) -> list[ProjectRoleOutgoingDto]:

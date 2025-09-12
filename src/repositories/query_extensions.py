@@ -1,5 +1,6 @@
 from sqlalchemy.orm.strategy_options import _AbstractLoad # type: ignore
 from sqlalchemy.orm import selectinload
+from src.models.project_role import ProjectRole
 from src.models.user import User
 from src.models import (
     Issue,
@@ -87,7 +88,9 @@ class QueryExtensions:
             selectinload(Project.scenarios).options(
                 *QueryExtensions.load_scenario_with_relationships()
             ),
-            selectinload(Project.project_role)
+            selectinload(Project.project_role).options(
+                selectinload(ProjectRole.user)
+            )
         ]
 
     @staticmethod
