@@ -12,8 +12,16 @@ from src.models.base import Base
 from sqlalchemy.pool import AsyncAdaptedQueuePool
 
 from src.config import config
-from src.seed_database import seed_database, create_single_project_with_scenario
-from src.database import get_connection_string_and_token, build_connection_url, validate_default_scenarios
+from src.seed_database import (
+    seed_database, 
+    create_single_project_with_scenario,
+)
+from src.database import (
+    DatabaseConnectionStrings,
+    get_connection_string_and_token,
+    build_connection_url,
+    validate_default_scenarios,
+)
 
 class SessionManager:
     """Manages asynchronous DB sessions with connection pooling."""
@@ -24,7 +32,7 @@ class SessionManager:
 
     async def init_db(self) -> None:
         """Initialize the database engine and session factory."""
-        db_connection_string, token_dict = await get_connection_string_and_token(config.APP_ENV)
+        db_connection_string = DatabaseConnectionStrings.get_connection_string(config.APP_ENV)
         if ":memory:" in db_connection_string:
             self.engine = create_async_engine(
                 db_connection_string,
@@ -40,6 +48,7 @@ class SessionManager:
                 await seed_database(conn, num_projects=10, num_scenarios=10, num_nodes=50)
                 await create_single_project_with_scenario(conn)
         else:
+            db_connection_string, token_dict = await get_connection_string_and_token(config.APP_ENV)
             database_url = build_connection_url(db_connection_string, driver="aioodbc")
 
             self.engine = create_async_engine(
