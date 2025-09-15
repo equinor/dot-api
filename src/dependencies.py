@@ -85,4 +85,7 @@ async def get_issue_service() -> IssueService:
     return IssueService()
 
 async def get_user_service() -> UserService:
-    return UserService()
+    return UserService(await get_async_engine())
+
+async def get_solver_service() -> SolverService:
+    return SolverService(await get_scenario_service())

@@ -10,6 +10,7 @@ from src.dtos.edge_dtos import (
     EdgeIncomingDto,
     EdgeOutgoingDto,
 )
+from src.models.filters.edge_filter import EdgeFilter
 from src.repositories.edge_repository import EdgeRepository
 from src.repositories.node_repository import NodeRepository
 
@@ -45,7 +46,8 @@ class EdgeService:
         result=EdgeMapper.to_outgoing_dtos(edges)
         return result
     
-    async def get_all(self, session: AsyncSession, odata_query: Optional[str]=None) -> list[EdgeOutgoingDto]:
-        edges: list[Edge] = await EdgeRepository(session).get_all(odata_query=odata_query)
+    async def get_all(self, session: AsyncSession, odata_query: Optional[str]=None, filter: Optional[EdgeFilter]=None) -> list[EdgeOutgoingDto]:
+        model_filter = filter.construct_filters() if filter else []
+        edges: list[Edge] = await EdgeRepository(session).get_all(odata_query=odata_query, model_filter=model_filter)
         result=EdgeMapper.to_outgoing_dtos(edges)
         return result

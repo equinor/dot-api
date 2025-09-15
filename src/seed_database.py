@@ -20,6 +20,7 @@ from src.models import (
     Outcome,
 )
 from typing import Protocol, TypeVar, Any
+from src.constants import Type, Boundary
 
 class AuditableEntityProtocol(Protocol):
     created_by_id: int
@@ -34,11 +35,156 @@ def add_auditable_fields(entity: T, user: User) -> T:
 
 class GenerateUuid:
     @staticmethod
-    def as_string(index: int) -> str: 
-        return str(uuid.uuid5(uuid.NAMESPACE_DNS, f"{index}"))
+    def as_string(x: int|str) -> str: 
+        return str(uuid.uuid5(uuid.NAMESPACE_DNS, f"{x}"))
     @staticmethod
-    def as_uuid(index: int) -> uuid.UUID:
-        return uuid.uuid5(uuid.NAMESPACE_DNS, f"{index}")
+    def as_uuid(x: int|str) -> uuid.UUID:
+        return uuid.uuid5(uuid.NAMESPACE_DNS, f"{x}")
+
+    
+async def create_single_project_with_scenario(conn: AsyncConnection):
+    # Define all IDs at the beginning of the function
+    user_id = 3
+    project_id = GenerateUuid.as_uuid("test_project_1")
+    scenario_id = GenerateUuid.as_uuid("test_scenario_1")
+    decision_issue_id = GenerateUuid.as_uuid("test_decision_issue_1")
+    decision_issue_id_2 = GenerateUuid.as_uuid("test_decision_issue_2")
+    decision_issue_id_3 = GenerateUuid.as_uuid("test_decision_issue_3")
+    uncertainty_issue_id = GenerateUuid.as_uuid("test_uncertainty_issue_1")
+    
+    edge_id = GenerateUuid.as_uuid("test_edge_1")
+    edge_id_2 = GenerateUuid.as_uuid("test_edge_2")
+
+    def create_decision_issue(
+        decision_id: uuid.UUID,
+        issue_id: uuid.UUID,
+        name: str,
+        order: int,
+    ):
+        """Helper function to create a decision issue and its related entities."""
+        decision = Decision(id=decision_id, issue_id=issue_id, options=[])
+        node = Node(
+            id=issue_id,
+            scenario_id=scenario_id,
+            issue_id=issue_id,
+            name=name,
+            node_style=None,
+        )
+        node_style = NodeStyle(id=issue_id, node_id=node.id)
+        issue = Issue(
+            id=issue_id,
+            scenario_id=scenario_id,
+            type=Type.DECISION.value,
+            order=order,
+            boundary=Boundary.ON.value,
+            name=name,
+            description=str(uuid.uuid4()),  # Example description
+            user_id=user_id,
+            node=node,
+        )
+        return [decision, node, node_style, issue]
+
+    def create_uncertainty_issue(
+        uncertainty_id: uuid.UUID,
+        issue_id: uuid.UUID,
+        name: str,
+        order: int,
+    ):
+        """Helper function to create an uncertainty issue and its related entities."""
+        uncertainty = Uncertainty(id=uncertainty_id, issue_id=issue_id, outcomes=[])
+        node = Node(
+            id=issue_id,
+            scenario_id=scenario_id,
+            issue_id=issue_id,
+            name=name,
+            node_style=None,
+        )
+        node_style = NodeStyle(id=issue_id, node_id=node.id)
+        issue = Issue(
+            id=issue_id,
+            scenario_id=scenario_id,
+            type=Type.UNCERTAINTY.value,
+            order=order,
+            boundary=Boundary.IN.value,
+            name=name,
+            description=str(uuid.uuid4()),  # Example description
+            user_id=user_id,
+            node=node,
+        )
+        return [uncertainty, node, node_style, issue]
+
+    # Create a user
+    user = User(id=user_id, name="test_user_3", azure_id="28652cc8-c5ed-43c7-a6b0-c2a4ce3d7185")
+    entities: list[Any] = [user]
+
+    # Create a project
+    project = Project(
+        id=project_id,
+        name="Test Project 1",
+        description="A test project with minimal data",
+        user_id=user.id,
+        scenarios=None,
+    )
+    project = add_auditable_fields(project, user)
+    entities.append(project)
+
+    # Create a scenario
+    scenario = Scenario(
+        id=scenario_id,
+        is_default=True,
+        name="Test Scenario 1",
+        project_id=project.id,
+        user_id=project.created_by_id,
+        objectives=[],
+        opportunities=[],
+    )
+    scenario = add_auditable_fields(scenario, user)
+    entities.append(scenario)
+
+    # Add decision issues
+    entities.extend(create_decision_issue(decision_issue_id, decision_issue_id, "Decision Issue 1", order=0))
+    entities.extend(create_decision_issue(decision_issue_id_2, decision_issue_id_2, "Decision Issue 2", order=1))
+    entities.extend(create_decision_issue(decision_issue_id_3, decision_issue_id_3, "Decision Issue 3", order=1))
+
+    # Add uncertainty issues
+    entities.extend(create_uncertainty_issue(uncertainty_issue_id, uncertainty_issue_id, "Uncertainty Issue 1", order=2))
+
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_issue_id, name="yes", utility=10))
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_issue_id, name="no", utility=-5))
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_issue_id_2, name="yes2", utility=-100))
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_issue_id_2, name="no2", utility=1.1))
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_issue_id_3, name="yes", utility=-100))
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_issue_id_3, name="no", utility=1.1))
+    entities.append(Outcome(id=uuid.uuid4(), uncertainty_id=uncertainty_issue_id, name="Outcome 1", probability=0.7, utility=15))
+    entities.append(Outcome(id=uuid.uuid4(), uncertainty_id=uncertainty_issue_id, name="Outcome 2", probability=0.3, utility=5))
+
+    # Add edges
+    edge_1 = Edge(
+        id=edge_id,
+        tail_node_id=decision_issue_id,
+        head_node_id=uncertainty_issue_id,
+        scenario_id=scenario_id,
+    )
+    edge_2 = Edge(
+        id=edge_id_2,
+        tail_node_id=uncertainty_issue_id,
+        head_node_id=decision_issue_id_2,
+        scenario_id=scenario_id,
+    )
+    edge_3=Edge(
+        id=uuid.uuid4(),
+        tail_node_id=uncertainty_issue_id,
+        head_node_id=decision_issue_id_3,
+        scenario_id=scenario_id
+    )
+    entities.extend([edge_1, edge_2, edge_3])
+
+    # Commit all entities to the database
+    async with AsyncSession(conn) as session:
+        session.add_all(entities)
+        await session.commit()
+
+
 
 async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios: int, num_nodes: int):
     user1 = User(id=1, name=str("test_user_1"), azure_id=str(uuid4()))
@@ -152,8 +298,8 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
                     name=str(uuid4()),
                     description=str(uuid4()),
                     node=node,
-                    type="Decision",
-                    boundary="out",
+                    type=Type.DECISION.value,
+                    boundary=Boundary.OUT.value,
                     order=0,
                     user_id=scenario.created_by_id,
                 )
