@@ -12,7 +12,7 @@ from src.models.base import Base
 from sqlalchemy.pool import AsyncAdaptedQueuePool
 
 from src.config import config
-from src.seed_database import seed_database
+from src.seed_database import seed_database, create_single_project_with_scenario
 from src.database import get_connection_string_and_token, build_connection_url, validate_default_scenarios
 
 class SessionManager:
@@ -38,6 +38,7 @@ class SessionManager:
             async with self.engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
                 await seed_database(conn, num_projects=10, num_scenarios=10, num_nodes=50)
+                await create_single_project_with_scenario(conn)
         else:
             database_url = build_connection_url(db_connection_string, driver="aioodbc")
 

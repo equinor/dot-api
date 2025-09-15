@@ -17,6 +17,7 @@ from src.services.issue_service import IssueService
 from src.services.outcome_service import OutcomeService
 from src.services.option_service import OptionService
 from src.services.user_service import UserService
+from src.services.solver_service import SolverService
 from src.config import config
 from src.database import get_connection_string_and_token, build_connection_url
 
@@ -85,7 +86,7 @@ async def get_issue_service() -> IssueService:
     return IssueService()
 
 async def get_user_service() -> UserService:
-    return UserService(await get_async_engine())
+    return UserService()
 
 async def get_solver_service() -> SolverService:
     return SolverService(await get_scenario_service())
