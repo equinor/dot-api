@@ -32,6 +32,9 @@ python-dotenv = "^1.1.1"
 asgi-lifespan = "^2.1.0"
 pyagrum = "^2.2.1"
 
+[tool.pytest.ini_options]
+asyncio_mode = "strict"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
