@@ -17,6 +17,14 @@ class UserRepository(BaseRepository[User, int]):
     
     async def get_by_azure_id(self, azure_id: str) -> Optional[User]:
         return (await self.session.scalars(select(User).where(User.azure_id==azure_id))).first()
+    
+    async def get_user_with_project_role(self, azure_id: str) -> list[User]:
+        self.query_extension_method = QueryExtensions.load_user_with_roles
+        user_with_roles_stmt = select(User).where(User.azure_id == azure_id).options(
+           *self.query_extension_method()
+        )
+        user_with_roles = (await self.session.scalars(user_with_roles_stmt)).all()
+        return list(user_with_roles)
 
     async def update(self, entities: list[User]) -> list[User]:
         entities_to_update=await self.get([decision.id for decision in entities])

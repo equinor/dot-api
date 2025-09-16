@@ -47,8 +47,8 @@ async def update_project_role(
     dto: list[ProjectRoleIncomingDto],
     project_role_service: ProjectRoleService = Depends(get_project_role_service),
     current_user: UserIncomingDto = Depends(get_current_user)
-):
+) -> list[ProjectRoleOutgoingDto]:
     try:
-        await project_role_service.update( dto, current_user)
+        return await project_role_service.update( dto, current_user)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

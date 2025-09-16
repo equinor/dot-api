@@ -38,7 +38,7 @@ class ProjectRoleService:
         async with session_handler(self.engine) as session:
             user_role_in_projects = await ProjectRoleRepository(session).get_accessible_projects_by_user(azure_id=current_user.azure_id)
             for dto in dtos:
-                if not any(project_role.project_id == dto.project_id and project_role.role == ProjectRoleType.OWNER for project_role in user_role_in_projects):
+                if not any(project_role.project_id == dto.project_id and project_role.role == ProjectRoleType.OWNER.value for project_role in user_role_in_projects):
                     raise HTTPException(status_code=403, detail="Not authorized to update this project role")
             
             entities_project_role: list[ProjectRole] = await ProjectRoleRepository(session).update(ProjectRoleMapper.to_project_role_entities(dtos))

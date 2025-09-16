@@ -60,7 +60,7 @@ async def seed_database(conn: AsyncConnection, num_projects: int, num_scenarios:
         project = add_auditable_fields(project, user)
         entities.append(project)
         project_role = ProjectRole(
-            id=project_id,  # Added id argument
+            id=project_id, 
             project_id=project_id,
             user_id=user.id,
             role=ProjectRoleType.OWNER
