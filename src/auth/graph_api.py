@@ -29,20 +29,27 @@ async def call_ms_graph_api (token: str) -> UserIncomingDto :
             if obo_response.is_success:
                 
                 # Call the graph `/me` endpoint to fetch more information about the current user, using the new token
-                graph_response: httpx.Response = await client.get(
-                    "https://graph.microsoft.com/v1.0/me",
-                    headers={
-                        "Authorization": f'Bearer {obo_response.json()["access_token"]}'
-                    },
-                )
-                graph = graph_response.json()
-                return UserIncomingDto(
-                    id=None,  # Assuming the ID is not provided by the Graph API
-                    name=graph.get("displayName"),
-                    azure_id=graph.get("id")
-                )
-            elif not obo_response.is_success:
+                try:
+                    graph_response: httpx.Response = await client.get(
+                        "https://graph.microsoft.com/v1.0/me",
+                        headers={
+                            "Authorization": f'Bearer {obo_response.json()["access_token"]}'
+                        },
+                    )
+                    graph = graph_response.json()
+                    return UserIncomingDto(
+                        id=None,  # Assuming the ID is not provided by the Graph API
+                        name=graph.get("displayName"),
+                        azure_id=graph.get("id")
+                    )
+                except Exception as e:
+                    raise HTTPException(
+                        status_code=500,
+                        detail=f"Unexpected error in call_ms_graph_api: {str(e)}"
+                    )
+            else:
+                # If OBO response is not successful, raise an HTTPException or return a default UserIncomingDto
                 raise HTTPException(
-                    status_code=obo_response.status_code,
-                    detail=f"Graph API error: {obo_response.text}"
+                    status_code=401,
+                    detail="Failed to obtain access token from Microsoft Graph API"
                 )

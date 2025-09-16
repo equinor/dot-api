@@ -17,15 +17,12 @@ class ProjectRoleIncomingDto(ProjectRoleDto, UserInfoDto):
     role: ProjectRoleType
     
 
-class ProjectRoleCreateDto(ProjectRoleDto, UserInfoDto):
+class ProjectRoleCreateDto(ProjectRoleDto,UserInfoDto):
     role: ProjectRoleType
     
-
 class ProjectRoleOutgoingDto(ProjectRoleDto, UserInfoDto):
     role: str
     
-
-
 class ProjectRoleMapper:
     @staticmethod
     def from_create_to_entity(dto: ProjectRoleCreateDto) -> ProjectRole:
@@ -55,8 +52,7 @@ class ProjectRoleMapper:
         )
 
     @staticmethod
-    def from_create_via_project_to_entities(dtos: list[ProjectRoleCreateDto], user_id: int, project_id: uuid.UUID) -> list[ProjectRole]:
-   
+    def from_create_via_project_to_entities(dtos: list[ProjectRoleCreateDto]) -> list[ProjectRole]:
         return [ProjectRoleMapper.from_create_to_entity(dto,) for dto in dtos]
         
     @staticmethod

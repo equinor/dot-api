@@ -1,7 +1,6 @@
 import pytest
 from uuid import uuid4
 from httpx import AsyncClient
-from src.dtos.project_roles_dtos import ProjectRoleCreateDto, ProjectRoleType
 from tests.utils import (
     parse_response_to_dto_test,
     parse_response_to_dtos_test,
@@ -39,17 +38,14 @@ async def test_get_project_populated(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_create_project(client: AsyncClient):
-    # Assuming ProjectRoleIncomingDto is the correct DTO for user roles
     test_project_id = uuid4()
-    user = ProjectRoleCreateDto(
-        id=uuid4(),
-        user_id=1,
-        project_id=test_project_id,
-        role=ProjectRoleType.OWNER,
-        user_name="test_user_1",
-        azure_id=str(uuid4())
-    )
-    payload = [ProjectCreateDto(id=test_project_id, name=str(uuid4()), description=str(uuid4()), scenarios=[], users=[user]).model_dump(mode="json")]
+    payload = [ProjectCreateDto(
+        id=test_project_id, 
+        name=str(uuid4()), 
+        description=str(uuid4()), 
+        users=[],
+        scenarios=[]    
+    ).model_dump(mode="json")]
 
     response=await client.post("/projects", json=payload)
     assert response.status_code == 200
@@ -84,6 +80,6 @@ async def test_update_project(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_delete_project(client: AsyncClient):
 
-    response=await client.delete(f"/projects/{GenerateUuid.as_string(2)}")
+    response=await client.delete(f"/projects/{GenerateUuid.as_string(4343434344342123532453453)}")
 
     assert response.status_code == 200
