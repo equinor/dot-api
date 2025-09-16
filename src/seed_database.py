@@ -124,6 +124,7 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
         name="Test Project 1",
         description="A test project with minimal data",
         user_id=user.id,
+        project_role=[],
         scenarios=None,
     )
     project = add_auditable_fields(project, user)
