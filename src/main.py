@@ -16,6 +16,7 @@ import src.routes.issue_routes as issue_routes
 import src.routes.user_routes as user_routes
 import src.routes.outcome_routes as outcome_routes
 import src.routes.option_routes as option_routes
+import src.routes.solver_routes as solver_routes
 from src.config import Config
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -51,6 +52,7 @@ app.include_router(user_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(project_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(project_role_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(scenario_routes.router, dependencies=[Depends(verify_token)])
+app.include_router(solver_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(issue_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(objective_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(opportunity_routes.router, dependencies=[Depends(verify_token)])
