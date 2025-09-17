@@ -7,6 +7,7 @@ from sqlalchemy.orm import (
 from sqlalchemy import ForeignKey
 from src.models.user import User
 
+
 class BaseAuditableEntity:
 
     @declared_attr

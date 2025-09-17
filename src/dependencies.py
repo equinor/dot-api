@@ -2,6 +2,7 @@ import urllib.parse
 from typing import Optional, Any
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
 from sqlalchemy import create_engine, Engine
+from src.services.project_role_service import ProjectRoleService
 from src.auth.db_auth import DatabaseAuthenticator
 from src.services.decision_service import DecisionService
 from src.services.project_service import ProjectService
@@ -63,6 +64,7 @@ async def get_async_engine() -> AsyncEngine:
                     connect_args={"attrs_before": token_dict},
                     pool_size=10,
                     max_overflow=20,
+
                 )
                 await database_start_task(async_engine)
     assert async_engine is not None
@@ -83,6 +85,9 @@ async def get_sync_engine(envionment: str = config.APP_ENV) -> Engine:
 
 async def get_project_service() -> ProjectService:
     return ProjectService(await get_async_engine())
+
+async def get_project_role_service() -> ProjectRoleService:
+    return ProjectRoleService(await get_async_engine())
 
 
 async def get_decision_service() -> DecisionService:
