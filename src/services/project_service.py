@@ -97,8 +97,10 @@ class ProjectService:
 
     async def delete(self, ids: list[uuid.UUID], user_dto: UserIncomingDto) -> None:
         async with session_handler(self.engine) as session:
-            user_role = await ProjectRoleRepository(session).get_accessible_projects_by_user(azure_id=user_dto.azure_id)
-            ids_to_delete = [project_role.project_id for project_role in user_role if project_role.role == ProjectRoleType.OWNER and project_role.project_id in ids]
+            user = await UserRepository(session).get_by_azure_id(azure_id=user_dto.azure_id)
+            if user is None or len(user.project_role) == 0:
+                return
+            ids_to_delete = [project_role.project_id for project_role in user.project_role if project_role.role == ProjectRoleType.OWNER and project_role.project_id in ids]
             await ProjectRepository(session).delete(ids=ids_to_delete)
 
 

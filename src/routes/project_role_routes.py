@@ -1,3 +1,4 @@
+from typing import Optional
 import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from src.dtos.project_roles_dtos import   ProjectRoleIncomingDto, ProjectRoleOutgoingDto
@@ -47,7 +48,7 @@ async def update_project_role(
     dto: list[ProjectRoleIncomingDto],
     project_role_service: ProjectRoleService = Depends(get_project_role_service),
     current_user: UserIncomingDto = Depends(get_current_user)
-) -> list[ProjectRoleOutgoingDto]:
+) -> Optional[list[ProjectRoleOutgoingDto]]:
     try:
         return await project_role_service.update( dto, current_user)
     except Exception as e:

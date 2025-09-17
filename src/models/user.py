@@ -4,10 +4,7 @@ from typing import  TYPE_CHECKING, Optional
 from src.models.base import Base
 from src.constants import DatabaseConstants
 from src.models.base_entity import BaseEntity
-from sqlalchemy.orm import (
-    Mapped, 
-    mapped_column,
-)
+
 
 if TYPE_CHECKING:
     from src.models.project_role import ProjectRole
@@ -25,11 +22,13 @@ class User(Base, BaseEntity):
         cascade="all, delete-orphan",
         foreign_keys='ProjectRole.user_id'
     )
-    def __init__(self, id: Optional[int], name: str, azure_id: str):
+    def __init__(self, id: Optional[int], name: str, azure_id: str, project_role: Optional[list["ProjectRole"]] = None):
         if id is not None:
             self.id = id
         self.name = name
         self.azure_id = azure_id
+        if project_role is not None:
+            self.project_role = project_role
 
     def __repr__(self) -> str:
-        return f"id: {self.id}, name: {self.name}, azure_id: {self.azure_id}"
+        return f"id: {self.id}, name: {self.name}, azure_id: {self.azure_id}, project_role: {self.project_role}"
