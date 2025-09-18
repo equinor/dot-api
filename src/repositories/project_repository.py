@@ -3,7 +3,6 @@ from src.models.project import Project
 from src.repositories.query_extensions import QueryExtensions
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.base_repository import BaseRepository
-from src.repositories.query_extensions import QueryExtensions
 
 class ProjectRepository(BaseRepository[Project, uuid.UUID]):
     def __init__(self, session: AsyncSession):
@@ -17,6 +16,7 @@ class ProjectRepository(BaseRepository[Project, uuid.UUID]):
         for n, entity_to_update in enumerate(entities_to_update):
             entity=entities[n]
             entity_to_update.name=entity.name
+            entity_to_update.project_role = [await self.session.merge(role) for role in entity.project_role]
             entity_to_update.description=entity.description
             
         await self.session.flush()

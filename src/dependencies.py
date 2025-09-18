@@ -2,6 +2,7 @@ import urllib.parse
 from typing import Optional, Any
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
 from sqlalchemy import create_engine, Engine
+from src.services.project_role_service import ProjectRoleService
 from src.auth.db_auth import DatabaseAuthenticator
 from src.services.decision_service import DecisionService
 from src.services.project_service import ProjectService
@@ -18,9 +19,10 @@ from src.services.issue_service import IssueService
 from src.services.outcome_service import OutcomeService
 from src.services.option_service import OptionService
 from src.services.user_service import UserService
+from src.services.solver_service import SolverService
 from src.database import DatabaseConnectionStrings
 from src.models.base import Base
-from src.seed_database import seed_database
+from src.seed_database import seed_database, create_single_project_with_scenario
 from src.config import Config
 from src.database import database_start_task
 import urllib
@@ -51,6 +53,7 @@ async def get_async_engine() -> AsyncEngine:
             async with async_engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
                 await seed_database(conn, num_projects=10, num_scenarios=10, num_nodes=50)
+                await create_single_project_with_scenario(conn)
         else:
             db_connection_string, token_dict = await get_connection_string_and_token(config.APP_ENV)
             conn_str = build_connection_url(db_connection_string, driver="aioodbc")
@@ -61,6 +64,7 @@ async def get_async_engine() -> AsyncEngine:
                     connect_args={"attrs_before": token_dict},
                     pool_size=10,
                     max_overflow=20,
+
                 )
                 await database_start_task(async_engine)
     assert async_engine is not None
@@ -81,6 +85,9 @@ async def get_sync_engine(envionment: str = config.APP_ENV) -> Engine:
 
 async def get_project_service() -> ProjectService:
     return ProjectService(await get_async_engine())
+
+async def get_project_role_service() -> ProjectRoleService:
+    return ProjectRoleService(await get_async_engine())
 
 
 async def get_decision_service() -> DecisionService:
@@ -124,3 +131,6 @@ async def get_issue_service() -> IssueService:
 
 async def get_user_service() -> UserService:
     return UserService(await get_async_engine())
+
+async def get_solver_service() -> SolverService:
+    return SolverService(await get_scenario_service())

@@ -7,7 +7,7 @@ from src.repositories.query_extensions import QueryExtensions
 
 class UserRepository(BaseRepository[User, int]):
     def __init__(self, session: AsyncSession):
-        super().__init__(session, User, query_extension_method=QueryExtensions.empty_load)
+        super().__init__(session, User, query_extension_method=QueryExtensions.load_user_with_roles)
 
     async def get_or_create(self, entity: User) -> User:
         user=await self.get_by_azure_id(entity.azure_id)
@@ -16,8 +16,10 @@ class UserRepository(BaseRepository[User, int]):
         return user
     
     async def get_by_azure_id(self, azure_id: str) -> Optional[User]:
-        return (await self.session.scalars(select(User).where(User.azure_id==azure_id))).first()
-    
+        return (await self.session.scalars(select(User).where(User.azure_id==azure_id).options(
+           *self.query_extension_method()
+        ))).first()
+
     async def update(self, entities: list[User]) -> list[User]:
         entities_to_update=await self.get([decision.id for decision in entities])
         # sort the entity lists to share the same order according to the entity.id

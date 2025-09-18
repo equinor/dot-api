@@ -3,6 +3,10 @@ from pydantic import BaseModel, Field
 from src.models.edge import (
     Edge
 )
+from src.dtos.node_dtos import (
+    NodeMapper,
+    NodeOutgoingDto
+)
 
 from src.dtos.node_dtos import (
     NodeMapper,
