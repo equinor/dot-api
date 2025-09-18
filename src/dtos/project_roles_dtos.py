@@ -2,6 +2,7 @@ import uuid
 from pydantic import BaseModel, Field
 
 from src.models.project_role import ProjectRole
+from src.models.user import User
 from src.constants import DatabaseConstants, ProjectRoleType
 
 class UserInfoDto(BaseModel):
@@ -38,7 +39,12 @@ class ProjectRoleMapper:
             id=dto.id,
             user_id=dto.user_id,
             project_id=dto.project_id,
-            role=dto.role
+            role=dto.role,
+            user = User(
+                id=dto.user_id,
+                name=dto.user_name,
+                azure_id=dto.azure_id
+            )
         )
     @staticmethod
     def to_outgoing_dto(entity: ProjectRole) -> ProjectRoleOutgoingDto:

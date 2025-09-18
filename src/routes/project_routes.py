@@ -101,9 +101,9 @@ async def update_projects(
     dtos: list[ProjectIncomingDto],
     project_service: ProjectService = Depends(get_project_service),
     current_user: UserIncomingDto = Depends(get_current_user)
-):
+)-> list[ProjectOutgoingDto]:
     try:
-        await project_service.update(dtos, current_user)
+        return list(await project_service.update(dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

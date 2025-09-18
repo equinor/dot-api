@@ -72,6 +72,10 @@ async def test_update_project(client: AsyncClient):
     payload=[ProjectIncomingDto(id=GenerateUuid.as_uuid(3), name=new_name, description="", scenarios=[],users=[]).model_dump(mode="json")]
     response=await client.put("/projects", json=payload)
     assert response.status_code == 200
+
+    response_content=parse_response_to_dtos_test(response, ProjectOutgoingDto)
+    assert response_content[0].name==new_name
+
 @pytest.mark.asyncio
 async def test_delete_project(client: AsyncClient):
 

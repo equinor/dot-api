@@ -24,12 +24,15 @@ class ProjectRole(Base,BaseEntity, BaseAuditableEntity):
     project: Mapped[Project] = relationship("Project", back_populates="project_role", foreign_keys=[project_id])
     user: Mapped[User] = relationship("User", back_populates="project_role", foreign_keys=[user_id])
 
-    def __init__(self,id: uuid.UUID, project_id: uuid.UUID, user_id: int, role: str):
+    def __init__(self,id: uuid.UUID, project_id: uuid.UUID, user_id: int, role: str,user: User | None = None):
         self.id = id
         self.project_id = project_id
         self.user_id = user_id
         self.role = role
         self.updated_by_id = user_id
+        if user is not None:
+            self.user = user
+
 
     def __repr__(self):
         return f"ProjectRole(id={self.id}, project_id={self.project_id}, user_id={self.user_id},role={self.role})"
