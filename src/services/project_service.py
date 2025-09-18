@@ -88,12 +88,11 @@ class ProjectService:
             result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(project_entities)
         return result
     
-    async def update(self, dtos: list[ProjectIncomingDto], user_dto: UserIncomingDto) -> list[ProjectOutgoingDto]:
+    async def update(self, dtos: list[ProjectIncomingDto], user_dto: UserIncomingDto)-> None:
         async with session_handler(self.engine) as session:
             user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
-            entities_project: list[Project] = await ProjectRepository(session).update(ProjectMapper.to_project_entities(dtos, user.id))
-            result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(entities_project)
-        return result
+            await ProjectRepository(session).update(ProjectMapper.to_project_entities(dtos, user.id))
+      
 
     async def delete(self, ids: list[uuid.UUID], user_dto: UserIncomingDto) -> None:
         async with session_handler(self.engine) as session:
