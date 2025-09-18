@@ -114,7 +114,7 @@ class ProjectService:
         
     async def get_all(self, user_dto: UserIncomingDto, filter: Optional[ProjectFilter]=None, odata_query: Optional[str]=None) -> list[ProjectOutgoingDto]:
         async with session_handler(self.engine) as session:
-            user = await UserRepository(session).get_by_azure_id(user_dto.azure_id)
+            user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
             if not user:
                 return []
             if filter is None:
