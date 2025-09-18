@@ -3,7 +3,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.session_manager import sessionmanager
 from sqlalchemy import create_engine, Engine
 from src.services.project_role_service import ProjectRoleService
-from src.auth.db_auth import DatabaseAuthenticator
 from src.services.decision_service import DecisionService
 from src.services.project_service import ProjectService
 from src.services.objective_service import ObjectiveService
@@ -46,10 +45,10 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             raise e
 
 async def get_project_service() -> ProjectService:
-    return ProjectService(await get_async_engine())
+    return ProjectService()
 
 async def get_project_role_service() -> ProjectRoleService:
-    return ProjectRoleService(await get_async_engine())
+    return ProjectRoleService()
 
 
 async def get_decision_service() -> DecisionService:
