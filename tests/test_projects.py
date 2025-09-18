@@ -38,7 +38,14 @@ async def test_get_project_populated(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_create_project(client: AsyncClient):
-    payload = [ProjectCreateDto(id=uuid4(), name=str(uuid4()), description=str(uuid4()), scenarios=[]).model_dump(mode="json")]
+    test_project_id = uuid4()
+    payload = [ProjectCreateDto(
+        id=test_project_id, 
+        name=str(uuid4()), 
+        description=str(uuid4()), 
+        users=[],
+        scenarios=[]    
+    ).model_dump(mode="json")]
 
     response=await client.post("/projects", json=payload)
     assert response.status_code == 200, f"Response content: {response.content}"
@@ -49,7 +56,7 @@ async def test_create_project(client: AsyncClient):
 async def test_create_project_with_objectives(client: AsyncClient):
     objectives=[ObjectiveViaScenarioDto(name=str(uuid4()), description=str(uuid4())), ObjectiveViaScenarioDto(name=str(uuid4()), description=str(uuid4()))]
     scenarios=[ScenarioCreateViaProjectDto(name=str(uuid4()), objectives=objectives, opportunities=[], is_default=True)]
-    project=ProjectCreateDto(name=str(uuid4()), description=str(uuid4()),scenarios=scenarios)
+    project=ProjectCreateDto(name=str(uuid4()), description=str(uuid4()),scenarios=scenarios,users=[])
     payload = [project.model_dump(mode="json")]
 
     response=await client.post("/projects", json=payload)
@@ -62,7 +69,7 @@ async def test_create_project_with_objectives(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_update_project(client: AsyncClient):
     new_name=str(uuid4())
-    payload=[ProjectIncomingDto(id=GenerateUuid.as_uuid(3), name=new_name, description="", scenarios=[]).model_dump(mode="json")]
+    payload=[ProjectIncomingDto(id=GenerateUuid.as_uuid(3), name=new_name, description="", scenarios=[],users=[]).model_dump(mode="json")]
 
     response=await client.put("/projects", json=payload)
     assert response.status_code == 200, f"Response content: {response.content}"
@@ -73,6 +80,6 @@ async def test_update_project(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_delete_project(client: AsyncClient):
 
-    response=await client.delete(f"/projects/{GenerateUuid.as_string(2)}")
+    response=await client.delete(f"/projects/{GenerateUuid.as_string(4343434344342123532453453)}")
 
     assert response.status_code == 200, f"Response content: {response.content}"

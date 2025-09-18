@@ -1,7 +1,7 @@
-import uuid
 import pytest_asyncio
 from typing import AsyncGenerator
 from httpx import ASGITransport, AsyncClient
+from src.seed_database import GenerateUuid
 from src.dtos.user_dtos import UserIncomingDto
 from asgi_lifespan import LifespanManager
 from src.auth.auth import verify_token
@@ -15,9 +15,9 @@ app.dependency_overrides[verify_token] = mock_verify_token
 
 async def mock_get_current_user():
     return UserIncomingDto(
-        id=None,  # Assuming the ID is not needed for the test
+        id=None,  
         name="test_user_1",
-        azure_id=str(uuid.uuid4())  
+        azure_id=GenerateUuid.as_string(15)
     )
 app.dependency_overrides[get_current_user] = mock_get_current_user
 

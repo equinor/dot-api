@@ -13,6 +13,10 @@ class DepricatedIssueTypes(str, Enum):
     OTHER="Other"
     ACTION_ITEM="Action Item"
 
+class ProjectRoleType(str, Enum):
+    OWNER="owner"
+    CONTRIBUTOR="contributor"
+
 class Boundary(str, Enum):
     IN="in"
     ON="on"

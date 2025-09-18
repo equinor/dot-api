@@ -15,7 +15,7 @@ oauth2_scheme = OAuth2AuthorizationCodeBearer(
 def get_jwks(jwks_uri: str):
     return requests.get(jwks_uri).json() 
 
-def get_claims_options():
+def get_claims_options() -> dict[str, dict[str, object]]:
     return {
         "iss": {"essential": True, "value": config.ISSUER},
         "aud": {"essential": True, "value": config.AUDIENCE},
