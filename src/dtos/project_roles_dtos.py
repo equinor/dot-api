@@ -2,10 +2,10 @@ import uuid
 from pydantic import BaseModel, Field
 
 from src.models.project_role import ProjectRole
-from src.constants import ProjectRoleType
+from src.constants import DatabaseConstants, ProjectRoleType
 
 class UserInfoDto(BaseModel):
-    user_name: str = Field(max_length=30)
+    user_name: str = Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)
     azure_id: str
 
 class ProjectRoleDto(BaseModel):
