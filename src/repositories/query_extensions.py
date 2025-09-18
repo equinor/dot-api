@@ -1,7 +1,5 @@
 from sqlalchemy.orm.strategy_options import _AbstractLoad  # type: ignore
 from sqlalchemy.orm import joinedload, selectinload
-from src.models.user import User
-from src.models.project_role import ProjectRole
 from src.models import (
     Issue,
     Node,
@@ -10,6 +8,8 @@ from src.models import (
     Scenario,
     Decision,
     Uncertainty,
+    ProjectRole,
+    User,
 )
 
 # Use joinedload for single relationships
@@ -91,7 +91,7 @@ class QueryExtensions:
                 *QueryExtensions.load_scenario_with_relationships()
             ),
             selectinload(Project.project_role).options(
-                selectinload(ProjectRole.user)
+                *QueryExtensions.load_role_with_user()
             )
         ]
 
@@ -101,6 +101,7 @@ class QueryExtensions:
         To be used as input for generic repositories when there are no relationships to be loaded.
         """
         return []
+    
     @staticmethod
     def load_role_with_user() -> list[_AbstractLoad]:
         """
@@ -108,8 +109,9 @@ class QueryExtensions:
         """
         
         return [
-            selectinload(ProjectRole.user),
+            joinedload(ProjectRole.user),
         ]
+
     @staticmethod
     def load_user_with_roles() -> list[_AbstractLoad]:
         """
