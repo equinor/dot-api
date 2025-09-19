@@ -70,7 +70,6 @@ async def test_create_project_with_objectives(client: AsyncClient):
 async def test_update_project(client: AsyncClient):
     new_name=str(uuid4())
     payload=[ProjectIncomingDto(id=GenerateUuid.as_uuid(3), name=new_name, description="", scenarios=[],users=[]).model_dump(mode="json")]
-
     response=await client.put("/projects", json=payload)
     assert response.status_code == 200, f"Response content: {response.content}"
 

@@ -18,7 +18,7 @@ class UserRepository(BaseRepository[User, int]):
     async def get_by_azure_id(self, azure_id: str) -> Optional[User]:
         return (await self.session.scalars(select(User).where(User.azure_id==azure_id).options(
            *self.query_extension_method()
-        ))).first()
+        ))).unique().first()
 
     async def update(self, entities: list[User]) -> list[User]:
         entities_to_update=await self.get([decision.id for decision in entities])
