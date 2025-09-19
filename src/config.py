@@ -53,8 +53,8 @@ class Config(BaseSettings):
         default=os.getenv("DATABASE_CONN_PROD", "DRIVER={ODBC Driver 18 for SQL Server};MARS_Connection=Yes;Server=decision-optimization-sqlserver-prod.database.windows.net;Database=decision-optimization-sqldb-prod;")
     )
 
-    POOL_SIZE: int=5
-    MAX_OVERFLOW: int=10
+    POOL_SIZE: int=10
+    MAX_OVERFLOW: int=20
     POOL_RECYCLE: int = 1800
     DEBUG: bool= False
 
