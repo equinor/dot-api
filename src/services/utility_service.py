@@ -1,6 +1,6 @@
 import uuid
 from typing import Optional
-from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.utility import Utility
 from src.dtos.utility_dtos import (
@@ -9,38 +9,29 @@ from src.dtos.utility_dtos import (
     UtilityMapper
 )
 from src.repositories.utility_repository import UtilityRepository
-from src.services.session_handler import session_handler
 
 class UtilityService:
-    def __init__(self, engine: AsyncEngine):
-        self.engine=engine
-
-    async def create(self, dtos: list[UtilityIncomingDto]) -> list[UtilityOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            entities: list[Utility] = await UtilityRepository(session).create(UtilityMapper.to_entities(dtos))
-            # get the dtos while the entities are still connected to the session
-            result: list[UtilityOutgoingDto] = UtilityMapper.to_outgoing_dtos(entities)
+    async def create(self, session: AsyncSession, dtos: list[UtilityIncomingDto]) -> list[UtilityOutgoingDto]:
+        entities: list[Utility] = await UtilityRepository(session).create(UtilityMapper.to_entities(dtos))
+        # get the dtos while the entities are still connected to the session
+        result: list[UtilityOutgoingDto] = UtilityMapper.to_outgoing_dtos(entities)
         return result
     
-    async def update(self, dtos: list[UtilityIncomingDto]) -> list[UtilityOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            entities: list[Utility] = await UtilityRepository(session).update(UtilityMapper.to_entities(dtos))
-            # get the dtos while the entities are still connected to the session
-            result: list[UtilityOutgoingDto] = UtilityMapper.to_outgoing_dtos(entities)
+    async def update(self, session: AsyncSession, dtos: list[UtilityIncomingDto]) -> list[UtilityOutgoingDto]:
+        entities: list[Utility] = await UtilityRepository(session).update(UtilityMapper.to_entities(dtos))
+        # get the dtos while the entities are still connected to the session
+        result: list[UtilityOutgoingDto] = UtilityMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[uuid.UUID]):
-        async with session_handler(self.engine) as session:
-            await UtilityRepository(session).delete(ids)
+    async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):
+        await UtilityRepository(session).delete(ids)
     
-    async def get(self, ids: list[uuid.UUID]) -> list[UtilityOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            entities: list[Utility] = await UtilityRepository(session).get(ids)
-            result=UtilityMapper.to_outgoing_dtos(entities)
+    async def get(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[UtilityOutgoingDto]:
+        entities: list[Utility] = await UtilityRepository(session).get(ids)
+        result = UtilityMapper.to_outgoing_dtos(entities)
         return result
     
-    async def get_all(self, odata_query: Optional[str]=None) -> list[UtilityOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            entities: list[Utility] = await UtilityRepository(session).get_all(odata_query=odata_query)
-            result=UtilityMapper.to_outgoing_dtos(entities)
+    async def get_all(self, session: AsyncSession, odata_query: Optional[str] = None) -> list[UtilityOutgoingDto]:
+        entities: list[Utility] = await UtilityRepository(session).get_all(odata_query=odata_query)
+        result = UtilityMapper.to_outgoing_dtos(entities)
         return result

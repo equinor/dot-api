@@ -28,14 +28,14 @@ async def test_post_options(client: AsyncClient):
 async def test_get_options(client: AsyncClient):
     response = await client.get("/options")
     print(response)
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
 
     parse_response_to_dtos_test(response, OptionOutgoingDto)
 
 @pytest.mark.asyncio
 async def test_get_option(client: AsyncClient):
     response = await client.get(f"/options/{GenerateUuid.as_string(20)}")
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
 
     parse_response_to_dto_test(response, OptionOutgoingDto)
 
@@ -52,7 +52,7 @@ async def test_update_option(client: AsyncClient):
     ).model_dump(mode="json")]
 
     response = await client.put("/options", json=payload)
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
 
     response_content = parse_response_to_dtos_test(response, OptionOutgoingDto)
     assert response_content[0].name == new_name
@@ -60,4 +60,4 @@ async def test_update_option(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_delete_option(client: AsyncClient):
     response = await client.delete(f"/options/{GenerateUuid.as_string(2)}")
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"

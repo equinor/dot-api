@@ -75,8 +75,10 @@ class Scenario(Base, BaseEntity, BaseAuditableEntity):
 
 def default_scenario_rule(connection, target: Scenario):
     """
-    Ensure that after 
+    Ensure that after operation that project has 1 default scenario
     """
+
+    # According to documentation sync engines should function asyncronously during an event
     session = Session(bind=connection)
     
     all_scenarios=session.query(Scenario).filter(

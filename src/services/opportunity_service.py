@@ -1,6 +1,6 @@
 import uuid
 from typing import Optional
-from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.opportunity import Opportunity
 from src.dtos.opportunity_dtos import (
@@ -14,40 +14,31 @@ from src.dtos.user_dtos import (
 )
 from src.repositories.opportunity_repository import OpportunityRepository
 from src.repositories.user_repository import UserRepository
-from src.services.session_handler import session_handler
 
 class OpportunityService:
-    def __init__(self, engine: AsyncEngine):
-        self.engine=engine
-
-    async def create(self, dtos: list[OpportunityIncomingDto], user_dto: UserIncomingDto) -> list[OpportunityOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
-            entities: list[Opportunity] = await OpportunityRepository(session).create(OpportunityMapper.to_entities(dtos, user.id))
-            # get the dtos while the entities are still connected to the session
-            result: list[OpportunityOutgoingDto] = OpportunityMapper.to_outgoing_dtos(entities)
+    async def create(self, session: AsyncSession, dtos: list[OpportunityIncomingDto], user_dto: UserIncomingDto) -> list[OpportunityOutgoingDto]:
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
+        entities: list[Opportunity] = await OpportunityRepository(session).create(OpportunityMapper.to_entities(dtos, user.id))
+        # get the dtos while the entities are still connected to the session
+        result: list[OpportunityOutgoingDto] = OpportunityMapper.to_outgoing_dtos(entities)
         return result
     
-    async def update(self, dtos: list[OpportunityIncomingDto], user_dto: UserIncomingDto) -> list[OpportunityOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
-            entities: list[Opportunity] = await OpportunityRepository(session).update(OpportunityMapper.to_entities(dtos, user.id))
-            # get the dtos while the entities are still connected to the session
-            result: list[OpportunityOutgoingDto] = OpportunityMapper.to_outgoing_dtos(entities)
+    async def update(self, session: AsyncSession, dtos: list[OpportunityIncomingDto], user_dto: UserIncomingDto) -> list[OpportunityOutgoingDto]:
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
+        entities: list[Opportunity] = await OpportunityRepository(session).update(OpportunityMapper.to_entities(dtos, user.id))
+        # get the dtos while the entities are still connected to the session
+        result: list[OpportunityOutgoingDto] = OpportunityMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[uuid.UUID]):
-        async with session_handler(self.engine) as session:
-            await OpportunityRepository(session).delete(ids)
+    async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):
+        await OpportunityRepository(session).delete(ids)
     
-    async def get(self, ids: list[uuid.UUID]) -> list[OpportunityOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            opportunities: list[Opportunity] = await OpportunityRepository(session).get(ids)
-            result=OpportunityMapper.to_outgoing_dtos(opportunities)
+    async def get(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[OpportunityOutgoingDto]:
+        opportunities: list[Opportunity] = await OpportunityRepository(session).get(ids)
+        result = OpportunityMapper.to_outgoing_dtos(opportunities)
         return result
     
-    async def get_all(self, odata_query: Optional[str]=None) -> list[OpportunityOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            opportunities: list[Opportunity] = await OpportunityRepository(session).get_all(odata_query=odata_query)
-            result=OpportunityMapper.to_outgoing_dtos(opportunities)
+    async def get_all(self, session: AsyncSession, odata_query: Optional[str] = None) -> list[OpportunityOutgoingDto]:
+        opportunities: list[Opportunity] = await OpportunityRepository(session).get_all(odata_query=odata_query)
+        result = OpportunityMapper.to_outgoing_dtos(opportunities)
         return result

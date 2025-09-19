@@ -1,13 +1,16 @@
 import uuid
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
+
+from sqlalchemy.ext.asyncio import AsyncSession
 from src.dtos.issue_dtos import IssueIncomingDto, IssueOutgoingDto
 from src.services.issue_service import IssueService
 from src.dependencies import get_issue_service
 from src.services.user_service import get_current_user
-from src.dtos.user_dtos import UserIncomingDto 
+from src.dtos.user_dtos import UserIncomingDto
 from src.models.filters.issues_filter import IssueFilter
 from src.constants import SwaggerDocumentationConstants
+from src.dependencies import get_db
 
 router = APIRouter(tags=["issues"])
 
@@ -15,25 +18,27 @@ router = APIRouter(tags=["issues"])
 async def create_issues(
     dtos: list[IssueIncomingDto],
     issue_service: IssueService = Depends(get_issue_service),
-    current_user: UserIncomingDto = Depends(get_current_user)
-)-> list[IssueOutgoingDto]:
+    current_user: UserIncomingDto = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> list[IssueOutgoingDto]:
     """
     Endpoint for creating Issues. 
     If supplied with nodes/decisions/uncertainties they will be created after the issue with the appropriate Id.
     If node is not supplied an empty node will be created
     """
     try:
-        return list(await issue_service.create(dtos, current_user))
+        return list(await issue_service.create(session, dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/issues/{id}")
 async def get_issue(
     id: uuid.UUID,
-    issue_service: IssueService = Depends(get_issue_service)
+    issue_service: IssueService = Depends(get_issue_service),
+    session: AsyncSession = Depends(get_db),
 ) -> IssueOutgoingDto:
     try:
-        issues: list[IssueOutgoingDto] = await issue_service.get([id])
+        issues: list[IssueOutgoingDto] = await issue_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
@@ -46,9 +51,10 @@ async def get_issue(
 async def get_all_issue(
     issue_service: IssueService = Depends(get_issue_service),
     filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    session: AsyncSession = Depends(get_db),
 ) -> list[IssueOutgoingDto]:
     try:
-        issues: list[IssueOutgoingDto] = await issue_service.get_all(odata_query=filter)
+        issues: list[IssueOutgoingDto] = await issue_service.get_all(session, odata_query=filter)
         return issues
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -58,9 +64,10 @@ async def get_all_issues_from_project(
     project_id: uuid.UUID,
     issue_service: IssueService = Depends(get_issue_service),
     filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    session: AsyncSession = Depends(get_db),
 ) -> list[IssueOutgoingDto]:
     try:
-        issues: list[IssueOutgoingDto] = await issue_service.get_all(IssueFilter(project_ids=[project_id]), odata_query=filter)
+        issues: list[IssueOutgoingDto] = await issue_service.get_all(session, IssueFilter(project_ids=[project_id]), odata_query=filter)
         return issues
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -70,9 +77,10 @@ async def get_all_issues_from_scenario(
     scenario_id: uuid.UUID,
     issue_service: IssueService = Depends(get_issue_service),
     filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    session: AsyncSession = Depends(get_db),
 ) -> list[IssueOutgoingDto]:
     try:
-        issues: list[IssueOutgoingDto] = await issue_service.get_all(IssueFilter(scenario_ids=[scenario_id]), odata_query=filter)
+        issues: list[IssueOutgoingDto] = await issue_service.get_all(session, IssueFilter(scenario_ids=[scenario_id]), odata_query=filter)
         return issues
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -80,10 +88,11 @@ async def get_all_issues_from_scenario(
 @router.delete("/issues/{id}")
 async def delete_issue(
     id: uuid.UUID,
-    issue_service: IssueService = Depends(get_issue_service)
+    issue_service: IssueService = Depends(get_issue_service),
+    session: AsyncSession = Depends(get_db),
 ):
     try:
-        await issue_service.delete([id])
+        await issue_service.delete(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
@@ -91,10 +100,10 @@ async def delete_issue(
 async def update_issues(
     dtos: list[IssueIncomingDto],
     issue_service: IssueService = Depends(get_issue_service),
-    current_user: UserIncomingDto = Depends(get_current_user)
-)-> list[IssueOutgoingDto]:
+    current_user: UserIncomingDto = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> list[IssueOutgoingDto]:
     try:
-        return list(await issue_service.update(dtos, current_user))
+        return list(await issue_service.update(session, dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    

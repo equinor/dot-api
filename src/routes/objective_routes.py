@@ -1,12 +1,15 @@
 import uuid
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
+
+from sqlalchemy.ext.asyncio import AsyncSession
 from src.dtos.objective_dtos import ObjectiveIncomingDto, ObjectiveOutgoingDto
 from src.services.objective_service import ObjectiveService
 from src.dependencies import get_objective_service
 from src.services.user_service import get_current_user
 from src.dtos.user_dtos import UserIncomingDto
 from src.constants import SwaggerDocumentationConstants
+from src.dependencies import get_db
 
 router = APIRouter(tags=["objectives"])
 
@@ -14,20 +17,22 @@ router = APIRouter(tags=["objectives"])
 async def create_objectives(
     dtos: list[ObjectiveIncomingDto],
     objective_service: ObjectiveService = Depends(get_objective_service),
-    current_user: UserIncomingDto = Depends(get_current_user)
-)-> list[ObjectiveOutgoingDto]:
+    current_user: UserIncomingDto = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> list[ObjectiveOutgoingDto]:
     try:
-        return list(await objective_service.create(dtos, current_user))
+        return list(await objective_service.create(session, dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/objectives/{id}")
 async def get_objective(
     id: uuid.UUID,
-    objective_service: ObjectiveService = Depends(get_objective_service)
+    objective_service: ObjectiveService = Depends(get_objective_service),
+    session: AsyncSession = Depends(get_db),
 ) -> ObjectiveOutgoingDto:
     try:
-        objectives: list[ObjectiveOutgoingDto] = await objective_service.get([id])
+        objectives: list[ObjectiveOutgoingDto] = await objective_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
@@ -39,10 +44,11 @@ async def get_objective(
 @router.get("/objectives")
 async def get_all_objective(
     objective_service: ObjectiveService = Depends(get_objective_service),
-    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    session: AsyncSession = Depends(get_db),
 ) -> list[ObjectiveOutgoingDto]:
     try:
-        objectives: list[ObjectiveOutgoingDto] = await objective_service.get_all(odata_query=filter)
+        objectives: list[ObjectiveOutgoingDto] = await objective_service.get_all(session, odata_query=filter)
         return objectives
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -50,10 +56,11 @@ async def get_all_objective(
 @router.delete("/objectives/{id}")
 async def delete_objective(
     id: uuid.UUID,
-    objective_service: ObjectiveService = Depends(get_objective_service)
+    objective_service: ObjectiveService = Depends(get_objective_service),
+    session: AsyncSession = Depends(get_db),
 ):
     try:
-        await objective_service.delete([id])
+        await objective_service.delete(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
@@ -61,10 +68,10 @@ async def delete_objective(
 async def update_objectives(
     dtos: list[ObjectiveIncomingDto],
     objective_service: ObjectiveService = Depends(get_objective_service),
-    current_user: UserIncomingDto = Depends(get_current_user)
-)-> list[ObjectiveOutgoingDto]:
+    current_user: UserIncomingDto = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> list[ObjectiveOutgoingDto]:
     try:
-        return list(await objective_service.update(dtos, current_user))
+        return list(await objective_service.update(session, dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    

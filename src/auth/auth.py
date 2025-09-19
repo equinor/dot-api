@@ -4,9 +4,8 @@ import requests
 from authlib.jose.errors import JoseError
 from authlib.jose import JsonWebToken
 import time
-from src.config import Config
+from src.config import config
 
-config = Config()
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl=config.AUTH_URL,
     tokenUrl=config.TOKEN_URL,

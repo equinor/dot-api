@@ -21,14 +21,14 @@ from src.seed_database import GenerateUuid
 @pytest.mark.asyncio
 async def test_get_issues(client: AsyncClient):
     response = await client.get("/issues")
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
 
     parse_response_to_dtos_test(response, IssueOutgoingDto)
 
 @pytest.mark.asyncio
 async def test_get_issue(client: AsyncClient):
     response = await client.get(f"/issues/{GenerateUuid.as_string(20)}")
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
 
     parse_response_to_dto_test(response, IssueOutgoingDto)
 
@@ -55,7 +55,7 @@ async def test_create_issue(client: AsyncClient):
     payload = [issue.model_dump(mode="json")]
 
     response = await client.post("/issues", json=payload)
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
     response_content = parse_response_to_dtos_test(response, IssueOutgoingDto)
     r = response_content[0]
 
@@ -93,7 +93,7 @@ async def test_update_issue(client: AsyncClient):
     ).model_dump(mode="json")]
 
     response = await client.put("/issues", json=payload)
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
 
     response_content = parse_response_to_dtos_test(response, IssueOutgoingDto)
     r = response_content[0]
@@ -107,4 +107,4 @@ async def test_delete_issue(client: AsyncClient):
     issue_id = GenerateUuid.as_string(3)
     response = await client.delete(f"/issues/{issue_id}")
 
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"

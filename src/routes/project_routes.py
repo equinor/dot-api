@@ -1,6 +1,10 @@
 import uuid
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
+
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+)
 from src.dtos.project_dtos import (
     ProjectIncomingDto, 
     ProjectOutgoingDto, 
@@ -12,6 +16,7 @@ from src.dependencies import get_project_service
 from src.services.user_service import get_current_user
 from src.dtos.user_dtos import UserIncomingDto
 from src.constants import SwaggerDocumentationConstants
+from src.dependencies import get_db
 
 router = APIRouter(tags=["projects"])
 
@@ -19,7 +24,8 @@ router = APIRouter(tags=["projects"])
 async def create_projects(
     dtos: list[ProjectCreateDto],
     project_service: ProjectService = Depends(get_project_service),
-    current_user: UserIncomingDto = Depends(get_current_user)
+    current_user: UserIncomingDto = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
 )-> list[ProjectOutgoingDto]:
     """
         Endpoint for creating Projects.
@@ -27,7 +33,7 @@ async def create_projects(
         If Objectives/Opportunities are supplied with the Scenario, then they will be created after the Scenario with the appropriate Id.
     """
     try:
-        return list(await project_service.create(dtos, current_user))
+        return list(await project_service.create(session, dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -35,9 +41,10 @@ async def create_projects(
 async def get_project(
     id: uuid.UUID,
     project_service: ProjectService = Depends(get_project_service),
+    session: AsyncSession = Depends(get_db)
 ) -> ProjectOutgoingDto:
     try:
-        projects: list[ProjectOutgoingDto] = await project_service.get([id])
+        projects: list[ProjectOutgoingDto] = await project_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
@@ -50,9 +57,10 @@ async def get_project(
 async def get_populated_project(
     id: uuid.UUID,
     project_service: ProjectService = Depends(get_project_service),
+    session: AsyncSession = Depends(get_db)
 ) -> PopulatedProjectDto:
     try:
-        projects: list[PopulatedProjectDto] = await project_service.get_populated_projects([id])
+        projects: list[PopulatedProjectDto] = await project_service.get_populated_projects(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
@@ -65,9 +73,10 @@ async def get_populated_project(
 async def get_all_populated_project(
     project_service: ProjectService = Depends(get_project_service),
     filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    session: AsyncSession = Depends(get_db)
 ) -> list[PopulatedProjectDto]:
     try:
-        projects: list[PopulatedProjectDto] = await project_service.get_all_populated_projects(odata_query=filter)
+        projects: list[PopulatedProjectDto] = await project_service.get_all_populated_projects(session, odata_query=filter)
         return projects
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -76,11 +85,11 @@ async def get_all_populated_project(
 async def get_all_project(
     project_service: ProjectService = Depends(get_project_service),
     filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
-    current_user: UserIncomingDto = Depends(get_current_user)
+    current_user: UserIncomingDto = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
 ) -> list[ProjectOutgoingDto]:
     try:
-   
-        projects: list[ProjectOutgoingDto] = await project_service.get_all(odata_query=filter,user_dto=current_user)
+        projects: list[ProjectOutgoingDto] = await project_service.get_all(session, odata_query=filter,user_dto=current_user)
         return projects
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -89,10 +98,11 @@ async def get_all_project(
 async def delete_project(
     id: uuid.UUID,
     project_service: ProjectService = Depends(get_project_service),
-    current_user: UserIncomingDto = Depends(get_current_user)
+    current_user: UserIncomingDto = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
 ):
     try:
-        await project_service.delete([id],current_user)
+        await project_service.delete(session, [id],current_user)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
@@ -100,14 +110,10 @@ async def delete_project(
 async def update_projects(
     dtos: list[ProjectIncomingDto],
     project_service: ProjectService = Depends(get_project_service),
-    current_user: UserIncomingDto = Depends(get_current_user)
+    current_user: UserIncomingDto = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
 )-> list[ProjectOutgoingDto]:
     try:
-        return list(await project_service.update(dtos, current_user))
+        return list(await project_service.update(session, dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-    
-
-    
