@@ -104,22 +104,21 @@ class ProjectService:
         result=ProjectMapper.to_outgoing_dtos(projects)
         return result
         
-    async def get_all(self, user_dto: UserIncomingDto, filter: Optional[ProjectFilter]=None, odata_query: Optional[str]=None) -> list[ProjectOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
-            if not user:
-                return []
-            if filter is None:
-                filter = ProjectFilter()
-            
-            filter.accessing_user_id = user.id
-            project_access_filter = filter.construct_access_conditions()
-            
-            # Construct model filters
-            model_filter = filter.construct_filters() if filter else []
-            model_filter.append(project_access_filter)
-            projects: list[Project] = await ProjectRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
-            result = ProjectMapper.to_outgoing_dtos(projects)
+    async def get_all(self, session: AsyncSession, user_dto: UserIncomingDto, filter: Optional[ProjectFilter]=None, odata_query: Optional[str]=None) -> list[ProjectOutgoingDto]:
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
+        if not user:
+            return []
+        if filter is None:
+            filter = ProjectFilter()
+        
+        filter.accessing_user_id = user.id
+        project_access_filter = filter.construct_access_conditions()
+        
+        # Construct model filters
+        model_filter = filter.construct_filters() if filter else []
+        model_filter.append(project_access_filter)
+        projects: list[Project] = await ProjectRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
+        result = ProjectMapper.to_outgoing_dtos(projects)
         return result
 
     async def get_populated_projects(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[PopulatedProjectDto]:
