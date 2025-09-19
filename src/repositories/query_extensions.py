@@ -1,7 +1,5 @@
-from sqlalchemy.orm.strategy_options import _AbstractLoad # type: ignore
-from sqlalchemy.orm import selectinload
-from src.models.user import User
-from src.models.project_role import ProjectRole
+from sqlalchemy.orm.strategy_options import _AbstractLoad  # type: ignore
+from sqlalchemy.orm import joinedload, selectinload
 from src.models import (
     Issue,
     Node,
@@ -10,8 +8,12 @@ from src.models import (
     Scenario,
     Decision,
     Uncertainty,
+    ProjectRole,
+    User,
 )
 
+# Use joinedload for single relationships
+# Use selectinload for collections
 class QueryExtensions:
 
     @staticmethod
@@ -23,50 +25,50 @@ class QueryExtensions:
     @staticmethod
     def load_uncertainty_with_relationships() -> list[_AbstractLoad]:
         return [
-            selectinload(Uncertainty.outcomes)
+            selectinload(Uncertainty.outcomes) 
         ]
 
     @staticmethod
     def load_issue_with_relationships() -> list[_AbstractLoad]:
         return [
-            selectinload(Issue.decision).options(
+            joinedload(Issue.decision).options(
                 *QueryExtensions.load_decision_with_relationships()
             ),
-            selectinload(Issue.uncertainty).options(
+            joinedload(Issue.uncertainty).options(
                 *QueryExtensions.load_uncertainty_with_relationships()
             ),
-            selectinload(Issue.utility),
-            selectinload(Issue.value_metric),
-            selectinload(Issue.node).options(
-                selectinload(Node.node_style)
+            joinedload(Issue.utility),
+            joinedload(Issue.value_metric),
+            joinedload(Issue.node).options(
+                joinedload(Node.node_style) 
             ),
         ]
     
     @staticmethod
     def load_node_with_relationships() -> list[_AbstractLoad]:
         return [
-            selectinload(Node.issue).options(
-                selectinload(Issue.decision).options(
-                *QueryExtensions.load_decision_with_relationships()
+            joinedload(Node.issue).options(
+                joinedload(Issue.decision).options(
+                    *QueryExtensions.load_decision_with_relationships()
+                ),
+                joinedload(Issue.uncertainty).options(
+                    *QueryExtensions.load_uncertainty_with_relationships()
+                ),
+                joinedload(Issue.utility),
+                joinedload(Issue.value_metric),
             ),
-                selectinload(Issue.uncertainty).options(
-                *QueryExtensions.load_uncertainty_with_relationships()
-            ),
-                selectinload(Issue.utility),
-                selectinload(Issue.value_metric),
-            ),
-            selectinload(Node.node_style)
+            joinedload(Node.node_style)
         ]
 
     @staticmethod
     def load_scenario_with_relationships() -> list[_AbstractLoad]:
         return [
-            selectinload(Scenario.project),
+            joinedload(Scenario.project),
             selectinload(Scenario.opportunities),
             selectinload(Scenario.objectives),
             selectinload(Scenario.nodes),
             selectinload(Scenario.edges),
-            selectinload(Scenario.issues).options(
+            joinedload(Scenario.issues).options(
                 *QueryExtensions.load_issue_with_relationships()
             ),
         ]
@@ -74,10 +76,10 @@ class QueryExtensions:
     @staticmethod
     def load_edge_with_relationships() -> list[_AbstractLoad]:
         return [
-            selectinload(Edge.tail_node).options(
+            joinedload(Edge.tail_node).options(
                 *QueryExtensions.load_node_with_relationships()
             ),
-            selectinload(Edge.head_node).options(
+            joinedload(Edge.head_node).options(
                 *QueryExtensions.load_node_with_relationships()
             ),
         ]
@@ -89,7 +91,7 @@ class QueryExtensions:
                 *QueryExtensions.load_scenario_with_relationships()
             ),
             selectinload(Project.project_role).options(
-                selectinload(ProjectRole.user)
+                *QueryExtensions.load_role_with_user()
             )
         ]
 
@@ -99,6 +101,7 @@ class QueryExtensions:
         To be used as input for generic repositories when there are no relationships to be loaded.
         """
         return []
+    
     @staticmethod
     def load_role_with_user() -> list[_AbstractLoad]:
         """
@@ -106,8 +109,9 @@ class QueryExtensions:
         """
         
         return [
-            selectinload(ProjectRole.user),
+            joinedload(ProjectRole.user),
         ]
+
     @staticmethod
     def load_user_with_roles() -> list[_AbstractLoad]:
         """
