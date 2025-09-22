@@ -95,11 +95,11 @@ class SessionManager:
 
         self._initialize_session_factory()
 
-        try:
-            await self.run_start_task()
-        except Exception:
-            # implyes that a different thread is performing the start task
-            pass
+        # try:
+        #     await self.run_start_task()
+        # except Exception:
+        #     # implyes that a different thread is performing the start task
+        #     pass
 
     async def close(self) -> None:
         """Dispose of the database engine."""
