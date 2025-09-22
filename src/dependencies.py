@@ -23,9 +23,9 @@ from src.config import config
 from src.database import get_connection_string_and_token, build_connection_url
 
 
-async def get_sync_engine(envionment: str = config.APP_ENV) -> Engine:
+async def get_sync_engine(environment: str = config.APP_ENV) -> Engine:
     sync_engine: Engine|None=None
-    db_connection_string, token_dict = await get_connection_string_and_token(envionment)
+    db_connection_string, token_dict = await get_connection_string_and_token(environment)
     conn_str = build_connection_url(db_connection_string, driver="pyodbc")
     if token_dict:
         sync_engine = create_engine(

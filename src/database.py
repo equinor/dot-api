@@ -10,7 +10,6 @@ import urllib.parse
 from typing import Optional, Any
 
 class DatabaseConnectionStrings(Enum):
-    local = "sqlite+aiosqlite:///:memory:"
     @classmethod
     def get_connection_string(cls, app_env: str) -> str:
         """Retrieve the appropriate connection string based on the application environment."""
