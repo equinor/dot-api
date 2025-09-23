@@ -4,8 +4,7 @@ import httpx
 from src.dtos.user_dtos import (
     UserIncomingDto,
 )
-from src.config import Config
-config = Config()
+from src.config import config
 
 async def call_ms_graph_api (token: str) -> UserIncomingDto :
     """

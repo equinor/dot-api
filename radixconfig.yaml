@@ -23,11 +23,11 @@ spec:
         - CLIENT_SECRET
       resources:
         requests:
-          memory: '900Mi'
-          cpu: '40m'
-        limits:
           memory: '1000Mi'
-          cpu: '60m'
+          cpu: '100m'
+        limits:
+          memory: '2000Mi'
+          cpu: '200m'
         horizontalScaling:
           resources:
             memory:

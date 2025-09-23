@@ -1,6 +1,6 @@
 import uuid
 from typing import Optional
-from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.constants import Boundary, Type
 from src.models.scenario import Scenario
@@ -33,69 +33,58 @@ from src.repositories.user_repository import UserRepository
 from src.repositories.objective_repository import ObjectiveRepository
 from src.repositories.opportunity_repository import OpportunityRepository
 from src.models.filters.scenario_filter import ScenarioFilter
-from src.services.session_handler import session_handler
 
 class ScenarioService:
-    def __init__(self, engine: AsyncEngine):
-        self.engine=engine
+    async def create(self, session: AsyncSession, dtos: list[ScenarioCreateDto], user_dto: UserIncomingDto) -> list[ScenarioOutgoingDto]:
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
+        # create scenario
+        entities: list[Scenario] = await ScenarioRepository(session).create(ScenarioMapper.from_create_to_entities(dtos, user.id))
 
-    async def create(self, dtos: list[ScenarioCreateDto], user_dto: UserIncomingDto) -> list[ScenarioOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
-            # create scenario
-            entities: list[Scenario] = await ScenarioRepository(session).create(ScenarioMapper.from_create_to_entities(dtos, user.id))
+        # create objectives/opportunities
+        for entity, dto in zip(entities, dtos):
+            objectives = await ObjectiveRepository(session).create(ObjectiveMapper.via_scenario_to_entities(dto.objectives, user.id, entity.id))
+            opportunities = await OpportunityRepository(session).create(OpportunityMapper.via_scenario_to_entities(dto.opportunities, user.id, entity.id))
 
-            # create objectives/opportunities
-            for entity, dto in zip(entities, dtos):
-                objectives=await ObjectiveRepository(session).create(ObjectiveMapper.via_scenario_to_entities(dto.objectives, user.id, entity.id))
-                opportunities=await OpportunityRepository(session).create(OpportunityMapper.via_scenario_to_entities(dto.opportunities, user.id, entity.id))
+            entity.objectives = objectives
+            entity.opportunities = opportunities
 
-                entity.objectives=objectives
-                entity.opportunities=opportunities
-
-            # get the dtos while the entities are still connected to the session
-            result: list[ScenarioOutgoingDto] = ScenarioMapper.to_outgoing_dtos(entities)
+        # get the dtos while the entities are still connected to the session
+        result: list[ScenarioOutgoingDto] = ScenarioMapper.to_outgoing_dtos(entities)
         return result
     
-    async def update(self, dtos: list[ScenarioIncomingDto], user_dto: UserIncomingDto) -> list[ScenarioOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            user=await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
-            entities: list[Scenario] = await ScenarioRepository(session).update(ScenarioMapper.to_entities(dtos, user.id))
-            # get the dtos while the entities are still connected to the session
-            result: list[ScenarioOutgoingDto] = ScenarioMapper.to_outgoing_dtos(entities)
+    async def update(self, session: AsyncSession, dtos: list[ScenarioIncomingDto], user_dto: UserIncomingDto) -> list[ScenarioOutgoingDto]:
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
+        entities: list[Scenario] = await ScenarioRepository(session).update(ScenarioMapper.to_entities(dtos, user.id))
+        # get the dtos while the entities are still connected to the session
+        result: list[ScenarioOutgoingDto] = ScenarioMapper.to_outgoing_dtos(entities)
         return result
     
-    async def delete(self, ids: list[uuid.UUID]):
-        async with session_handler(self.engine) as session:
-            await ScenarioRepository(session).delete(ids)
+    async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):
+        await ScenarioRepository(session).delete(ids)
                 
-    async def get(self, ids: list[uuid.UUID]) -> list[ScenarioOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            scenarios: list[Scenario] = await ScenarioRepository(session).get(ids)
-            result=ScenarioMapper.to_outgoing_dtos(scenarios)
+    async def get(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[ScenarioOutgoingDto]:
+        scenarios: list[Scenario] = await ScenarioRepository(session).get(ids)
+        result = ScenarioMapper.to_outgoing_dtos(scenarios)
         return result
     
-    async def get_populated(self, ids: list[uuid.UUID]) -> list[PopulatedScenarioDto]:
-        async with session_handler(self.engine) as session:
-            scenarios: list[Scenario] = await ScenarioRepository(session).get(ids)
-            result=ScenarioMapper.to_populated_dtos(scenarios)
+    async def get_populated(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[PopulatedScenarioDto]:
+        scenarios: list[Scenario] = await ScenarioRepository(session).get(ids)
+        result = ScenarioMapper.to_populated_dtos(scenarios)
         return result
     
-    async def get_all(self, filter: Optional[ScenarioFilter] = None, odata_query: Optional[str]=None) -> list[ScenarioOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            model_filter=filter.construct_filters() if filter else []
-            scenarios: list[Scenario] = await ScenarioRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
-            result=ScenarioMapper.to_outgoing_dtos(scenarios)
+    async def get_all(self, session: AsyncSession, filter: Optional[ScenarioFilter] = None, odata_query: Optional[str] = None) -> list[ScenarioOutgoingDto]:
+        model_filter = filter.construct_filters() if filter else []
+        scenarios: list[Scenario] = await ScenarioRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
+        result = ScenarioMapper.to_outgoing_dtos(scenarios)
         return result
     
-    async def get_all_populated(self, filter: Optional[ScenarioFilter] = None, odata_query: Optional[str]=None) -> list[PopulatedScenarioDto]:
-        async with session_handler(self.engine) as session:
-            model_filter=filter.construct_filters() if filter else []
-            scenarios: list[Scenario] = await ScenarioRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
-            result=ScenarioMapper.to_populated_dtos(scenarios)
+    async def get_all_populated(self, session: AsyncSession, filter: Optional[ScenarioFilter] = None, odata_query: Optional[str] = None) -> list[PopulatedScenarioDto]:
+        model_filter = filter.construct_filters() if filter else []
+        scenarios: list[Scenario] = await ScenarioRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
+        result = ScenarioMapper.to_populated_dtos(scenarios)
         return result
 
-    async def get_influence_diagram_data(self, scenario_id: uuid.UUID) -> tuple[list[IssueOutgoingDto], list[EdgeOutgoingDto]]:
+    async def get_influence_diagram_data(self, session: AsyncSession, scenario_id: uuid.UUID) -> tuple[list[IssueOutgoingDto], list[EdgeOutgoingDto]]:
         issue_filter = IssueFilter(
             scenario_ids=[scenario_id],
             boundaries=[Boundary.ON.value, Boundary.IN.value],
@@ -107,12 +96,10 @@ class ScenarioService:
             issue_types=[Type.DECISION.value, Type.UNCERTAINTY.value]
         )
 
-        async with session_handler(self.engine) as session:
-            issues_entities = await IssueRepository(session).get_all(model_filter=issue_filter.construct_filters())
-            edges_entities = await EdgeRepository(session).get_all(model_filter=edge_filter.construct_filters())
+        issues_entities = await IssueRepository(session).get_all(model_filter=issue_filter.construct_filters())
+        edges_entities = await EdgeRepository(session).get_all(model_filter=edge_filter.construct_filters())
 
-            issue_dtos=IssueMapper.to_outgoing_dtos(issues_entities)
-            edge_dtos=EdgeMapper.to_outgoing_dtos(edges_entities)
+        issue_dtos = IssueMapper.to_outgoing_dtos(issues_entities)
+        edge_dtos = EdgeMapper.to_outgoing_dtos(edges_entities)
 
         return issue_dtos, edge_dtos
-    

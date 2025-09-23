@@ -1,21 +1,25 @@
 import uuid
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
+
+from sqlalchemy.ext.asyncio import AsyncSession
 from src.dtos.node_dtos import NodeIncomingDto, NodeOutgoingDto
 from src.services.node_service import NodeService
 from src.dependencies import get_node_service
 from src.models.filters.node_filter import NodeFilter
 from src.constants import SwaggerDocumentationConstants
+from src.dependencies import get_db
 
 router = APIRouter(tags=["nodes"])
 
 @router.get("/nodes/{id}")
 async def get_node(
     id: uuid.UUID,
-    node_service: NodeService = Depends(get_node_service)
+    node_service: NodeService = Depends(get_node_service),
+    session: AsyncSession = Depends(get_db),
 ) -> NodeOutgoingDto:
     try:
-        nodes: list[NodeOutgoingDto] = await node_service.get([id])
+        nodes: list[NodeOutgoingDto] = await node_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
@@ -27,10 +31,11 @@ async def get_node(
 @router.get("/nodes")
 async def get_all_node(
     node_service: NodeService = Depends(get_node_service),
-    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    session: AsyncSession = Depends(get_db),
 ) -> list[NodeOutgoingDto]:
     try:
-        nodes: list[NodeOutgoingDto] = await node_service.get_all(odata_query=filter)
+        nodes: list[NodeOutgoingDto] = await node_service.get_all(session, odata_query=filter)
         return nodes
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -39,10 +44,11 @@ async def get_all_node(
 async def get_all_nodes_from_project(
     project_id: uuid.UUID,
     node_service: NodeService = Depends(get_node_service),
-    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    session: AsyncSession = Depends(get_db),
 ) -> list[NodeOutgoingDto]:
     try:
-        nodes: list[NodeOutgoingDto] = await node_service.get_all(NodeFilter(project_ids=[project_id]), odata_query=filter)
+        nodes: list[NodeOutgoingDto] = await node_service.get_all(session, NodeFilter(project_ids=[project_id]), odata_query=filter)
         return nodes
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -51,10 +57,11 @@ async def get_all_nodes_from_project(
 async def get_all_nodes_from_scenario(
     scenario_id: uuid.UUID,
     node_service: NodeService = Depends(get_node_service),
-    filter: Optional[str]=Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    session: AsyncSession = Depends(get_db),
 ) -> list[NodeOutgoingDto]:
     try:
-        nodes: list[NodeOutgoingDto] = await node_service.get_all(NodeFilter(scenario_ids=[scenario_id]), odata_query=filter)
+        nodes: list[NodeOutgoingDto] = await node_service.get_all(session, NodeFilter(scenario_ids=[scenario_id]), odata_query=filter)
         return nodes
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -62,20 +69,21 @@ async def get_all_nodes_from_scenario(
 @router.delete("/nodes/{id}")
 async def delete_node(
     id: uuid.UUID,
-    node_service: NodeService = Depends(get_node_service)
+    node_service: NodeService = Depends(get_node_service),
+    session: AsyncSession = Depends(get_db),
 ):
     try:
-        await node_service.delete([id])
+        await node_service.delete(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         
 @router.put("/nodes")
 async def update_nodes(
     dtos: list[NodeIncomingDto],
-    node_service: NodeService = Depends(get_node_service)
-)-> list[NodeOutgoingDto]:
+    node_service: NodeService = Depends(get_node_service),
+    session: AsyncSession = Depends(get_db),
+) -> list[NodeOutgoingDto]:
     try:
-        return list(await node_service.update(dtos))
+        return list(await node_service.update(session, dtos))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    

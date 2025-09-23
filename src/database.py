@@ -3,17 +3,18 @@ from enum import Enum
 from src.models import Project, Scenario
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from src.services.session_handler import session_handler
-from src.config import Config
+from src.config import config
 
+from src.auth.db_auth import DatabaseAuthenticator
+import urllib.parse
+from typing import Optional, Any
 
-config = Config()
 class DatabaseConnectionStrings(Enum):
-    local = "sqlite+aiosqlite:///:memory:"
     @classmethod
     def get_connection_string(cls, app_env: str) -> str:
         """Retrieve the appropriate connection string based on the application environment."""
         if app_env == "local":
-            return cls.local.value
+            return config.DATABASE_CONN_LOCAL
         elif app_env == "dev":
             return config.DATABASE_CONN_DEV
         elif app_env == "test":
@@ -52,3 +53,14 @@ async def validate_default_scenarios(session: AsyncSession):
                 else:
                     scenario.is_default = False
             await session.flush()
+
+async def get_connection_string_and_token(env: str) -> tuple[str, Optional[dict[Any, Any]]]:
+    db_connection_string = DatabaseConnectionStrings.get_connection_string(env)
+    database_authenticator = DatabaseAuthenticator()
+    token_dict = await database_authenticator.authenticate_db_connection_string()
+    await database_authenticator.close()
+    return db_connection_string, token_dict
+
+def build_connection_url(db_connection_string: str, driver: str) -> str:
+    params = urllib.parse.quote_plus(db_connection_string.replace('"', ""))
+    return f"mssql+{driver}:///?odbc_connect={params}"
