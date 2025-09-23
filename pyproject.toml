@@ -31,7 +31,6 @@ greenlet = "^3.2.4"
 python-dotenv = "^1.1.1"
 asgi-lifespan = "^2.1.0"
 pyagrum = "^2.2.1"
-gunicorn = "^23.0.0"
 
 [tool.pytest.ini_options]
 asyncio_mode = "strict"
