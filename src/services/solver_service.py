@@ -1,7 +1,11 @@
 import uuid
+import asyncio
 from src.services.pyagrum_solver import PyagrumSolver
 from src.services.scenario_service import ScenarioService
 from src.session_manager import sessionmanager
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+executor = ThreadPoolExecutor()
 
 class SolverService:
     def __init__(
@@ -15,5 +19,6 @@ class SolverService:
             issues, edges = await self.scenario_service.get_influence_diagram_data(session, scenario_id)
 
         solution = PyagrumSolver().find_optimal_decisions(issues=issues, edges=edges)
+        solution = await asyncio.get_event_loop().run_in_executor(executor, partial(PyagrumSolver().find_optimal_decisions, issues=issues, edges=edges))
 
         return solution
