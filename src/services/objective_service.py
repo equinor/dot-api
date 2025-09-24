@@ -18,7 +18,10 @@ from src.repositories.user_repository import UserRepository
 
 class ObjectiveService:
     async def create(
-        self, session: AsyncSession, dtos: list[ObjectiveIncomingDto], user_dto: UserIncomingDto,
+        self,
+        session: AsyncSession,
+        dtos: list[ObjectiveIncomingDto],
+        user_dto: UserIncomingDto,
     ) -> list[ObjectiveOutgoingDto]:
         user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         entities: list[Objective] = await ObjectiveRepository(session).create(
@@ -29,7 +32,10 @@ class ObjectiveService:
         return result
 
     async def update(
-        self, session: AsyncSession, dtos: list[ObjectiveIncomingDto], user_dto: UserIncomingDto,
+        self,
+        session: AsyncSession,
+        dtos: list[ObjectiveIncomingDto],
+        user_dto: UserIncomingDto,
     ) -> list[ObjectiveOutgoingDto]:
         user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         entities: list[Objective] = await ObjectiveRepository(session).update(

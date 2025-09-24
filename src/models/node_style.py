@@ -25,7 +25,11 @@ class NodeStyle(Base, BaseEntity):
     node: Mapped["Node"] = relationship("Node", back_populates="node_style")
 
     def __init__(
-        self, id: uuid.UUID, node_id: Optional[uuid.UUID], x_position: int = 0, y_position: int = 0,
+        self,
+        id: uuid.UUID,
+        node_id: Optional[uuid.UUID],
+        x_position: int = 0,
+        y_position: int = 0,
     ):
         self.id = id
         if node_id:

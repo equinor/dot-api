@@ -88,7 +88,9 @@ async def get_all_issues_from_scenario(
 ) -> list[IssueOutgoingDto]:
     try:
         issues: list[IssueOutgoingDto] = await issue_service.get_all(
-            session, IssueFilter(scenario_ids=[scenario_id]), odata_query=filter,
+            session,
+            IssueFilter(scenario_ids=[scenario_id]),
+            odata_query=filter,
         )
         return issues
     except Exception as e:

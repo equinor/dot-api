@@ -8,7 +8,9 @@ from src.repositories.query_extensions import QueryExtensions
 class ValueMetricRepository(BaseRepository[ValueMetric, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(
-            session, ValueMetric, query_extension_method=QueryExtensions.empty_load,
+            session,
+            ValueMetric,
+            query_extension_method=QueryExtensions.empty_load,
         )
 
     async def update(self, entities: list[ValueMetric]) -> list[ValueMetric]:

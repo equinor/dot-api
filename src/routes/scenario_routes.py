@@ -111,7 +111,9 @@ async def get_all_scenario_from_project(
 ) -> list[ScenarioOutgoingDto]:
     try:
         scenarios: list[ScenarioOutgoingDto] = await scenario_service.get_all(
-            session, ScenarioFilter(project_ids=[project_id]), odata_query=filter,
+            session,
+            ScenarioFilter(project_ids=[project_id]),
+            odata_query=filter,
         )
         return scenarios
     except Exception as e:
@@ -127,7 +129,9 @@ async def get_all_scenarios_populated_from_project(
 ) -> list[PopulatedScenarioDto]:
     try:
         scenarios: list[PopulatedScenarioDto] = await scenario_service.get_all_populated(
-            session, ScenarioFilter(project_ids=[project_id]), odata_query=filter,
+            session,
+            ScenarioFilter(project_ids=[project_id]),
+            odata_query=filter,
         )
         return scenarios
     except Exception as e:

@@ -33,7 +33,10 @@ class ProjectRoleMapper:
     @staticmethod
     def from_create_to_entity(dto: ProjectRoleCreateDto) -> ProjectRole:
         return ProjectRole(
-            id=dto.id, user_id=dto.user_id, project_id=dto.project_id, role=dto.role,
+            id=dto.id,
+            user_id=dto.user_id,
+            project_id=dto.project_id,
+            role=dto.role,
         )
 
     @staticmethod
@@ -58,13 +61,24 @@ class ProjectRoleMapper:
         )
 
     @staticmethod
-    def from_create_via_project_to_entities(dtos: list[ProjectRoleCreateDto],) -> list[ProjectRole]:
-        return [ProjectRoleMapper.from_create_to_entity(dto,) for dto in dtos]
+    def from_create_via_project_to_entities(
+        dtos: list[ProjectRoleCreateDto],
+    ) -> list[ProjectRole]:
+        return [
+            ProjectRoleMapper.from_create_to_entity(
+                dto,
+            )
+            for dto in dtos
+        ]
 
     @staticmethod
-    def to_outgoing_dtos(entities: list[ProjectRole],) -> list[ProjectRoleOutgoingDto]:
+    def to_outgoing_dtos(
+        entities: list[ProjectRole],
+    ) -> list[ProjectRoleOutgoingDto]:
         return [ProjectRoleMapper.to_outgoing_dto(entity) for entity in entities]
 
     @staticmethod
-    def to_project_role_entities(entities: list[ProjectRoleIncomingDto],) -> list[ProjectRole]:
+    def to_project_role_entities(
+        entities: list[ProjectRoleIncomingDto],
+    ) -> list[ProjectRole]:
         return [ProjectRoleMapper.to_project_role_entity(entity) for entity in entities]

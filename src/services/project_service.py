@@ -53,7 +53,11 @@ class ProjectService:
                 objectives,
                 opportunities,
             ) = await self._create_opportunities_and_objectives_for_scenario(
-                session, scenario_dto.objectives, scenario_dto.opportunities, user, scenario.id,
+                session,
+                scenario_dto.objectives,
+                scenario_dto.opportunities,
+                user,
+                scenario.id,
             )
             scenario.objectives, scenario.opportunities = (
                 objectives,
@@ -62,7 +66,9 @@ class ProjectService:
         return scenarios
 
     async def _create_role_for_project(
-        self, session: AsyncSession, project_role_dtos: list[ProjectRoleCreateDto],
+        self,
+        session: AsyncSession,
+        project_role_dtos: list[ProjectRoleCreateDto],
     ):
         # Ensure this method is always called within an async session context
         project_user_roles = await ProjectRoleRepository(session).create(
@@ -90,9 +96,11 @@ class ProjectService:
         return objectives, opportunities
 
     async def create(
-        self, session: AsyncSession, dtos: list[ProjectCreateDto], user_dto: UserIncomingDto,
+        self,
+        session: AsyncSession,
+        dtos: list[ProjectCreateDto],
+        user_dto: UserIncomingDto,
     ) -> list[ProjectOutgoingDto]:
-
         user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         for dto in dtos:
             owner_role = ProjectRoleCreateDto(
@@ -121,7 +129,10 @@ class ProjectService:
         return result
 
     async def update(
-        self, session: AsyncSession, dtos: list[ProjectIncomingDto], user_dto: UserIncomingDto,
+        self,
+        session: AsyncSession,
+        dtos: list[ProjectIncomingDto],
+        user_dto: UserIncomingDto,
     ) -> list[ProjectOutgoingDto]:
         user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         entities_project: list[Project] = await ProjectRepository(session).update(
@@ -131,7 +142,10 @@ class ProjectService:
         return result
 
     async def delete(
-        self, session: AsyncSession, ids: list[uuid.UUID], user_dto: UserIncomingDto,
+        self,
+        session: AsyncSession,
+        ids: list[uuid.UUID],
+        user_dto: UserIncomingDto,
     ) -> None:
         user = await UserRepository(session).get_by_azure_id(azure_id=user_dto.azure_id)
         if user is None or len(user.project_role) == 0:

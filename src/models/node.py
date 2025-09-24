@@ -48,7 +48,10 @@ class Node(Base, BaseEntity):
     )
 
     node_style: Mapped["NodeStyle"] = relationship(
-        "NodeStyle", back_populates="node", cascade="all, delete-orphan", single_parent=True,
+        "NodeStyle",
+        back_populates="node",
+        cascade="all, delete-orphan",
+        single_parent=True,
     )
 
     def __init__(

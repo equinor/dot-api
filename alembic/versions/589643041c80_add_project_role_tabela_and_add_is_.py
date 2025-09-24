@@ -8,10 +8,9 @@ Create Date: 2025-09-09 13:00:00.299541
 from typing import Sequence, Union
 
 
-
 # revision identifiers, used by Alembic.
-revision: str = '589643041c80'
-down_revision: Union[str, tuple[str, ...], None] = ('ee08f39e47aa', '355ec823911a')
+revision: str = "589643041c80"
+down_revision: Union[str, tuple[str, ...], None] = ("ee08f39e47aa", "355ec823911a")
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

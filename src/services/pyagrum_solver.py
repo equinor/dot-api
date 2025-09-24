@@ -91,7 +91,6 @@ class PyagrumSolver:
         self.fill_cpt(edge.head_node.issue)
 
     def fill_cpt(self, head_issue: IssueViaNodeOutgoingDto):
-
         if head_issue.type != Type.UNCERTAINTY:
             return
         assert head_issue.uncertainty is not None
@@ -113,10 +112,11 @@ class PyagrumSolver:
             ].probability
 
     def add_utility(self, issue: IssueOutgoingDto):
-
         node_id = self.diagram.addUtilityNode(
             gum.LabelizedVariable(
-                f"{issue.id.__str__()} utility", f"{issue.id.__str__()} utility", 1,
+                f"{issue.id.__str__()} utility",
+                f"{issue.id.__str__()} utility",
+                1,
             )
         )
         self.diagram.addArc(self.diagram.idFromName(issue.id.__str__()), node_id)
