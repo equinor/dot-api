@@ -35,13 +35,11 @@ class UncertaintyMapper:
     @staticmethod
     def to_entity(dto: UncertaintyIncomingDto) -> Uncertainty:
         return Uncertainty(
-            id=dto.id,
-            issue_id=dto.issue_id,
-            outcomes=OutcomeMapper.to_entities(dto.outcomes),
+            id=dto.id, issue_id=dto.issue_id, outcomes=OutcomeMapper.to_entities(dto.outcomes),
         )
 
     @staticmethod
-    def to_outgoing_dtos(entities: list[Uncertainty]) -> list[UncertaintyOutgoingDto]:
+    def to_outgoing_dtos(entities: list[Uncertainty],) -> list[UncertaintyOutgoingDto]:
         return [UncertaintyMapper.to_outgoing_dto(entity) for entity in entities]
 
     @staticmethod

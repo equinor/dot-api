@@ -32,9 +32,13 @@ python-dotenv = "^1.1.1"
 asgi-lifespan = "^2.1.0"
 pyagrum = "^2.2.1"
 black = "^25.9.0"
+flake8 = "^7.3.0"
 
 [tool.pytest.ini_options]
 asyncio_mode = "strict"
+
+[tool.black]
+line-length = 100
 
 [build-system]
 requires = ["poetry-core"]

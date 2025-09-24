@@ -33,15 +33,11 @@ async def get_node(
 @router.get("/nodes")
 async def get_all_node(
     node_service: NodeService = Depends(get_node_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[NodeOutgoingDto]:
     try:
-        nodes: list[NodeOutgoingDto] = await node_service.get_all(
-            session, odata_query=filter
-        )
+        nodes: list[NodeOutgoingDto] = await node_service.get_all(session, odata_query=filter)
         return nodes
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -51,9 +47,7 @@ async def get_all_node(
 async def get_all_nodes_from_project(
     project_id: uuid.UUID,
     node_service: NodeService = Depends(get_node_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[NodeOutgoingDto]:
     try:
@@ -69,9 +63,7 @@ async def get_all_nodes_from_project(
 async def get_all_nodes_from_scenario(
     scenario_id: uuid.UUID,
     node_service: NodeService = Depends(get_node_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[NodeOutgoingDto]:
     try:

@@ -21,9 +21,7 @@ class PyagrumSolver:
     def add_to_lookup(self, issue: IssueOutgoingDto, node_id: int) -> None:
         self.node_lookup[issue.id] = node_id
 
-    def find_optimal_decisions(
-        self, issues: list[IssueOutgoingDto], edges: list[EdgeOutgoingDto]
-    ):
+    def find_optimal_decisions(self, issues: list[IssueOutgoingDto], edges: list[EdgeOutgoingDto]):
         self.add_nodes(issues)
         self.add_edges(edges)
         self.add_utilities(issues)
@@ -50,9 +48,7 @@ class PyagrumSolver:
 
         optimal_options: list[OptionOutgoingDto] = []
         for array, decision_issue_id in zip(data, decision_issue_ids):
-            issue: IssueOutgoingDto = [
-                x for x in issues if x.id.__str__() == decision_issue_id
-            ][0]
+            issue: IssueOutgoingDto = [x for x in issues if x.id.__str__() == decision_issue_id][0]
             optimal_options.append(issue.decision.options[array.argmax()])
 
         solution = SolutionDto(
@@ -65,7 +61,7 @@ class PyagrumSolver:
 
     def add_node(self, issue: IssueOutgoingDto):
         if issue.type == Type.DECISION:
-            assert issue.decision != None
+            assert issue.decision is not None
             node_id = self.diagram.addDecisionNode(
                 gum.LabelizedVariable(
                     issue.id.__str__(),
@@ -76,7 +72,7 @@ class PyagrumSolver:
             self.add_to_lookup(issue, node_id)
 
         if issue.type == Type.UNCERTAINTY:
-            assert issue.uncertainty != None
+            assert issue.uncertainty is not None
             node_id = self.diagram.addChanceNode(
                 gum.LabelizedVariable(
                     issue.id.__str__(),
@@ -98,15 +94,13 @@ class PyagrumSolver:
 
         if head_issue.type != Type.UNCERTAINTY:
             return
-        assert head_issue.uncertainty != None
+        assert head_issue.uncertainty is not None
 
         node_id = self.node_lookup[head_issue.id]
 
         # Get parent nodes
         parent_ids: list[int] = self.diagram.parents(node_id)
-        parent_states = [
-            self.diagram.variable(parent_id).labels() for parent_id in parent_ids
-        ]
+        parent_states = [self.diagram.variable(parent_id).labels() for parent_id in parent_ids]
 
         # Generate all combinations of parent states
         parent_combinations = list(product(*parent_states))
@@ -122,19 +116,19 @@ class PyagrumSolver:
 
         node_id = self.diagram.addUtilityNode(
             gum.LabelizedVariable(
-                f"{issue.id.__str__()} utility", f"{issue.id.__str__()} utility", 1
+                f"{issue.id.__str__()} utility", f"{issue.id.__str__()} utility", 1,
             )
         )
         self.diagram.addArc(self.diagram.idFromName(issue.id.__str__()), node_id)
 
         if issue.type == Type.DECISION:
-            assert issue.decision != None
+            assert issue.decision is not None
 
             for n, x in enumerate(issue.decision.options):
                 self.diagram.utility(node_id)[{issue.id.__str__(): n}] = x.utility
 
         if issue.type == Type.UNCERTAINTY:
-            assert issue.uncertainty != None
+            assert issue.uncertainty is not None
 
             for n, x in enumerate(issue.uncertainty.outcomes):
                 self.diagram.utility(node_id)[{issue.id.__str__(): n}] = x.utility

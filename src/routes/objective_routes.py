@@ -34,9 +34,7 @@ async def get_objective(
     session: AsyncSession = Depends(get_db),
 ) -> ObjectiveOutgoingDto:
     try:
-        objectives: list[ObjectiveOutgoingDto] = await objective_service.get(
-            session, [id]
-        )
+        objectives: list[ObjectiveOutgoingDto] = await objective_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -49,9 +47,7 @@ async def get_objective(
 @router.get("/objectives")
 async def get_all_objective(
     objective_service: ObjectiveService = Depends(get_objective_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[ObjectiveOutgoingDto]:
     try:

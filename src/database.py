@@ -64,9 +64,7 @@ async def validate_default_scenarios(session: AsyncSession):
             await session.flush()
 
 
-async def get_connection_string_and_token(
-    env: str,
-) -> tuple[str, Optional[dict[Any, Any]]]:
+async def get_connection_string_and_token(env: str,) -> tuple[str, Optional[dict[Any, Any]]]:
     db_connection_string = DatabaseConnectionStrings.get_connection_string(env)
     database_authenticator = DatabaseAuthenticator()
     token_dict = await database_authenticator.authenticate_db_connection_string()

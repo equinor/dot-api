@@ -12,9 +12,7 @@ class NodeService:
     async def create(
         self, session: AsyncSession, dtos: list[NodeIncomingDto]
     ) -> list[NodeOutgoingDto]:
-        entities: list[Node] = await NodeRepository(session).create(
-            NodeMapper.to_entities(dtos)
-        )
+        entities: list[Node] = await NodeRepository(session).create(NodeMapper.to_entities(dtos))
         # get the dtos while the entities are still connected to the session
         result: list[NodeOutgoingDto] = NodeMapper.to_outgoing_dtos(entities)
         return result
@@ -22,9 +20,7 @@ class NodeService:
     async def update(
         self, session: AsyncSession, dtos: list[NodeIncomingDto]
     ) -> list[NodeOutgoingDto]:
-        entities: list[Node] = await NodeRepository(session).update(
-            NodeMapper.to_entities(dtos)
-        )
+        entities: list[Node] = await NodeRepository(session).update(NodeMapper.to_entities(dtos))
         # get the dtos while the entities are still connected to the session
         result: list[NodeOutgoingDto] = NodeMapper.to_outgoing_dtos(entities)
         return result
@@ -32,9 +28,7 @@ class NodeService:
     async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):
         await NodeRepository(session).delete(ids)
 
-    async def get(
-        self, session: AsyncSession, ids: list[uuid.UUID]
-    ) -> list[NodeOutgoingDto]:
+    async def get(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[NodeOutgoingDto]:
         nodes: list[Node] = await NodeRepository(session).get(ids)
         result = NodeMapper.to_outgoing_dtos(nodes)
         return result

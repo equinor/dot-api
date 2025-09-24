@@ -21,9 +21,7 @@ class Option(Base, BaseEntity):
 
     utility: Mapped[float] = mapped_column(Float(), default=0.0)
 
-    def __init__(
-        self, id: uuid.UUID, decision_id: uuid.UUID, name: str, utility: float
-    ):
+    def __init__(self, id: uuid.UUID, decision_id: uuid.UUID, name: str, utility: float):
         self.id = id
         self.decision_id = decision_id
         self.name = name

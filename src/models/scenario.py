@@ -10,7 +10,6 @@ from sqlalchemy.orm import (
 )
 from src.models.base import Base
 from sqlalchemy.event import listens_for
-from src.models.guid import GUID
 
 if TYPE_CHECKING:
     from src.models.node import Node
@@ -31,7 +30,7 @@ class Scenario(Base, BaseEntity, BaseAuditableEntity):
     project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey(Project.id), index=True)
 
     name: Mapped[str] = mapped_column(
-        String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True, default=""
+        String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True, default="",
     )
 
     is_default: Mapped[bool] = mapped_column(Boolean(), default=False)
@@ -88,17 +87,13 @@ def default_scenario_rule(connection, target: Scenario):
     # According to documentation sync engines should function asyncronously during an event
     session = Session(bind=connection)
 
-    all_scenarios = (
-        session.query(Scenario).filter(Scenario.project_id == target.project_id,).all()
-    )
+    all_scenarios = session.query(Scenario).filter(Scenario.project_id == target.project_id,).all()
 
     if len(all_scenarios) == 0:
         return
 
     if sum([x.is_default for x in all_scenarios]) != 1:
-        raise ValueError(
-            f"Project {target.project_id} must have exactly one default scenario."
-        )
+        raise ValueError(f"Project {target.project_id} must have exactly one default scenario.")
 
 
 @listens_for(Scenario, "before_insert")
@@ -117,5 +112,5 @@ def ensure_one_default_scenario_on_update(mapper, connection, target: Scenario):
 
 
 @listens_for(Scenario, "after_delete")
-def ensure_one_default_scenario_on_update(mapper, connection, target: Scenario):  # type: ignore
+def ensure_one_default_scenario_on_delete(mapper, connection, target: Scenario):  # type: ignore
     default_scenario_rule(connection, target)

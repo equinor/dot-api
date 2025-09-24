@@ -67,11 +67,7 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
         """Helper function to create a decision issue and its related entities."""
         decision = Decision(id=decision_id, issue_id=issue_id, options=[])
         node = Node(
-            id=issue_id,
-            scenario_id=scenario_id,
-            issue_id=issue_id,
-            name=name,
-            node_style=None,
+            id=issue_id, scenario_id=scenario_id, issue_id=issue_id, name=name, node_style=None,
         )
         node_style = NodeStyle(id=issue_id, node_id=node.id)
         issue = Issue(
@@ -93,11 +89,7 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
         """Helper function to create an uncertainty issue and its related entities."""
         uncertainty = Uncertainty(id=uncertainty_id, issue_id=issue_id, outcomes=[])
         node = Node(
-            id=issue_id,
-            scenario_id=scenario_id,
-            issue_id=issue_id,
-            name=name,
-            node_style=None,
+            id=issue_id, scenario_id=scenario_id, issue_id=issue_id, name=name, node_style=None,
         )
         node_style = NodeStyle(id=issue_id, node_id=node.id)
         issue = Issue(
@@ -114,9 +106,7 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
         return [uncertainty, node, node_style, issue]
 
     # Create a user
-    user = User(
-        id=user_id, name="test_user_3", azure_id="28652cc8-c5ed-43c7-a6b0-c2a4ce3d7185"
-    )
+    user = User(id=user_id, name="test_user_3", azure_id="28652cc8-c5ed-43c7-a6b0-c2a4ce3d7185",)
     entities: list[Any] = [user]
 
     # Create a project
@@ -146,51 +136,39 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
 
     # Add decision issues
     entities.extend(
+        create_decision_issue(decision_issue_id, decision_issue_id, "Decision Issue 1", order=0)
+    )
+    entities.extend(
         create_decision_issue(
-            decision_issue_id, decision_issue_id, "Decision Issue 1", order=0
+            decision_issue_id_2, decision_issue_id_2, "Decision Issue 2", order=1,
         )
     )
     entities.extend(
         create_decision_issue(
-            decision_issue_id_2, decision_issue_id_2, "Decision Issue 2", order=1
-        )
-    )
-    entities.extend(
-        create_decision_issue(
-            decision_issue_id_3, decision_issue_id_3, "Decision Issue 3", order=1
+            decision_issue_id_3, decision_issue_id_3, "Decision Issue 3", order=1,
         )
     )
 
     # Add uncertainty issues
     entities.extend(
         create_uncertainty_issue(
-            uncertainty_issue_id, uncertainty_issue_id, "Uncertainty Issue 1", order=2
+            uncertainty_issue_id, uncertainty_issue_id, "Uncertainty Issue 1", order=2,
         )
     )
 
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_issue_id, name="yes", utility=10,))
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_issue_id, name="no", utility=-5,))
     entities.append(
-        Option(id=uuid.uuid4(), decision_id=decision_issue_id, name="yes", utility=10)
+        Option(id=uuid.uuid4(), decision_id=decision_issue_id_2, name="yes2", utility=-100,)
     )
     entities.append(
-        Option(id=uuid.uuid4(), decision_id=decision_issue_id, name="no", utility=-5)
+        Option(id=uuid.uuid4(), decision_id=decision_issue_id_2, name="no2", utility=1.1,)
     )
     entities.append(
-        Option(
-            id=uuid.uuid4(), decision_id=decision_issue_id_2, name="yes2", utility=-100
-        )
+        Option(id=uuid.uuid4(), decision_id=decision_issue_id_3, name="yes", utility=-100,)
     )
     entities.append(
-        Option(
-            id=uuid.uuid4(), decision_id=decision_issue_id_2, name="no2", utility=1.1
-        )
-    )
-    entities.append(
-        Option(
-            id=uuid.uuid4(), decision_id=decision_issue_id_3, name="yes", utility=-100
-        )
-    )
-    entities.append(
-        Option(id=uuid.uuid4(), decision_id=decision_issue_id_3, name="no", utility=1.1)
+        Option(id=uuid.uuid4(), decision_id=decision_issue_id_3, name="no", utility=1.1,)
     )
     entities.append(
         Outcome(
@@ -239,7 +217,7 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
 
 
 async def seed_database(
-    conn: AsyncConnection, num_projects: int, num_scenarios: int, num_nodes: int
+    conn: AsyncConnection, num_projects: int, num_scenarios: int, num_nodes: int,
 ):
     user1 = User(id=1, name=str("test_user_1"), azure_id=GenerateUuid.as_string(15))
     user2 = User(id=2, name=str("test_user_2"), azure_id=GenerateUuid.as_string(12))
@@ -259,10 +237,7 @@ async def seed_database(
         project = add_auditable_fields(project, user)
         entities.append(project)
         project_role = ProjectRole(
-            id=project_id,
-            project_id=project_id,
-            user_id=user.id,
-            role=ProjectRoleType.OWNER,
+            id=project_id, project_id=project_id, user_id=user.id, role=ProjectRoleType.OWNER,
         )
         project_role = add_auditable_fields(project_role, user)
         entities.append(project_role)
@@ -289,9 +264,7 @@ async def seed_database(
         former_node_id = None
         default_scenario = True
         for scenario_index in range(num_scenarios):
-            scenario_id = GenerateUuid.as_uuid(
-                project_index * num_scenarios + scenario_index + 1
-            )
+            scenario_id = GenerateUuid.as_uuid(project_index * num_scenarios + scenario_index + 1)
             scenario = Scenario(
                 id=scenario_id,
                 name=str(uuid4()),
@@ -317,14 +290,9 @@ async def seed_database(
                     issue_id=issue_node_id,
                     options=[
                         Option(
-                            id=issue_node_id,
-                            decision_id=issue_node_id,
-                            name="yes",
-                            utility=-3,
+                            id=issue_node_id, decision_id=issue_node_id, name="yes", utility=-3,
                         ),
-                        Option(
-                            id=uuid4(), decision_id=issue_node_id, name="no", utility=30
-                        ),
+                        Option(id=uuid4(), decision_id=issue_node_id, name="no", utility=30,),
                     ],
                 )
                 entities.append(decision)
@@ -351,9 +319,7 @@ async def seed_database(
                 )
                 entities.append(uncertainty)
 
-                utility = Utility(
-                    id=issue_node_id, issue_id=issue_node_id, values="200,150"
-                )
+                utility = Utility(id=issue_node_id, issue_id=issue_node_id, values="200,150")
                 entities.append(utility)
 
                 value_metric = ValueMetric(

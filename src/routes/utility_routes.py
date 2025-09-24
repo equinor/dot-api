@@ -32,9 +32,7 @@ async def get_utility(
 @router.get("/utilities")
 async def get_all_utility(
     utility_service: UtilityService = Depends(get_utility_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[UtilityOutgoingDto]:
     try:

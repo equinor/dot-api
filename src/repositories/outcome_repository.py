@@ -7,9 +7,7 @@ from src.repositories.query_extensions import QueryExtensions
 
 class OutcomeRepository(BaseRepository[Outcome, uuid.UUID]):
     def __init__(self, session: AsyncSession):
-        super().__init__(
-            session, Outcome, query_extension_method=QueryExtensions.empty_load
-        )
+        super().__init__(session, Outcome, query_extension_method=QueryExtensions.empty_load)
 
     async def update(self, entities: list[Outcome]) -> list[Outcome]:
         entities_to_update = await self.get([outcome.id for outcome in entities])

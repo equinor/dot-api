@@ -18,17 +18,13 @@ async def get_me(token: str = Depends(verify_token)) -> UserIncomingDto:
     try:
         return await call_ms_graph_api(token)
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Failed to retrieve user: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve user: {str(e)}")
 
 
 @router.get("/users")
 async def get_users(
     user_service: UserService = Depends(get_user_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[UserOutgoingDto]:
     try:

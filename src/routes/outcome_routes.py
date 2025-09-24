@@ -44,9 +44,7 @@ async def get_outcome(
 @router.get("/outcomes")
 async def get_all_outcome(
     outcome_service: OutcomeService = Depends(get_outcome_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[OutcomeOutgoingDto]:
     try:

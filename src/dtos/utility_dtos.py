@@ -31,9 +31,7 @@ class UtilityMapper:
 
     @staticmethod
     def to_entity(dto: UtilityIncomingDto) -> Utility:
-        return Utility(
-            id=dto.id, issue_id=dto.issue_id, values=",".join(map(str, dto.values))
-        )
+        return Utility(id=dto.id, issue_id=dto.issue_id, values=",".join(map(str, dto.values)),)
 
     @staticmethod
     def to_outgoing_dtos(entities: list[Utility]) -> list[UtilityOutgoingDto]:

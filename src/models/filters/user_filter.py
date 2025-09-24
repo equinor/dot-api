@@ -15,9 +15,7 @@ class UserFilter(BaseFilter):
 
         self.add_condition_for_property(self.ids, self._user_id_condition, conditions)
         self.add_condition_for_property(self.names, self._name_condition, conditions)
-        self.add_condition_for_property(
-            self.azure_ids, self._azure_id_condition, conditions
-        )
+        self.add_condition_for_property(self.azure_ids, self._azure_id_condition, conditions)
 
         return conditions
 

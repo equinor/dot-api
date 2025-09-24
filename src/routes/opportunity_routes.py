@@ -3,7 +3,10 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.dtos.opportunity_dtos import OpportunityIncomingDto, OpportunityOutgoingDto
+from src.dtos.opportunity_dtos import (
+    OpportunityIncomingDto,
+    OpportunityOutgoingDto,
+)
 from src.services.opportunity_service import OpportunityService
 from src.dependencies import get_opportunity_service
 from src.services.user_service import get_current_user
@@ -34,9 +37,7 @@ async def get_opportunity(
     session: AsyncSession = Depends(get_db),
 ) -> OpportunityOutgoingDto:
     try:
-        opportunities: list[OpportunityOutgoingDto] = await opportunity_service.get(
-            session, [id]
-        )
+        opportunities: list[OpportunityOutgoingDto] = await opportunity_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -49,9 +50,7 @@ async def get_opportunity(
 @router.get("/opportunities")
 async def get_all_opportunity(
     opportunity_service: OpportunityService = Depends(get_opportunity_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[OpportunityOutgoingDto]:
     try:

@@ -34,9 +34,7 @@ class DecisionService:
     async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):
         await DecisionRepository(session).delete(ids)
 
-    async def get(
-        self, session: AsyncSession, ids: list[uuid.UUID]
-    ) -> list[DecisionOutgoingDto]:
+    async def get(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[DecisionOutgoingDto]:
         decisions: list[Decision] = await DecisionRepository(session).get(ids)
         result = DecisionMapper.to_outgoing_dtos(decisions)
         return result

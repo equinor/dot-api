@@ -55,9 +55,7 @@ class BaseRepository(Generic[T, IDType]):
 
     async def get(self, ids: List[IDType]) -> List[T]:
         query = (
-            select(self.model)
-            .where(self.model.id.in_(ids))
-            .options(*self.query_extension_method())
+            select(self.model).where(self.model.id.in_(ids)).options(*self.query_extension_method())
         )
         return list((await self.session.scalars(query)).unique().all())
 

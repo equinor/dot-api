@@ -22,9 +22,7 @@ class Uncertainty(Base, BaseEntity):
 
     issue: Mapped["Issue"] = relationship("Issue", back_populates="uncertainty")
 
-    outcomes: Mapped[list[Outcome]] = relationship(
-        "Outcome", cascade="all, delete-orphan"
-    )
+    outcomes: Mapped[list[Outcome]] = relationship("Outcome", cascade="all, delete-orphan")
 
     def __init__(self, id: uuid.UUID, issue_id: uuid.UUID, outcomes: list[Outcome]):
         self.id = id

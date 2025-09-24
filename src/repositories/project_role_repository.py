@@ -8,9 +8,7 @@ import uuid
 class ProjectRoleRepository(BaseRepository[ProjectRole, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(
-            session,
-            ProjectRole,
-            query_extension_method=QueryExtensions.load_role_with_user,
+            session, ProjectRole, query_extension_method=QueryExtensions.load_role_with_user,
         )
 
     async def update(self, entities: list[ProjectRole]) -> list[ProjectRole]:

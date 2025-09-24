@@ -38,8 +38,10 @@ class SwaggerDocumentationConstants:
         String for applying OData filtering.
 
         Documentation on the OData protocol can be found at:
-        - [OData Query Options Overview](https://learn.microsoft.com/en-us/odata/concepts/queryoptions-overview)
-        - [odata-query Python Library](https://pypi.org/project/odata-query/) (Note: May differ from Microsoft's implementation)
+        - [OData Query Options Overview]
+        (https://learn.microsoft.com/en-us/odata/concepts/queryoptions-overview)
+        - [odata-query Python Library](https://pypi.org/project/odata-query/) (Note: May differ
+          from Microsoft's implementation)
 
         To filter on properties of related tables, use the following syntax:
         `related_table/property <operator> <value>`

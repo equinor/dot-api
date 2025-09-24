@@ -21,9 +21,7 @@ class Project(Base, BaseEntity, BaseAuditableEntity):
     name: Mapped[str] = mapped_column(
         String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True
     )
-    description: Mapped[str] = mapped_column(
-        String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value)
-    )
+    description: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value))
 
     scenarios: Mapped[list["Scenario"]] = relationship(
         "Scenario", back_populates="project", cascade="all, delete-orphan",

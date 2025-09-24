@@ -33,14 +33,9 @@ from src.models.filters.scenario_filter import ScenarioFilter
 
 class ScenarioService:
     async def create(
-        self,
-        session: AsyncSession,
-        dtos: list[ScenarioCreateDto],
-        user_dto: UserIncomingDto,
+        self, session: AsyncSession, dtos: list[ScenarioCreateDto], user_dto: UserIncomingDto,
     ) -> list[ScenarioOutgoingDto]:
-        user = await UserRepository(session).get_or_create(
-            UserMapper.to_entity(user_dto)
-        )
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         # create scenario
         entities: list[Scenario] = await ScenarioRepository(session).create(
             ScenarioMapper.from_create_to_entities(dtos, user.id)
@@ -49,14 +44,10 @@ class ScenarioService:
         # create objectives/opportunities
         for entity, dto in zip(entities, dtos):
             objectives = await ObjectiveRepository(session).create(
-                ObjectiveMapper.via_scenario_to_entities(
-                    dto.objectives, user.id, entity.id
-                )
+                ObjectiveMapper.via_scenario_to_entities(dto.objectives, user.id, entity.id)
             )
             opportunities = await OpportunityRepository(session).create(
-                OpportunityMapper.via_scenario_to_entities(
-                    dto.opportunities, user.id, entity.id
-                )
+                OpportunityMapper.via_scenario_to_entities(dto.opportunities, user.id, entity.id)
             )
 
             entity.objectives = objectives
@@ -67,14 +58,9 @@ class ScenarioService:
         return result
 
     async def update(
-        self,
-        session: AsyncSession,
-        dtos: list[ScenarioIncomingDto],
-        user_dto: UserIncomingDto,
+        self, session: AsyncSession, dtos: list[ScenarioIncomingDto], user_dto: UserIncomingDto,
     ) -> list[ScenarioOutgoingDto]:
-        user = await UserRepository(session).get_or_create(
-            UserMapper.to_entity(user_dto)
-        )
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         entities: list[Scenario] = await ScenarioRepository(session).update(
             ScenarioMapper.to_entities(dtos, user.id)
         )
@@ -85,9 +71,7 @@ class ScenarioService:
     async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):
         await ScenarioRepository(session).delete(ids)
 
-    async def get(
-        self, session: AsyncSession, ids: list[uuid.UUID]
-    ) -> list[ScenarioOutgoingDto]:
+    async def get(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[ScenarioOutgoingDto]:
         scenarios: list[Scenario] = await ScenarioRepository(session).get(ids)
         result = ScenarioMapper.to_outgoing_dtos(scenarios)
         return result

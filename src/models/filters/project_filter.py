@@ -14,13 +14,9 @@ class ProjectFilter(BaseFilter):
 
     def construct_filters(self) -> list[ColumnElement[bool]]:
         conditions: list[ColumnElement[bool]] = []
-        self.add_condition_for_property(
-            self.project_ids, self._project_id_condition, conditions
-        )
+        self.add_condition_for_property(self.project_ids, self._project_id_condition, conditions)
         self.add_condition_for_property(self.names, self._name_condition, conditions)
-        self.add_condition_for_property(
-            self.descriptions, self._description_condition, conditions
-        )
+        self.add_condition_for_property(self.descriptions, self._description_condition, conditions)
         return conditions
 
     def construct_access_conditions(self) -> ColumnElement[bool]:

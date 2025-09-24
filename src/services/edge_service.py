@@ -24,9 +24,7 @@ class EdgeService:
     async def create(
         self, session: AsyncSession, dtos: list[EdgeIncomingDto]
     ) -> list[EdgeOutgoingDto]:
-        entities: list[Edge] = await EdgeRepository(session).create(
-            EdgeMapper.to_entities(dtos)
-        )
+        entities: list[Edge] = await EdgeRepository(session).create(EdgeMapper.to_entities(dtos))
 
         tail_nodes = await NodeRepository(session).get([x.tail_id for x in dtos])
         head_nodes = await NodeRepository(session).get([x.head_id for x in dtos])
@@ -40,9 +38,7 @@ class EdgeService:
     async def update(
         self, session: AsyncSession, dtos: list[EdgeIncomingDto]
     ) -> list[EdgeOutgoingDto]:
-        entities: list[Edge] = await EdgeRepository(session).update(
-            EdgeMapper.to_entities(dtos)
-        )
+        entities: list[Edge] = await EdgeRepository(session).update(EdgeMapper.to_entities(dtos))
         # get the dtos while the entities are still connected to the session
         result: list[EdgeOutgoingDto] = EdgeMapper.to_outgoing_dtos(entities)
         return result
@@ -50,9 +46,7 @@ class EdgeService:
     async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):
         await EdgeRepository(session).delete(ids)
 
-    async def get(
-        self, session: AsyncSession, ids: list[uuid.UUID]
-    ) -> list[EdgeOutgoingDto]:
+    async def get(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[EdgeOutgoingDto]:
         edges: list[Edge] = await EdgeRepository(session).get(ids)
         result = EdgeMapper.to_outgoing_dtos(edges)
         return result

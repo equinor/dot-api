@@ -26,9 +26,7 @@ class GUID(TypeDecorator[uuid.UUID]):
         elif dialect.name == "sqlite":
             return dialect.type_descriptor(UUID(as_uuid=True))
         else:
-            raise NotImplementedError(
-                f"GUID type is not implemented for dialect: {dialect.name}"
-            )
+            raise NotImplementedError(f"GUID type is not implemented for dialect: {dialect.name}")
 
     def process_bind_param(
         self, value: Optional[uuid.UUID], dialect: Dialect

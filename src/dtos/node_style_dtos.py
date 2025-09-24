@@ -39,7 +39,7 @@ class NodeStyleMapper:
         )
 
     @staticmethod
-    def to_outgoing_dtos(entities: list[NodeStyle]) -> list[NodeStyleOutgoingDto]:
+    def to_outgoing_dtos(entities: list[NodeStyle],) -> list[NodeStyleOutgoingDto]:
         return [NodeStyleMapper.to_outgoing_dto(entity) for entity in entities]
 
     @staticmethod

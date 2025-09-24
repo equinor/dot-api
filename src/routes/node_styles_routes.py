@@ -19,9 +19,7 @@ async def get_node_style(
     session: AsyncSession = Depends(get_db),
 ) -> NodeStyleOutgoingDto:
     try:
-        node_styles: list[NodeStyleOutgoingDto] = await node_style_service.get(
-            session, [id]
-        )
+        node_styles: list[NodeStyleOutgoingDto] = await node_style_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -34,9 +32,7 @@ async def get_node_style(
 @router.get("/node-styles")
 async def get_all_node_style(
     node_style_service: NodeStyleService = Depends(get_node_style_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[NodeStyleOutgoingDto]:
     try:

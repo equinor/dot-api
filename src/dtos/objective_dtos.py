@@ -7,12 +7,8 @@ from src.constants import DatabaseConstants
 
 class ObjectiveDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    name: Annotated[
-        str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)
-    ]
-    description: Annotated[
-        str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)
-    ]
+    name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)]
+    description: Annotated[str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)]
 
 
 class ObjectiveViaScenarioDto(ObjectiveDto):
@@ -65,15 +61,12 @@ class ObjectiveMapper:
 
     @staticmethod
     def via_scenario_to_entities(
-        dtos: list[ObjectiveViaScenarioDto], user_id: int, scenario_id: uuid.UUID
+        dtos: list[ObjectiveViaScenarioDto], user_id: int, scenario_id: uuid.UUID,
     ) -> list[Objective]:
-        return [
-            ObjectiveMapper.via_scenario_to_entity(dto, user_id, scenario_id)
-            for dto in dtos
-        ]
+        return [ObjectiveMapper.via_scenario_to_entity(dto, user_id, scenario_id) for dto in dtos]
 
     @staticmethod
-    def to_outgoing_dtos(entities: list[Objective]) -> list[ObjectiveOutgoingDto]:
+    def to_outgoing_dtos(entities: list[Objective],) -> list[ObjectiveOutgoingDto]:
         return [ObjectiveMapper.to_outgoing_dto(entity) for entity in entities]
 
     @staticmethod

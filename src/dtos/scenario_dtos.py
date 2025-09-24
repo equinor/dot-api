@@ -27,9 +27,7 @@ from src.constants import DatabaseConstants
 
 class ScenarioDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    name: Annotated[
-        str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)
-    ] = ""
+    name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
     is_default: bool = False
 
 
@@ -127,7 +125,7 @@ class ScenarioMapper:
 
     @staticmethod
     def from_create_via_project_to_entities(
-        dtos: list[ScenarioCreateViaProjectDto], user_id: int, project_id: uuid.UUID
+        dtos: list[ScenarioCreateViaProjectDto], user_id: int, project_id: uuid.UUID,
     ) -> list[Scenario]:
         return [
             ScenarioMapper.from_create_via_project_to_entity(dto, user_id, project_id)
@@ -135,17 +133,15 @@ class ScenarioMapper:
         ]
 
     @staticmethod
-    def from_create_to_entities(
-        dtos: list[ScenarioCreateDto], user_id: int
-    ) -> list[Scenario]:
+    def from_create_to_entities(dtos: list[ScenarioCreateDto], user_id: int) -> list[Scenario]:
         return [ScenarioMapper.from_create_to_entity(dto, user_id) for dto in dtos]
 
     @staticmethod
-    def to_outgoing_dtos(entities: list[Scenario]) -> list[ScenarioOutgoingDto]:
+    def to_outgoing_dtos(entities: list[Scenario],) -> list[ScenarioOutgoingDto]:
         return [ScenarioMapper.to_outgoing_dto(entity) for entity in entities]
 
     @staticmethod
-    def to_populated_dtos(entities: list[Scenario]) -> list[PopulatedScenarioDto]:
+    def to_populated_dtos(entities: list[Scenario],) -> list[PopulatedScenarioDto]:
         return [ScenarioMapper.to_populated_dto(entity) for entity in entities]
 
     @staticmethod

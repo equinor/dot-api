@@ -3,7 +3,11 @@ from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.utility import Utility
-from src.dtos.utility_dtos import UtilityIncomingDto, UtilityOutgoingDto, UtilityMapper
+from src.dtos.utility_dtos import (
+    UtilityIncomingDto,
+    UtilityOutgoingDto,
+    UtilityMapper,
+)
 from src.repositories.utility_repository import UtilityRepository
 
 
@@ -31,9 +35,7 @@ class UtilityService:
     async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):
         await UtilityRepository(session).delete(ids)
 
-    async def get(
-        self, session: AsyncSession, ids: list[uuid.UUID]
-    ) -> list[UtilityOutgoingDto]:
+    async def get(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[UtilityOutgoingDto]:
         entities: list[Utility] = await UtilityRepository(session).get(ids)
         result = UtilityMapper.to_outgoing_dtos(entities)
         return result
@@ -41,8 +43,6 @@ class UtilityService:
     async def get_all(
         self, session: AsyncSession, odata_query: Optional[str] = None
     ) -> list[UtilityOutgoingDto]:
-        entities: list[Utility] = await UtilityRepository(session).get_all(
-            odata_query=odata_query
-        )
+        entities: list[Utility] = await UtilityRepository(session).get_all(odata_query=odata_query)
         result = UtilityMapper.to_outgoing_dtos(entities)
         return result

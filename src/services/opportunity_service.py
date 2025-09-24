@@ -18,39 +18,25 @@ from src.repositories.user_repository import UserRepository
 
 class OpportunityService:
     async def create(
-        self,
-        session: AsyncSession,
-        dtos: list[OpportunityIncomingDto],
-        user_dto: UserIncomingDto,
+        self, session: AsyncSession, dtos: list[OpportunityIncomingDto], user_dto: UserIncomingDto,
     ) -> list[OpportunityOutgoingDto]:
-        user = await UserRepository(session).get_or_create(
-            UserMapper.to_entity(user_dto)
-        )
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         entities: list[Opportunity] = await OpportunityRepository(session).create(
             OpportunityMapper.to_entities(dtos, user.id)
         )
         # get the dtos while the entities are still connected to the session
-        result: list[OpportunityOutgoingDto] = OpportunityMapper.to_outgoing_dtos(
-            entities
-        )
+        result: list[OpportunityOutgoingDto] = OpportunityMapper.to_outgoing_dtos(entities)
         return result
 
     async def update(
-        self,
-        session: AsyncSession,
-        dtos: list[OpportunityIncomingDto],
-        user_dto: UserIncomingDto,
+        self, session: AsyncSession, dtos: list[OpportunityIncomingDto], user_dto: UserIncomingDto,
     ) -> list[OpportunityOutgoingDto]:
-        user = await UserRepository(session).get_or_create(
-            UserMapper.to_entity(user_dto)
-        )
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         entities: list[Opportunity] = await OpportunityRepository(session).update(
             OpportunityMapper.to_entities(dtos, user.id)
         )
         # get the dtos while the entities are still connected to the session
-        result: list[OpportunityOutgoingDto] = OpportunityMapper.to_outgoing_dtos(
-            entities
-        )
+        result: list[OpportunityOutgoingDto] = OpportunityMapper.to_outgoing_dtos(entities)
         return result
 
     async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):

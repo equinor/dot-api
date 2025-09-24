@@ -19,9 +19,7 @@ class ValueMetricService:
             ValueMetricMapper.to_entities(dtos)
         )
         # get the dtos while the entities are still connected to the session
-        result: list[ValueMetricOutgoingDto] = ValueMetricMapper.to_outgoing_dtos(
-            entities
-        )
+        result: list[ValueMetricOutgoingDto] = ValueMetricMapper.to_outgoing_dtos(entities)
         return result
 
     async def update(
@@ -31,9 +29,7 @@ class ValueMetricService:
             ValueMetricMapper.to_entities(dtos)
         )
         # get the dtos while the entities are still connected to the session
-        result: list[ValueMetricOutgoingDto] = ValueMetricMapper.to_outgoing_dtos(
-            entities
-        )
+        result: list[ValueMetricOutgoingDto] = ValueMetricMapper.to_outgoing_dtos(entities)
         return result
 
     async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):

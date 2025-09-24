@@ -3,7 +3,10 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.dtos.value_metric_dtos import ValueMetricIncomingDto, ValueMetricOutgoingDto
+from src.dtos.value_metric_dtos import (
+    ValueMetricIncomingDto,
+    ValueMetricOutgoingDto,
+)
 from src.services.value_metric_service import ValueMetricService
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_value_metric_service
@@ -19,9 +22,7 @@ async def get_value_metric(
     session: AsyncSession = Depends(get_db),
 ) -> ValueMetricOutgoingDto:
     try:
-        value_metrics: list[ValueMetricOutgoingDto] = await value_metric_service.get(
-            session, [id]
-        )
+        value_metrics: list[ValueMetricOutgoingDto] = await value_metric_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -34,15 +35,13 @@ async def get_value_metric(
 @router.get("/value-metrics")
 async def get_all_value_metric(
     value_metric_service: ValueMetricService = Depends(get_value_metric_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[ValueMetricOutgoingDto]:
     try:
-        value_metrics: list[
-            ValueMetricOutgoingDto
-        ] = await value_metric_service.get_all(session, odata_query=filter)
+        value_metrics: list[ValueMetricOutgoingDto] = await value_metric_service.get_all(
+            session, odata_query=filter
+        )
         return value_metrics
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

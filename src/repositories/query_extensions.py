@@ -14,6 +14,8 @@ from src.models import (
 
 # Use joinedload for single relationships
 # Use selectinload for collections
+
+
 class QueryExtensions:
     @staticmethod
     def load_decision_with_relationships() -> list[_AbstractLoad]:
@@ -26,9 +28,7 @@ class QueryExtensions:
     @staticmethod
     def load_issue_with_relationships() -> list[_AbstractLoad]:
         return [
-            joinedload(Issue.decision).options(
-                *QueryExtensions.load_decision_with_relationships()
-            ),
+            joinedload(Issue.decision).options(*QueryExtensions.load_decision_with_relationships()),
             joinedload(Issue.uncertainty).options(
                 *QueryExtensions.load_uncertainty_with_relationships()
             ),
@@ -61,20 +61,14 @@ class QueryExtensions:
             selectinload(Scenario.objectives),
             selectinload(Scenario.nodes),
             selectinload(Scenario.edges),
-            joinedload(Scenario.issues).options(
-                *QueryExtensions.load_issue_with_relationships()
-            ),
+            joinedload(Scenario.issues).options(*QueryExtensions.load_issue_with_relationships()),
         ]
 
     @staticmethod
     def load_edge_with_relationships() -> list[_AbstractLoad]:
         return [
-            joinedload(Edge.tail_node).options(
-                *QueryExtensions.load_node_with_relationships()
-            ),
-            joinedload(Edge.head_node).options(
-                *QueryExtensions.load_node_with_relationships()
-            ),
+            joinedload(Edge.tail_node).options(*QueryExtensions.load_node_with_relationships()),
+            joinedload(Edge.head_node).options(*QueryExtensions.load_node_with_relationships()),
         ]
 
     @staticmethod
@@ -83,9 +77,7 @@ class QueryExtensions:
             selectinload(Project.scenarios).options(
                 *QueryExtensions.load_scenario_with_relationships()
             ),
-            selectinload(Project.project_role).options(
-                *QueryExtensions.load_role_with_user()
-            ),
+            selectinload(Project.project_role).options(*QueryExtensions.load_role_with_user()),
         ]
 
     @staticmethod

@@ -3,7 +3,6 @@ from src.models.scenario import Scenario
 from src.repositories.query_extensions import QueryExtensions
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.base_repository import BaseRepository
-from src.repositories.query_extensions import QueryExtensions
 
 
 class ScenarioRepository(BaseRepository[Scenario, uuid.UUID]):

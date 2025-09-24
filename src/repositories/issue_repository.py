@@ -3,15 +3,12 @@ from src.models.issue import Issue
 from src.repositories.query_extensions import QueryExtensions
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.base_repository import BaseRepository
-from src.repositories.query_extensions import QueryExtensions
 
 
 class IssueRepository(BaseRepository[Issue, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(
-            session,
-            Issue,
-            query_extension_method=QueryExtensions.load_issue_with_relationships,
+            session, Issue, query_extension_method=QueryExtensions.load_issue_with_relationships,
         )
 
     async def update(self, entities: list[Issue]) -> list[Issue]:
@@ -35,17 +32,13 @@ class IssueRepository(BaseRepository[Issue, uuid.UUID]):
                 entity_to_update.decision = await self.session.merge(entity.decision)
 
             if entity.uncertainty:
-                entity_to_update.uncertainty = await self.session.merge(
-                    entity.uncertainty
-                )
+                entity_to_update.uncertainty = await self.session.merge(entity.uncertainty)
 
             if entity.utility:
                 entity_to_update.utility = await self.session.merge(entity.utility)
 
             if entity.value_metric:
-                entity_to_update.value_metric = await self.session.merge(
-                    entity.value_metric
-                )
+                entity_to_update.value_metric = await self.session.merge(entity.value_metric)
 
         await self.session.flush()
         return entities_to_update

@@ -18,14 +18,9 @@ from src.repositories.user_repository import UserRepository
 
 class ObjectiveService:
     async def create(
-        self,
-        session: AsyncSession,
-        dtos: list[ObjectiveIncomingDto],
-        user_dto: UserIncomingDto,
+        self, session: AsyncSession, dtos: list[ObjectiveIncomingDto], user_dto: UserIncomingDto,
     ) -> list[ObjectiveOutgoingDto]:
-        user = await UserRepository(session).get_or_create(
-            UserMapper.to_entity(user_dto)
-        )
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         entities: list[Objective] = await ObjectiveRepository(session).create(
             ObjectiveMapper.to_entities(dtos, user.id)
         )
@@ -34,14 +29,9 @@ class ObjectiveService:
         return result
 
     async def update(
-        self,
-        session: AsyncSession,
-        dtos: list[ObjectiveIncomingDto],
-        user_dto: UserIncomingDto,
+        self, session: AsyncSession, dtos: list[ObjectiveIncomingDto], user_dto: UserIncomingDto,
     ) -> list[ObjectiveOutgoingDto]:
-        user = await UserRepository(session).get_or_create(
-            UserMapper.to_entity(user_dto)
-        )
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         entities: list[Objective] = await ObjectiveRepository(session).update(
             ObjectiveMapper.to_entities(dtos, user.id)
         )
@@ -52,9 +42,7 @@ class ObjectiveService:
     async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):
         await ObjectiveRepository(session).delete(ids)
 
-    async def get(
-        self, session: AsyncSession, ids: list[uuid.UUID]
-    ) -> list[ObjectiveOutgoingDto]:
+    async def get(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[ObjectiveOutgoingDto]:
         objectives: list[Objective] = await ObjectiveRepository(session).get(ids)
         result = ObjectiveMapper.to_outgoing_dtos(objectives)
         return result

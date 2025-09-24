@@ -23,9 +23,9 @@ async def create_issues(
     session: AsyncSession = Depends(get_db),
 ) -> list[IssueOutgoingDto]:
     """
-    Endpoint for creating Issues. 
+    Endpoint for creating Issues.
     If supplied with nodes/decisions/uncertainties they will be created after the issue with the appropriate Id.
-    If node is not supplied an empty node will be created
+    If node is not supplied an empty node will be created.
     """
     try:
         return list(await issue_service.create(session, dtos, current_user))
@@ -53,15 +53,11 @@ async def get_issue(
 @router.get("/issues")
 async def get_all_issue(
     issue_service: IssueService = Depends(get_issue_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[IssueOutgoingDto]:
     try:
-        issues: list[IssueOutgoingDto] = await issue_service.get_all(
-            session, odata_query=filter
-        )
+        issues: list[IssueOutgoingDto] = await issue_service.get_all(session, odata_query=filter)
         return issues
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -71,9 +67,7 @@ async def get_all_issue(
 async def get_all_issues_from_project(
     project_id: uuid.UUID,
     issue_service: IssueService = Depends(get_issue_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[IssueOutgoingDto]:
     try:
@@ -89,14 +83,12 @@ async def get_all_issues_from_project(
 async def get_all_issues_from_scenario(
     scenario_id: uuid.UUID,
     issue_service: IssueService = Depends(get_issue_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[IssueOutgoingDto]:
     try:
         issues: list[IssueOutgoingDto] = await issue_service.get_all(
-            session, IssueFilter(scenario_ids=[scenario_id]), odata_query=filter
+            session, IssueFilter(scenario_ids=[scenario_id]), odata_query=filter,
         )
         return issues
     except Exception as e:

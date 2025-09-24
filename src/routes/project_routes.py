@@ -61,9 +61,9 @@ async def get_populated_project(
     session: AsyncSession = Depends(get_db),
 ) -> PopulatedProjectDto:
     try:
-        projects: list[
-            PopulatedProjectDto
-        ] = await project_service.get_populated_projects(session, [id])
+        projects: list[PopulatedProjectDto] = await project_service.get_populated_projects(
+            session, [id]
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -76,15 +76,11 @@ async def get_populated_project(
 @router.get("/projects-populated")
 async def get_all_populated_project(
     project_service: ProjectService = Depends(get_project_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[PopulatedProjectDto]:
     try:
-        projects: list[
-            PopulatedProjectDto
-        ] = await project_service.get_all_populated_projects(
+        projects: list[PopulatedProjectDto] = await project_service.get_all_populated_projects(
             session, odata_query=filter
         )
         return projects
@@ -95,9 +91,7 @@ async def get_all_populated_project(
 @router.get("/projects")
 async def get_all_project(
     project_service: ProjectService = Depends(get_project_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     current_user: UserIncomingDto = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> list[ProjectOutgoingDto]:

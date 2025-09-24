@@ -8,7 +8,7 @@ from src.repositories.query_extensions import QueryExtensions
 class OpportunityRepository(BaseRepository[Opportunity, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(
-            session, Opportunity, query_extension_method=QueryExtensions.empty_load
+            session, Opportunity, query_extension_method=QueryExtensions.empty_load,
         )
 
     async def update(self, entities: list[Opportunity]) -> list[Opportunity]:

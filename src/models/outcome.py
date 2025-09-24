@@ -13,9 +13,7 @@ from src.constants import DatabaseConstants
 class Outcome(Base, BaseEntity):
     __tablename__ = "outcome"
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
-    uncertainty_id: Mapped[uuid.UUID] = mapped_column(
-        GUID(), ForeignKey("uncertainty.id")
-    )
+    uncertainty_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("uncertainty.id"))
 
     name: Mapped[str] = mapped_column(
         String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default=""

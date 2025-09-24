@@ -2,7 +2,11 @@ import uuid
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.outcome import Outcome
-from src.dtos.outcome_dtos import OutcomeIncomingDto, OutcomeOutgoingDto, OutcomeMapper
+from src.dtos.outcome_dtos import (
+    OutcomeIncomingDto,
+    OutcomeOutgoingDto,
+    OutcomeMapper,
+)
 from src.repositories.outcome_repository import OutcomeRepository
 
 
@@ -30,9 +34,7 @@ class OutcomeService:
     async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):
         await OutcomeRepository(session).delete(ids)
 
-    async def get(
-        self, session: AsyncSession, ids: list[uuid.UUID]
-    ) -> list[OutcomeOutgoingDto]:
+    async def get(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[OutcomeOutgoingDto]:
         outcomes: list[Outcome] = await OutcomeRepository(session).get(ids)
         result = OutcomeMapper.to_outgoing_dtos(outcomes)
         return result
@@ -40,8 +42,6 @@ class OutcomeService:
     async def get_all(
         self, session: AsyncSession, odata_query: Optional[str] = None
     ) -> list[OutcomeOutgoingDto]:
-        outcomes: list[Outcome] = await OutcomeRepository(session).get_all(
-            odata_query=odata_query
-        )
+        outcomes: list[Outcome] = await OutcomeRepository(session).get_all(odata_query=odata_query)
         result = OutcomeMapper.to_outgoing_dtos(outcomes)
         return result

@@ -35,9 +35,7 @@ class NodeStyleService:
     async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):
         await NodeStyleRepository(session).delete(ids)
 
-    async def get(
-        self, session: AsyncSession, ids: list[uuid.UUID]
-    ) -> list[NodeStyleOutgoingDto]:
+    async def get(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[NodeStyleOutgoingDto]:
         node_styles: list[NodeStyle] = await NodeStyleRepository(session).get(ids)
         result = NodeStyleMapper.to_outgoing_dtos(node_styles)
         return result

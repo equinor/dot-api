@@ -21,9 +21,7 @@ from src.dtos.project_roles_dtos import ProjectRoleOutgoingDto
 
 class ProjectDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    name: Annotated[
-        str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)
-    ] = ""
+    name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
     description: Annotated[
         str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)
     ] = ""
@@ -103,11 +101,9 @@ class ProjectMapper:
         return [ProjectMapper.to_outgoing_dto(entity) for entity in entities]
 
     @staticmethod
-    def to_populated_dtos(entities: list[Project]) -> list[PopulatedProjectDto]:
+    def to_populated_dtos(entities: list[Project],) -> list[PopulatedProjectDto]:
         return [ProjectMapper.to_populated_dto(entity) for entity in entities]
 
     @staticmethod
-    def to_project_entities(
-        dtos: list[ProjectIncomingDto], user_id: int
-    ) -> list[Project]:
+    def to_project_entities(dtos: list[ProjectIncomingDto], user_id: int) -> list[Project]:
         return [ProjectMapper.to_project_entity(dto, user_id) for dto in dtos]

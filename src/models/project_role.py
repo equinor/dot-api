@@ -19,9 +19,7 @@ class ProjectRole(Base, BaseEntity, BaseAuditableEntity):
     __tablename__ = "project_role"
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
-    project_id: Mapped[uuid.UUID] = mapped_column(
-        GUID(), ForeignKey("project.id"), index=True
-    )
+    project_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("project.id"), index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), index=True)
     role: Mapped[str] = mapped_column(
         String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), nullable=False
@@ -29,9 +27,7 @@ class ProjectRole(Base, BaseEntity, BaseAuditableEntity):
     project: Mapped[Project] = relationship(
         "Project", back_populates="project_role", foreign_keys=[project_id]
     )
-    user: Mapped[User] = relationship(
-        "User", back_populates="project_role", foreign_keys=[user_id]
-    )
+    user: Mapped[User] = relationship("User", back_populates="project_role", foreign_keys=[user_id])
 
     def __init__(
         self,

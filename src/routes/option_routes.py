@@ -44,15 +44,11 @@ async def get_option(
 @router.get("/options")
 async def get_all_option(
     option_service: OptionService = Depends(get_option_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[OptionOutgoingDto]:
     try:
-        options: list[OptionOutgoingDto] = await option_service.get_all(
-            session, odata_query=filter
-        )
+        options: list[OptionOutgoingDto] = await option_service.get_all(session, odata_query=filter)
         return options
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

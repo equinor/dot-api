@@ -30,9 +30,7 @@ async def call_ms_graph_api(token: str) -> UserIncomingDto:
             try:
                 graph_response: httpx.Response = await client.get(
                     "https://graph.microsoft.com/v1.0/me",
-                    headers={
-                        "Authorization": f'Bearer {obo_response.json()["access_token"]}'
-                    },
+                    headers={"Authorization": f'Bearer {obo_response.json()["access_token"]}'},
                 )
                 graph = graph_response.json()
                 return UserIncomingDto(
@@ -42,12 +40,10 @@ async def call_ms_graph_api(token: str) -> UserIncomingDto:
                 )
             except Exception as e:
                 raise HTTPException(
-                    status_code=500,
-                    detail=f"Unexpected error in call_ms_graph_api: {str(e)}",
+                    status_code=500, detail=f"Unexpected error in call_ms_graph_api: {str(e)}",
                 )
         else:
             # If OBO response is not successful, raise an HTTPException or return a default UserIncomingDto
             raise HTTPException(
-                status_code=401,
-                detail="Failed to obtain access token from Microsoft Graph API",
+                status_code=401, detail="Failed to obtain access token from Microsoft Graph API",
             )

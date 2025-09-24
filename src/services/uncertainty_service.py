@@ -19,9 +19,7 @@ class UncertaintyService:
             UncertaintyMapper.to_entities(dtos)
         )
         # get the dtos while the entities are still connected to the session
-        result: list[UncertaintyOutgoingDto] = UncertaintyMapper.to_outgoing_dtos(
-            entities
-        )
+        result: list[UncertaintyOutgoingDto] = UncertaintyMapper.to_outgoing_dtos(entities)
         return result
 
     async def update(
@@ -31,9 +29,7 @@ class UncertaintyService:
             UncertaintyMapper.to_entities(dtos)
         )
         # get the dtos while the entities are still connected to the session
-        result: list[UncertaintyOutgoingDto] = UncertaintyMapper.to_outgoing_dtos(
-            entities
-        )
+        result: list[UncertaintyOutgoingDto] = UncertaintyMapper.to_outgoing_dtos(entities)
         return result
 
     async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):

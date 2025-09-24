@@ -46,26 +46,23 @@ class ProjectService:
         project_id: uuid.UUID,
     ):
         scenarios = await ScenarioRepository(session).create(
-            ScenarioMapper.from_create_via_project_to_entities(
-                scenario_dtos, user.id, project_id
-            )
+            ScenarioMapper.from_create_via_project_to_entities(scenario_dtos, user.id, project_id)
         )
         for scenario_dto, scenario in zip(scenario_dtos, scenarios):
             (
                 objectives,
                 opportunities,
             ) = await self._create_opportunities_and_objectives_for_scenario(
-                session,
-                scenario_dto.objectives,
-                scenario_dto.opportunities,
-                user,
-                scenario.id,
+                session, scenario_dto.objectives, scenario_dto.opportunities, user, scenario.id,
             )
-            scenario.objectives, scenario.opportunities = objectives, opportunities
+            scenario.objectives, scenario.opportunities = (
+                objectives,
+                opportunities,
+            )
         return scenarios
 
     async def _create_role_for_project(
-        self, session: AsyncSession, project_role_dtos: list[ProjectRoleCreateDto]
+        self, session: AsyncSession, project_role_dtos: list[ProjectRoleCreateDto],
     ):
         # Ensure this method is always called within an async session context
         project_user_roles = await ProjectRoleRepository(session).create(
@@ -85,27 +82,18 @@ class ProjectService:
         scenario_id: uuid.UUID,
     ):
         objectives = await ObjectiveRepository(session).create(
-            ObjectiveMapper.via_scenario_to_entities(
-                objective_dtos, user.id, scenario_id
-            )
+            ObjectiveMapper.via_scenario_to_entities(objective_dtos, user.id, scenario_id)
         )
         opportunities = await OpportunityRepository(session).create(
-            OpportunityMapper.via_scenario_to_entities(
-                opportunities_dtos, user.id, scenario_id
-            )
+            OpportunityMapper.via_scenario_to_entities(opportunities_dtos, user.id, scenario_id)
         )
         return objectives, opportunities
 
     async def create(
-        self,
-        session: AsyncSession,
-        dtos: list[ProjectCreateDto],
-        user_dto: UserIncomingDto,
+        self, session: AsyncSession, dtos: list[ProjectCreateDto], user_dto: UserIncomingDto,
     ) -> list[ProjectOutgoingDto]:
 
-        user = await UserRepository(session).get_or_create(
-            UserMapper.to_entity(user_dto)
-        )
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         for dto in dtos:
             owner_role = ProjectRoleCreateDto(
                 user_name=user.name,
@@ -121,38 +109,29 @@ class ProjectService:
         )
         for project_entity, dto in zip(project_entities, dtos):
             if len(dto.users) > 0:
-                project_role_entities: list[
-                    ProjectRole
-                ] = await self._create_role_for_project(session, dto.users)
+                project_role_entities: list[ProjectRole] = await self._create_role_for_project(
+                    session, dto.users
+                )
                 project_entity.project_role = project_role_entities
             scenarios = await self._create_scenarios_for_project(
                 session, dto.scenarios, user, project_entity.id
             )
             project_entity.scenarios = scenarios
-        result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(
-            project_entities
-        )
+        result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(project_entities)
         return result
 
     async def update(
-        self,
-        session: AsyncSession,
-        dtos: list[ProjectIncomingDto],
-        user_dto: UserIncomingDto,
+        self, session: AsyncSession, dtos: list[ProjectIncomingDto], user_dto: UserIncomingDto,
     ) -> list[ProjectOutgoingDto]:
-        user = await UserRepository(session).get_or_create(
-            UserMapper.to_entity(user_dto)
-        )
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         entities_project: list[Project] = await ProjectRepository(session).update(
             ProjectMapper.to_project_entities(dtos, user.id)
         )
-        result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(
-            entities_project
-        )
+        result: list[ProjectOutgoingDto] = ProjectMapper.to_outgoing_dtos(entities_project)
         return result
 
     async def delete(
-        self, session: AsyncSession, ids: list[uuid.UUID], user_dto: UserIncomingDto
+        self, session: AsyncSession, ids: list[uuid.UUID], user_dto: UserIncomingDto,
     ) -> None:
         user = await UserRepository(session).get_by_azure_id(azure_id=user_dto.azure_id)
         if user is None or len(user.project_role) == 0:
@@ -160,14 +139,11 @@ class ProjectService:
         ids_to_delete = [
             project_role.project_id
             for project_role in user.project_role
-            if project_role.role == ProjectRoleType.OWNER
-            and project_role.project_id in ids
+            if project_role.role == ProjectRoleType.OWNER and project_role.project_id in ids
         ]
         await ProjectRepository(session).delete(ids=ids_to_delete)
 
-    async def get(
-        self, session: AsyncSession, ids: list[uuid.UUID]
-    ) -> list[ProjectOutgoingDto]:
+    async def get(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[ProjectOutgoingDto]:
         if not ids:
             return []
         projects: list[Project] = await ProjectRepository(session).get(ids)
@@ -181,9 +157,7 @@ class ProjectService:
         filter: Optional[ProjectFilter] = None,
         odata_query: Optional[str] = None,
     ) -> list[ProjectOutgoingDto]:
-        user = await UserRepository(session).get_or_create(
-            UserMapper.to_entity(user_dto)
-        )
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         if not user:
             return []
         if filter is None:

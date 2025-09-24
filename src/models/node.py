@@ -48,10 +48,7 @@ class Node(Base, BaseEntity):
     )
 
     node_style: Mapped["NodeStyle"] = relationship(
-        "NodeStyle",
-        back_populates="node",
-        cascade="all, delete-orphan",
-        single_parent=True,
+        "NodeStyle", back_populates="node", cascade="all, delete-orphan", single_parent=True,
     )
 
     def __init__(
@@ -76,11 +73,11 @@ class Node(Base, BaseEntity):
     def head_neighbors(self) -> list["Node"]:
         try:
             return [x.head_node for x in self.head_edges]
-        except:
+        except Exception:
             return []
 
     def tail_neighbors(self) -> list["Node"]:
         try:
             return [x.tail_node for x in self.tail_edges]
-        except:
+        except Exception:
             return []

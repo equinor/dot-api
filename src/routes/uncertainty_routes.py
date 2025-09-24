@@ -3,7 +3,10 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.dtos.uncertainty_dtos import UncertaintyIncomingDto, UncertaintyOutgoingDto
+from src.dtos.uncertainty_dtos import (
+    UncertaintyIncomingDto,
+    UncertaintyOutgoingDto,
+)
 from src.services.uncertainty_service import UncertaintyService
 from src.dependencies import get_uncertainty_service
 from src.constants import SwaggerDocumentationConstants
@@ -19,9 +22,7 @@ async def get_uncertainty(
     session: AsyncSession = Depends(get_db),
 ) -> UncertaintyOutgoingDto:
     try:
-        uncertainties: list[UncertaintyOutgoingDto] = await uncertainty_service.get(
-            session, [id]
-        )
+        uncertainties: list[UncertaintyOutgoingDto] = await uncertainty_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -34,9 +35,7 @@ async def get_uncertainty(
 @router.get("/uncertainties")
 async def get_all_uncertainty(
     uncertainty_service: UncertaintyService = Depends(get_uncertainty_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[UncertaintyOutgoingDto]:
     try:

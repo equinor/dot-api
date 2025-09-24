@@ -18,9 +18,7 @@ class NodeDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     scenario_id: uuid.UUID
     issue_id: uuid.UUID
-    name: Annotated[
-        str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)
-    ] = ""
+    name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
 
 
 class NodeIncomingDto(NodeDto):
@@ -67,9 +65,7 @@ class NodeMapper:
             issue_id=dto.issue_id,
             scenario_id=dto.scenario_id,
             name=dto.name,
-            node_style=NodeStyleMapper.to_entity(dto.node_style)
-            if dto.node_style
-            else None,
+            node_style=NodeStyleMapper.to_entity(dto.node_style) if dto.node_style else None,
         )
 
     @staticmethod

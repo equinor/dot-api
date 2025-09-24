@@ -95,9 +95,7 @@ class IssueService:
         value_metric_dto: Optional[ValueMetricIncomingDto],
     ):
         node_dto.issue_id = entity.id
-        node = await NodeRepository(session).create_single(
-            NodeMapper.to_entity(node_dto)
-        )
+        node = await NodeRepository(session).create_single(NodeMapper.to_entity(node_dto))
         entity.node = node
         if decision_dto:
             decision_dto.issue_id = entity.id
@@ -126,14 +124,9 @@ class IssueService:
         return entity
 
     async def create(
-        self,
-        session: AsyncSession,
-        dtos: list[IssueIncomingDto],
-        user_dto: UserIncomingDto,
+        self, session: AsyncSession, dtos: list[IssueIncomingDto], user_dto: UserIncomingDto,
     ) -> list[IssueOutgoingDto]:
-        user = await UserRepository(session).get_or_create(
-            UserMapper.to_entity(user_dto)
-        )
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         # remove node dto to create later
         (
             dtos,
@@ -155,12 +148,7 @@ class IssueService:
             utility_dto,
             value_metric_dto,
         ) in zip(
-            entities,
-            node_dtos,
-            decision_dtos,
-            uncertainty_dtos,
-            utility_dtos,
-            value_metric_dtos,
+            entities, node_dtos, decision_dtos, uncertainty_dtos, utility_dtos, value_metric_dtos,
         ):
             entity = await self._create_related_entities(
                 session,
@@ -175,14 +163,9 @@ class IssueService:
         return result
 
     async def update(
-        self,
-        session: AsyncSession,
-        dtos: list[IssueIncomingDto],
-        user_dto: UserIncomingDto,
+        self, session: AsyncSession, dtos: list[IssueIncomingDto], user_dto: UserIncomingDto,
     ) -> list[IssueOutgoingDto]:
-        user = await UserRepository(session).get_or_create(
-            UserMapper.to_entity(user_dto)
-        )
+        user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         entities: list[Issue] = await IssueRepository(session).update(
             IssueMapper.to_entities(dtos, user.id)
         )
@@ -193,9 +176,7 @@ class IssueService:
     async def delete(self, session: AsyncSession, ids: list[uuid.UUID]):
         await IssueRepository(session).delete(ids)
 
-    async def get(
-        self, session: AsyncSession, ids: list[uuid.UUID]
-    ) -> list[IssueOutgoingDto]:
+    async def get(self, session: AsyncSession, ids: list[uuid.UUID]) -> list[IssueOutgoingDto]:
         issues: list[Issue] = await IssueRepository(session).get(ids)
         result = IssueMapper.to_outgoing_dtos(issues)
         return result

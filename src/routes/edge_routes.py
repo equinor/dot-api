@@ -47,15 +47,11 @@ async def get_edge(
 @router.get("/edges")
 async def get_all_edge(
     edge_service: EdgeService = Depends(get_edge_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[EdgeOutgoingDto]:
     try:
-        edges: list[EdgeOutgoingDto] = await edge_service.get_all(
-            session, odata_query=filter
-        )
+        edges: list[EdgeOutgoingDto] = await edge_service.get_all(session, odata_query=filter)
         return edges
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -32,9 +32,7 @@ async def get_decision(
 @router.get("/decisions")
 async def get_all_decision(
     decision_service: DecisionService = Depends(get_decision_service),
-    filter: Optional[str] = Query(
-        None, description=SwaggerDocumentationConstants.FILTER_DOC
-    ),
+    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
     session: AsyncSession = Depends(get_db),
 ) -> list[DecisionOutgoingDto]:
     try:

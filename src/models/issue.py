@@ -27,7 +27,7 @@ class Issue(Base, BaseEntity, BaseAuditableEntity):
     scenario_id: Mapped[uuid.UUID] = mapped_column(ForeignKey(Scenario.id), index=True)
 
     type: Mapped[str] = mapped_column(
-        String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="Undecided"
+        String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="Undecided",
     )
     boundary: Mapped[str] = mapped_column(
         String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="out"
@@ -50,30 +50,18 @@ class Issue(Base, BaseEntity, BaseAuditableEntity):
     )
 
     decision: Mapped[Optional[Decision]] = relationship(
-        Decision,
-        back_populates="issue",
-        cascade="all, delete-orphan",
-        single_parent=True,
+        Decision, back_populates="issue", cascade="all, delete-orphan", single_parent=True,
     )
     uncertainty: Mapped[Optional[Uncertainty]] = relationship(
-        Uncertainty,
-        back_populates="issue",
-        cascade="all, delete-orphan",
-        single_parent=True,
+        Uncertainty, back_populates="issue", cascade="all, delete-orphan", single_parent=True,
     )
 
     utility: Mapped[Optional[Utility]] = relationship(
-        Utility,
-        back_populates="issue",
-        cascade="all, delete-orphan",
-        single_parent=True,
+        Utility, back_populates="issue", cascade="all, delete-orphan", single_parent=True,
     )
 
     value_metric: Mapped[Optional[ValueMetric]] = relationship(
-        ValueMetric,
-        back_populates="issue",
-        cascade="all, delete-orphan",
-        single_parent=True,
+        ValueMetric, back_populates="issue", cascade="all, delete-orphan", single_parent=True,
     )
 
     def __init__(

@@ -7,9 +7,7 @@ from src.repositories.query_extensions import QueryExtensions
 
 class OptionRepository(BaseRepository[Option, uuid.UUID]):
     def __init__(self, session: AsyncSession):
-        super().__init__(
-            session, Option, query_extension_method=QueryExtensions.empty_load
-        )
+        super().__init__(session, Option, query_extension_method=QueryExtensions.empty_load)
 
     async def update(self, entities: list[Option]) -> list[Option]:
         entities_to_update = await self.get([option.id for option in entities])
