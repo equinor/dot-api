@@ -125,7 +125,9 @@ class ScenarioMapper:
 
     @staticmethod
     def from_create_via_project_to_entities(
-        dtos: list[ScenarioCreateViaProjectDto], user_id: int, project_id: uuid.UUID,
+        dtos: list[ScenarioCreateViaProjectDto],
+        user_id: int,
+        project_id: uuid.UUID,
     ) -> list[Scenario]:
         return [
             ScenarioMapper.from_create_via_project_to_entity(dto, user_id, project_id)
@@ -137,11 +139,15 @@ class ScenarioMapper:
         return [ScenarioMapper.from_create_to_entity(dto, user_id) for dto in dtos]
 
     @staticmethod
-    def to_outgoing_dtos(entities: list[Scenario],) -> list[ScenarioOutgoingDto]:
+    def to_outgoing_dtos(
+        entities: list[Scenario],
+    ) -> list[ScenarioOutgoingDto]:
         return [ScenarioMapper.to_outgoing_dto(entity) for entity in entities]
 
     @staticmethod
-    def to_populated_dtos(entities: list[Scenario],) -> list[PopulatedScenarioDto]:
+    def to_populated_dtos(
+        entities: list[Scenario],
+    ) -> list[PopulatedScenarioDto]:
         return [ScenarioMapper.to_populated_dto(entity) for entity in entities]
 
     @staticmethod

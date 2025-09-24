@@ -8,7 +8,9 @@ from src.repositories.query_extensions import QueryExtensions
 class NodeStyleRepository(BaseRepository[NodeStyle, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(
-            session, NodeStyle, query_extension_method=QueryExtensions.empty_load,
+            session,
+            NodeStyle,
+            query_extension_method=QueryExtensions.empty_load,
         )
 
     async def update(self, entities: list[NodeStyle]) -> list[NodeStyle]:

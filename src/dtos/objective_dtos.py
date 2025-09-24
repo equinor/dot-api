@@ -61,12 +61,16 @@ class ObjectiveMapper:
 
     @staticmethod
     def via_scenario_to_entities(
-        dtos: list[ObjectiveViaScenarioDto], user_id: int, scenario_id: uuid.UUID,
+        dtos: list[ObjectiveViaScenarioDto],
+        user_id: int,
+        scenario_id: uuid.UUID,
     ) -> list[Objective]:
         return [ObjectiveMapper.via_scenario_to_entity(dto, user_id, scenario_id) for dto in dtos]
 
     @staticmethod
-    def to_outgoing_dtos(entities: list[Objective],) -> list[ObjectiveOutgoingDto]:
+    def to_outgoing_dtos(
+        entities: list[Objective],
+    ) -> list[ObjectiveOutgoingDto]:
         return [ObjectiveMapper.to_outgoing_dto(entity) for entity in entities]
 
     @staticmethod

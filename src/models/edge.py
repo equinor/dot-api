@@ -24,11 +24,15 @@ class Edge(Base, BaseEntity):
     scenario: Mapped[Scenario] = relationship(Scenario, foreign_keys=[scenario_id])
 
     tail_node: Mapped[Node] = relationship(
-        Node, primaryjoin=tail_id == Node.id, back_populates="tail_edges",
+        Node,
+        primaryjoin=tail_id == Node.id,
+        back_populates="tail_edges",
     )
 
     head_node: Mapped[Node] = relationship(
-        Node, primaryjoin=head_id == Node.id, back_populates="head_edges",
+        Node,
+        primaryjoin=head_id == Node.id,
+        back_populates="head_edges",
     )
 
     def __init__(

@@ -30,7 +30,8 @@ class ProjectRoleService:
             for user_role_in_project in user.project_role
         ):
             raise HTTPException(
-                status_code=403, detail="Not authorized to delete this project role",
+                status_code=403,
+                detail="Not authorized to delete this project role",
             )
 
         await ProjectRoleRepository(session).delete(ids=role_ids)
@@ -42,7 +43,10 @@ class ProjectRoleService:
         result: list[ProjectRoleOutgoingDto] = ProjectRoleMapper.to_outgoing_dtos(project_roles)
         return result
 
-    async def get_all(self, session: AsyncSession,) -> list[ProjectRoleOutgoingDto]:
+    async def get_all(
+        self,
+        session: AsyncSession,
+    ) -> list[ProjectRoleOutgoingDto]:
         project_roles = await ProjectRoleRepository(session).get_all()
         result: list[ProjectRoleOutgoingDto] = ProjectRoleMapper.to_outgoing_dtos(project_roles)
         return result
@@ -57,7 +61,8 @@ class ProjectRoleService:
         for dto in dtos:
             if user is None or len(user.project_role) == 0:
                 raise HTTPException(
-                    status_code=403, detail="User does not have any project roles",
+                    status_code=403,
+                    detail="User does not have any project roles",
                 )
             else:
                 if not any(
@@ -66,7 +71,8 @@ class ProjectRoleService:
                     for userRole in user.project_role
                 ):
                     raise HTTPException(
-                        status_code=403, detail="Not authorized to update this project role",
+                        status_code=403,
+                        detail="Not authorized to update this project role",
                     )
         entities_project_role: list[ProjectRole] = await ProjectRoleRepository(session).update(
             ProjectRoleMapper.to_project_role_entities(dtos)

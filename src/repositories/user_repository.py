@@ -9,7 +9,9 @@ from src.repositories.query_extensions import QueryExtensions
 class UserRepository(BaseRepository[User, int]):
     def __init__(self, session: AsyncSession):
         super().__init__(
-            session, User, query_extension_method=QueryExtensions.load_user_with_roles,
+            session,
+            User,
+            query_extension_method=QueryExtensions.load_user_with_roles,
         )
 
     async def get_or_create(self, entity: User) -> User:

@@ -49,7 +49,10 @@ class SessionManager:
 
     async def _initialize_persistent_db(self) -> None:
         """Initialize a persistent database."""
-        (db_connection_string, token_dict,) = await get_connection_string_and_token(config.APP_ENV)
+        (
+            db_connection_string,
+            token_dict,
+        ) = await get_connection_string_and_token(config.APP_ENV)
         database_url = build_connection_url(db_connection_string, driver="aioodbc")
 
         if config.APP_ENV == "local":
@@ -79,7 +82,10 @@ class SessionManager:
     def _initialize_session_factory(self) -> None:
         """Initialize the session factory."""
         self.session_factory = async_sessionmaker(
-            self.engine, expire_on_commit=False, autoflush=False, class_=AsyncSession,
+            self.engine,
+            expire_on_commit=False,
+            autoflush=False,
+            class_=AsyncSession,
         )
 
     async def init_db(self) -> None:

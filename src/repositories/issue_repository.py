@@ -8,7 +8,9 @@ from src.repositories.base_repository import BaseRepository
 class IssueRepository(BaseRepository[Issue, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(
-            session, Issue, query_extension_method=QueryExtensions.load_issue_with_relationships,
+            session,
+            Issue,
+            query_extension_method=QueryExtensions.load_issue_with_relationships,
         )
 
     async def update(self, entities: list[Issue]) -> list[Issue]:

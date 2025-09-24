@@ -19,14 +19,18 @@ class EdgeFilter(BaseFilter):
         self.add_condition_for_property(self.ids, self._id_condition, conditions)
 
         self.add_condition_for_property(
-            self.issue_boundaries, self._tail_node_boundary_condition, conditions,
+            self.issue_boundaries,
+            self._tail_node_boundary_condition,
+            conditions,
         )
         self.add_condition_for_property(
             self.issue_types, self._tail_node_issue_type_condition, conditions
         )
 
         self.add_condition_for_property(
-            self.issue_boundaries, self._head_node_boundary_condition, conditions,
+            self.issue_boundaries,
+            self._head_node_boundary_condition,
+            conditions,
         )
         self.add_condition_for_property(
             self.issue_types, self._head_node_issue_type_condition, conditions
@@ -46,17 +50,25 @@ class EdgeFilter(BaseFilter):
         return Edge.scenario_id == scenario_id
 
     @staticmethod
-    def _tail_node_boundary_condition(issue_boundary: str,) -> ColumnElement[bool]:
+    def _tail_node_boundary_condition(
+        issue_boundary: str,
+    ) -> ColumnElement[bool]:
         return Edge.tail_node.has(Node.issue.has(Issue.boundary == issue_boundary))
 
     @staticmethod
-    def _tail_node_issue_type_condition(issue_type: str,) -> ColumnElement[bool]:
+    def _tail_node_issue_type_condition(
+        issue_type: str,
+    ) -> ColumnElement[bool]:
         return Edge.tail_node.has(Node.issue.has(Issue.type == issue_type))
 
     @staticmethod
-    def _head_node_boundary_condition(issue_boundary: str,) -> ColumnElement[bool]:
+    def _head_node_boundary_condition(
+        issue_boundary: str,
+    ) -> ColumnElement[bool]:
         return Edge.head_node.has(Node.issue.has(Issue.boundary == issue_boundary))
 
     @staticmethod
-    def _head_node_issue_type_condition(issue_type: str,) -> ColumnElement[bool]:
+    def _head_node_issue_type_condition(
+        issue_type: str,
+    ) -> ColumnElement[bool]:
         return Edge.head_node.has(Node.issue.has(Issue.type == issue_type))

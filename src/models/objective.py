@@ -21,18 +21,27 @@ class Objective(Base, BaseEntity, BaseAuditableEntity):
     scenario_id: Mapped[uuid.UUID] = mapped_column(ForeignKey(Scenario.id), index=True)
 
     name: Mapped[str] = mapped_column(
-        String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True, default="",
+        String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value),
+        index=True,
+        default="",
     )
     description: Mapped[str] = mapped_column(
         String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value), default=""
     )
 
     scenario: Mapped[Scenario] = relationship(
-        Scenario, foreign_keys=[scenario_id], back_populates="objectives",
+        Scenario,
+        foreign_keys=[scenario_id],
+        back_populates="objectives",
     )
 
     def __init__(
-        self, id: uuid.UUID, scenario_id: uuid.UUID, description: str, name: str, user_id: int,
+        self,
+        id: uuid.UUID,
+        scenario_id: uuid.UUID,
+        description: str,
+        name: str,
+        user_id: int,
     ):
         self.id = id
         self.scenario_id = scenario_id
