@@ -39,7 +39,19 @@ asyncio_mode = "strict"
 
 [tool.black]
 line-length = 100
-
+exclude = '''
+    /(
+        \.git
+      | \.hg
+      | \.mypy_cache
+      | \.tox
+      | \.venv
+      | _build
+      | buck-out
+      | build
+      | dist
+    )/
+'''
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
