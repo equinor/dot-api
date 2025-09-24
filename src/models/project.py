@@ -8,31 +8,39 @@ from src.models.base import Base
 from src.models.base_entity import BaseEntity
 from src.models.base_auditable_entity import BaseAuditableEntity
 from src.constants import DatabaseConstants
+
 if TYPE_CHECKING:
     from models.scenario import Scenario
     from models.project_role import ProjectRole
+
 
 class Project(Base, BaseEntity, BaseAuditableEntity):
     __tablename__ = "project"
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
-    name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True)
+    name: Mapped[str] = mapped_column(
+        String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True
+    )
     description: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value))
 
     scenarios: Mapped[list["Scenario"]] = relationship(
-        "Scenario", 
-        back_populates="project",
-        cascade="all, delete-orphan",
+        "Scenario", back_populates="project", cascade="all, delete-orphan",
     )
     project_role: Mapped[list["ProjectRole"]] = relationship(
-        "ProjectRole", 
-        back_populates="project",
-        cascade="all, delete-orphan",
+        "ProjectRole", back_populates="project", cascade="all, delete-orphan",
     )
 
-    def __init__(self, id: uuid.UUID, description: str, name: str, project_role: list["ProjectRole"], user_id: int, scenarios: Optional[list["Scenario"]]):
+    def __init__(
+        self,
+        id: uuid.UUID,
+        description: str,
+        name: str,
+        project_role: list["ProjectRole"],
+        user_id: int,
+        scenarios: Optional[list["Scenario"]],
+    ):
         self.id = id
-            
+
         if scenarios is not None:
             self.scenarios = scenarios
 
@@ -46,5 +54,5 @@ class Project(Base, BaseEntity, BaseAuditableEntity):
 
 
 @listens_for(Project, "before_insert")
-def set_created_by_id(mapper, connection, target: Project): # type: ignore
+def set_created_by_id(mapper, connection, target: Project):  # type: ignore
     target.created_by_id = target.updated_by_id

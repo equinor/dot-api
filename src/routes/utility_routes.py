@@ -11,6 +11,7 @@ from src.dependencies import get_db
 
 router = APIRouter(tags=["utilities"])
 
+
 @router.get("/utilities/{id}")
 async def get_utility(
     id: uuid.UUID,
@@ -21,12 +22,13 @@ async def get_utility(
         utilities: list[UtilityOutgoingDto] = await utility_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
     if len(utilities) > 0:
         return utilities[0]
     else:
         raise HTTPException(status_code=404)
-    
+
+
 @router.get("/utilities")
 async def get_all_utility(
     utility_service: UtilityService = Depends(get_utility_service),
@@ -34,10 +36,13 @@ async def get_all_utility(
     session: AsyncSession = Depends(get_db),
 ) -> list[UtilityOutgoingDto]:
     try:
-        utilities: list[UtilityOutgoingDto] = await utility_service.get_all(session, odata_query=filter)
+        utilities: list[UtilityOutgoingDto] = await utility_service.get_all(
+            session, odata_query=filter
+        )
         return utilities
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.delete("/utilities/{id}")
 async def delete_utility(
@@ -49,7 +54,8 @@ async def delete_utility(
         await utility_service.delete(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
+
 @router.put("/utilities")
 async def update_utilities(
     dtos: list[UtilityIncomingDto],

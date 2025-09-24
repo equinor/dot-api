@@ -4,6 +4,7 @@ from src.models.user import User
 from src.models.filters.base_filter import BaseFilter
 from sqlalchemy.sql import ColumnElement
 
+
 class UserFilter(BaseFilter):
     ids: Optional[list[int]] = None
     names: Optional[list[str]] = None

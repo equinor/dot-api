@@ -2,24 +2,43 @@ from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
 from sqlalchemy.sql import ColumnElement, Select, select, desc
-from sqlalchemy.orm.strategy_options import _AbstractLoad # type: ignore
-from typing import Type, TypeVar, Generic, List, Protocol, Callable, Union, Optional, Tuple, cast
+from sqlalchemy.orm.strategy_options import _AbstractLoad  # type: ignore
+from typing import (
+    Type,
+    TypeVar,
+    Generic,
+    List,
+    Protocol,
+    Callable,
+    Union,
+    Optional,
+    Tuple,
+    cast,
+)
 from odata_query.sqlalchemy.shorthand import apply_odata_query
 from src.constants import PageSize
 import uuid
 
 LoadOptions = List[_AbstractLoad]
 
+
 class AlchemyModel(Protocol):
     id: InstrumentedAttribute[Union[int, uuid.UUID]]
     created_at: InstrumentedAttribute[datetime]
     updated_at: InstrumentedAttribute[datetime]
 
-T = TypeVar('T', bound=AlchemyModel)
-IDType = TypeVar('IDType', int, uuid.UUID)
+
+T = TypeVar("T", bound=AlchemyModel)
+IDType = TypeVar("IDType", int, uuid.UUID)
+
 
 class BaseRepository(Generic[T, IDType]):
-    def __init__(self, session: AsyncSession, model: Type[T], query_extension_method: Callable[[], LoadOptions]):
+    def __init__(
+        self,
+        session: AsyncSession,
+        model: Type[T],
+        query_extension_method: Callable[[], LoadOptions],
+    ):
         self.session = session
         self.model = model
         self.query_extension_method = query_extension_method
@@ -28,27 +47,31 @@ class BaseRepository(Generic[T, IDType]):
         self.session.add_all(entities)
         await self.session.flush()
         return entities
-    
+
     async def create_single(self, entity: T) -> T:
         self.session.add(entity)
         await self.session.flush()
         return entity
 
     async def get(self, ids: List[IDType]) -> List[T]:
-        query = select(self.model).where(self.model.id.in_(ids)).options(
-            *self.query_extension_method()
+        query = (
+            select(self.model).where(self.model.id.in_(ids)).options(*self.query_extension_method())
         )
         return list((await self.session.scalars(query)).unique().all())
 
-    async def get_all(self, model_filter: List[ColumnElement[bool]] = [], odata_query: Optional[str]=None, skip: int=0, take: int=PageSize.DEFAULT) -> List[T]:
-        query = select(self.model).options(
-            *self.query_extension_method()
-        )
+    async def get_all(
+        self,
+        model_filter: List[ColumnElement[bool]] = [],
+        odata_query: Optional[str] = None,
+        skip: int = 0,
+        take: int = PageSize.DEFAULT,
+    ) -> List[T]:
+        query = select(self.model).options(*self.query_extension_method())
         if len(model_filter) != 0:
             query = query.filter(*model_filter)
         if odata_query is not None:
             query = cast(Select[Tuple[T]], apply_odata_query(query, odata_query))
-        query=query.order_by(desc(self.model.created_at)).offset(skip).limit(take)
+        query = query.order_by(desc(self.model.created_at)).offset(skip).limit(take)
         return list((await self.session.scalars(query)).unique().all())
 
     async def delete(self, ids: List[IDType]) -> None:

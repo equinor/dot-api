@@ -5,6 +5,7 @@ from sqlalchemy.sql._typing import _ColumnExpressionArgument  # type: ignore
 from src.models.filters.base_filter import BaseFilter
 from src.models import Project
 
+
 class ProjectFilter(BaseFilter):
     project_ids: Optional[list[uuid.UUID]] = None
     names: Optional[list[str]] = None
@@ -22,16 +23,14 @@ class ProjectFilter(BaseFilter):
         conditions: list[_ColumnExpressionArgument[bool]] = []
         if self.accessing_user_id:
             user_id = self.accessing_user_id
-            self.add_condition(
-                conditions,
-                 self.user_role_condition(user_id)
-            )
+            self.add_condition(conditions, self.user_role_condition(user_id))
         return or_(*conditions)
-    
+
     @staticmethod
     def user_role_condition(user_id: int) -> ColumnElement[bool]:
         # This method constructs the condition for the user role
         return Project.project_role.any(user_id=user_id)
+
     # Static helper methods to encapsulate condition logic
     @staticmethod
     def _project_id_condition(project_id: uuid.UUID) -> ColumnElement[bool]:

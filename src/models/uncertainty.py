@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey
 from src.models.guid import GUID
 from sqlalchemy.orm import (
-    Mapped, 
+    Mapped,
     relationship,
     mapped_column,
 )
@@ -13,6 +13,7 @@ from src.models.outcome import Outcome
 
 if TYPE_CHECKING:
     from src.models.issue import Issue
+
 
 class Uncertainty(Base, BaseEntity):
     __tablename__ = "uncertainty"
@@ -25,5 +26,5 @@ class Uncertainty(Base, BaseEntity):
 
     def __init__(self, id: uuid.UUID, issue_id: uuid.UUID, outcomes: list[Outcome]):
         self.id = id
-        self.issue_id=issue_id
-        self.outcomes=outcomes
+        self.issue_id = issue_id
+        self.outcomes = outcomes

@@ -1,9 +1,9 @@
 import uuid
 from typing import Optional
-from sqlalchemy.sql._typing import _ColumnExpressionArgument  # type: ignore
 from src.models.filters.base_filter import BaseFilter
 from src.models import Node, Scenario
 from sqlalchemy.sql import ColumnElement
+
 
 class NodeFilter(BaseFilter):
     node_ids: Optional[list[uuid.UUID]] = None

@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI, status,Depends
+from fastapi import FastAPI, status, Depends
 from contextlib import asynccontextmanager
 from src.routes import project_role_routes
 from src.auth.auth import verify_token
@@ -25,34 +25,35 @@ from fastapi.middleware.cors import CORSMiddleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-   await sessionmanager.init_db()
-   yield
-   await sessionmanager.close()
+    await sessionmanager.init_db()
+    yield
+    await sessionmanager.close()
 
-app = FastAPI(swagger_ui_init_oauth={
+
+app = FastAPI(
+    swagger_ui_init_oauth={
         "usePkceWithAuthorizationCodeGrant": True,
         "clientId": config.CLIENT_ID,
-        "redirectUrl":config.REDIRECT_URL,
-
+        "redirectUrl": config.REDIRECT_URL,
     },
-    swagger_ui_parameters={
-        "syntaxHighlight": False
-    },
-    lifespan=lifespan
+    swagger_ui_parameters={"syntaxHighlight": False},
+    lifespan=lifespan,
 )
 
 # Adding CORS middleware to the FastAPI application
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=config.ORIGINS, # List of allowed origins
-    allow_credentials=True, # Allow credentials (cookies, authorization headers, etc.)
-    allow_methods=["*"], # Allow all HTTP methods
-    allow_headers=["*"], # Allow all HTTP headers
+    allow_origins=config.ORIGINS,  # List of allowed origins
+    allow_credentials=True,  # Allow credentials (cookies, authorization headers, etc.)
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all HTTP headers
 )
+
 
 @app.get("/", status_code=status.HTTP_200_OK)
 async def root():
     return {"message": "Welcome to the DOT api"}
+
 
 app.include_router(user_routes.router, dependencies=[Depends(verify_token)])
 app.include_router(project_routes.router, dependencies=[Depends(verify_token)])

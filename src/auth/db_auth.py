@@ -20,19 +20,13 @@ class DatabaseAuthenticator:
             option for the access token, with the key being the option identifier
             and the value being the packed token structure.
         """
-        access_token = await self.credential.get_token(
-            "https://database.windows.net/.default"
-        )
+        access_token = await self.credential.get_token("https://database.windows.net/.default")
         token_bytes = access_token.token.encode("UTF-16-LE")
-        token_struct = struct.pack(
-            f"<I{len(token_bytes)}s", len(token_bytes), token_bytes
-        )
-        SQL_COPT_SS_ACCESS_TOKEN = (
-            1256
-        )
+        token_struct = struct.pack(f"<I{len(token_bytes)}s", len(token_bytes), token_bytes)
+        SQL_COPT_SS_ACCESS_TOKEN = 1256
         token_dict = {SQL_COPT_SS_ACCESS_TOKEN: token_struct}
         return token_dict
-    
+
     async def close(self):
         """
         Closes the credential session.

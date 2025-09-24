@@ -7,6 +7,7 @@ from src.dtos.user_dtos import UserIncomingDto
 
 router = APIRouter(tags=["solvers"])
 
+
 @router.get("/solvers/scenario/{scenario_id}")
 async def get_optimal_decisions_for_scenario(
     scenario_id: uuid.UUID,
