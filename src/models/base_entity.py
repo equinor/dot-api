@@ -1,10 +1,11 @@
 from datetime import datetime
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import (
-    Mapped, 
+    Mapped,
     mapped_column,
 )
 from sqlalchemy import func
+
 
 class BaseEntity:
     @declared_attr

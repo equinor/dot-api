@@ -1,5 +1,5 @@
 from fastapi.security import OAuth2AuthorizationCodeBearer
-from fastapi import status,Depends,HTTPException
+from fastapi import status, Depends, HTTPException
 import requests
 from authlib.jose.errors import JoseError
 from authlib.jose import JsonWebToken
@@ -12,8 +12,10 @@ oauth2_scheme = OAuth2AuthorizationCodeBearer(
     scopes={f"{config.SCOPE}": "Read",},
 )
 
+
 def get_jwks(jwks_uri: str):
-    return requests.get(jwks_uri).json() 
+    return requests.get(jwks_uri).json()
+
 
 def get_claims_options() -> dict[str, dict[str, object]]:
     return {
@@ -24,22 +26,22 @@ def get_claims_options() -> dict[str, dict[str, object]]:
         "iat": {"essential": True},
     }
 
+
 def verify_token(token: str = Depends(oauth2_scheme)) -> dict[str, str]:
     try:
         claims_options = get_claims_options()
         jwt = JsonWebToken(["RS256"])  # Only allow RS256
-        jwks = get_jwks("https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/discovery/v2.0/keys")
+        jwks = get_jwks(
+            "https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/discovery/v2.0/keys"
+        )
         claims = jwt.decode(token, jwks, claims_options=claims_options)
         claims.validate(now=time.time(), leeway=1)
-        roles = claims.get("roles", []) 
+        roles = claims.get("roles", [])
         if "DecisionOptimizationUser" not in roles:
-            raise HTTPException(
-                status_code=403, detail="Forbidden: Insufficient role"
-            )
+            raise HTTPException(status_code=403, detail="Forbidden: Insufficient role")
         return token
     except JoseError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Token validation failed: {str(e)}"
+            detail=f"Token validation failed: {str(e)}",
         )
-    

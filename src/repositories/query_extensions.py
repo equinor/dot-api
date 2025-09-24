@@ -15,18 +15,13 @@ from src.models import (
 # Use joinedload for single relationships
 # Use selectinload for collections
 class QueryExtensions:
-
     @staticmethod
     def load_decision_with_relationships() -> list[_AbstractLoad]:
-        return [
-            selectinload(Decision.options)
-        ]
-    
+        return [selectinload(Decision.options)]
+
     @staticmethod
     def load_uncertainty_with_relationships() -> list[_AbstractLoad]:
-        return [
-            selectinload(Uncertainty.outcomes) 
-        ]
+        return [selectinload(Uncertainty.outcomes)]
 
     @staticmethod
     def load_issue_with_relationships() -> list[_AbstractLoad]:
@@ -39,11 +34,9 @@ class QueryExtensions:
             ),
             joinedload(Issue.utility),
             joinedload(Issue.value_metric),
-            joinedload(Issue.node).options(
-                joinedload(Node.node_style) 
-            ),
+            joinedload(Issue.node).options(joinedload(Node.node_style)),
         ]
-    
+
     @staticmethod
     def load_node_with_relationships() -> list[_AbstractLoad]:
         return [
@@ -57,7 +50,7 @@ class QueryExtensions:
                 joinedload(Issue.utility),
                 joinedload(Issue.value_metric),
             ),
-            joinedload(Node.node_style)
+            joinedload(Node.node_style),
         ]
 
     @staticmethod
@@ -72,7 +65,7 @@ class QueryExtensions:
                 *QueryExtensions.load_issue_with_relationships()
             ),
         ]
-    
+
     @staticmethod
     def load_edge_with_relationships() -> list[_AbstractLoad]:
         return [
@@ -83,7 +76,7 @@ class QueryExtensions:
                 *QueryExtensions.load_node_with_relationships()
             ),
         ]
-    
+
     @staticmethod
     def load_project_with_relationships() -> list[_AbstractLoad]:
         return [
@@ -92,7 +85,7 @@ class QueryExtensions:
             ),
             selectinload(Project.project_role).options(
                 *QueryExtensions.load_role_with_user()
-            )
+            ),
         ]
 
     @staticmethod
@@ -101,13 +94,13 @@ class QueryExtensions:
         To be used as input for generic repositories when there are no relationships to be loaded.
         """
         return []
-    
+
     @staticmethod
     def load_role_with_user() -> list[_AbstractLoad]:
         """
         To be used as input for generic repositories to load user relationships.
         """
-        
+
         return [
             joinedload(ProjectRole.user),
         ]
@@ -121,4 +114,3 @@ class QueryExtensions:
         return [
             selectinload(User.project_role),
         ]
-      

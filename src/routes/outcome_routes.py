@@ -11,6 +11,7 @@ from src.dependencies import get_db
 
 router = APIRouter(tags=["outcomes"])
 
+
 @router.post("/outcomes")
 async def create_outcomes(
     dtos: list[OutcomeIncomingDto],
@@ -22,6 +23,7 @@ async def create_outcomes(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/outcomes/{id}")
 async def get_outcome(
     id: uuid.UUID,
@@ -32,23 +34,29 @@ async def get_outcome(
         outcomes: list[OutcomeOutgoingDto] = await outcome_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
     if len(outcomes) > 0:
         return outcomes[0]
     else:
         raise HTTPException(status_code=404)
-    
+
+
 @router.get("/outcomes")
 async def get_all_outcome(
     outcome_service: OutcomeService = Depends(get_outcome_service),
-    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    filter: Optional[str] = Query(
+        None, description=SwaggerDocumentationConstants.FILTER_DOC
+    ),
     session: AsyncSession = Depends(get_db),
 ) -> list[OutcomeOutgoingDto]:
     try:
-        outcomes: list[OutcomeOutgoingDto] = await outcome_service.get_all(session, odata_query=filter)
+        outcomes: list[OutcomeOutgoingDto] = await outcome_service.get_all(
+            session, odata_query=filter
+        )
         return outcomes
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.delete("/outcomes/{id}")
 async def delete_outcome(
@@ -60,7 +68,8 @@ async def delete_outcome(
         await outcome_service.delete(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
+
 @router.put("/outcomes")
 async def update_outcomes(
     dtos: list[OutcomeIncomingDto],

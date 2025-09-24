@@ -11,6 +11,7 @@ from src.dependencies import get_db
 
 router = APIRouter(tags=["options"])
 
+
 @router.post("/options")
 async def create_options(
     dtos: list[OptionIncomingDto],
@@ -22,6 +23,7 @@ async def create_options(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/options/{id}")
 async def get_option(
     id: uuid.UUID,
@@ -32,23 +34,29 @@ async def get_option(
         options: list[OptionOutgoingDto] = await option_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
     if len(options) > 0:
         return options[0]
     else:
         raise HTTPException(status_code=404)
-    
+
+
 @router.get("/options")
 async def get_all_option(
     option_service: OptionService = Depends(get_option_service),
-    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    filter: Optional[str] = Query(
+        None, description=SwaggerDocumentationConstants.FILTER_DOC
+    ),
     session: AsyncSession = Depends(get_db),
 ) -> list[OptionOutgoingDto]:
     try:
-        options: list[OptionOutgoingDto] = await option_service.get_all(session, odata_query=filter)
+        options: list[OptionOutgoingDto] = await option_service.get_all(
+            session, odata_query=filter
+        )
         return options
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.delete("/options/{id}")
 async def delete_option(
@@ -60,7 +68,8 @@ async def delete_option(
         await option_service.delete(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
+
 @router.put("/options")
 async def update_options(
     dtos: list[OptionIncomingDto],

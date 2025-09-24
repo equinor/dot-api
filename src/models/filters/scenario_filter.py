@@ -5,6 +5,7 @@ from src.models.filters.base_filter import BaseFilter
 from src.models import Scenario
 from sqlalchemy.sql import ColumnElement
 
+
 class ScenarioFilter(BaseFilter):
     scenario_ids: Optional[list[uuid.UUID]] = None
     project_ids: Optional[list[uuid.UUID]] = None
@@ -12,8 +13,12 @@ class ScenarioFilter(BaseFilter):
 
     def construct_filters(self) -> list[ColumnElement[bool]]:
         conditions: list[ColumnElement[bool]] = []
-        self.add_condition_for_property(self.scenario_ids, self._scenario_id_condition, conditions)
-        self.add_condition_for_property(self.project_ids, self._project_id_condition, conditions)
+        self.add_condition_for_property(
+            self.scenario_ids, self._scenario_id_condition, conditions
+        )
+        self.add_condition_for_property(
+            self.project_ids, self._project_id_condition, conditions
+        )
         self.add_condition_for_property(self.names, self._name_condition, conditions)
         return conditions
 

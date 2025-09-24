@@ -5,6 +5,7 @@ from src.models.filters.base_filter import BaseFilter
 from src.models import Issue, Scenario
 from sqlalchemy.sql import ColumnElement
 
+
 class IssueFilter(BaseFilter):
     issue_ids: Optional[list[uuid.UUID]] = None
     scenario_ids: Optional[list[uuid.UUID]] = None
@@ -20,13 +21,23 @@ class IssueFilter(BaseFilter):
         conditions: list[ColumnElement[bool]] = []
 
         # Add conditions for each attribute
-        self.add_condition_for_property(self.issue_ids, self._issue_id_condition, conditions)
-        self.add_condition_for_property(self.scenario_ids, self._scenario_id_condition, conditions)
-        self.add_condition_for_property(self.project_ids, self._project_id_condition, conditions)
+        self.add_condition_for_property(
+            self.issue_ids, self._issue_id_condition, conditions
+        )
+        self.add_condition_for_property(
+            self.scenario_ids, self._scenario_id_condition, conditions
+        )
+        self.add_condition_for_property(
+            self.project_ids, self._project_id_condition, conditions
+        )
         self.add_condition_for_property(self.types, self._type_condition, conditions)
         self.add_condition_for_property(self.names, self._name_condition, conditions)
-        self.add_condition_for_property(self.descriptions, self._description_condition, conditions)
-        self.add_condition_for_property(self.boundaries, self._boundary_condition, conditions)
+        self.add_condition_for_property(
+            self.descriptions, self._description_condition, conditions
+        )
+        self.add_condition_for_property(
+            self.boundaries, self._boundary_condition, conditions
+        )
         self.add_condition_for_property(self.orders, self._order_condition, conditions)
 
         return conditions

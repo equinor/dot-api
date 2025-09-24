@@ -11,6 +11,7 @@ from src.dependencies import get_db
 
 router = APIRouter(tags=["decisions"])
 
+
 @router.get("/decisions/{id}")
 async def get_decision(
     id: uuid.UUID,
@@ -21,23 +22,29 @@ async def get_decision(
         decisions: list[DecisionOutgoingDto] = await decision_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
     if len(decisions) > 0:
         return decisions[0]
     else:
         raise HTTPException(status_code=404)
-    
+
+
 @router.get("/decisions")
 async def get_all_decision(
     decision_service: DecisionService = Depends(get_decision_service),
-    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    filter: Optional[str] = Query(
+        None, description=SwaggerDocumentationConstants.FILTER_DOC
+    ),
     session: AsyncSession = Depends(get_db),
 ) -> list[DecisionOutgoingDto]:
     try:
-        decisions: list[DecisionOutgoingDto] = await decision_service.get_all(session, odata_query=filter)
+        decisions: list[DecisionOutgoingDto] = await decision_service.get_all(
+            session, odata_query=filter
+        )
         return decisions
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.delete("/decisions/{id}")
 async def delete_decision(
@@ -49,7 +56,8 @@ async def delete_decision(
         await decision_service.delete(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
+
 @router.put("/decisions")
 async def update_decisions(
     dtos: list[DecisionIncomingDto],

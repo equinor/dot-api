@@ -12,26 +12,31 @@ from src.dependencies import get_db
 
 router = APIRouter(tags=["user"])
 
+
 @router.get("/user/me")
-async def get_me(
-    token: str = Depends(verify_token)
-) -> UserIncomingDto:
+async def get_me(token: str = Depends(verify_token)) -> UserIncomingDto:
     try:
         return await call_ms_graph_api(token)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve user: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to retrieve user: {str(e)}"
+        )
+
 
 @router.get("/users")
 async def get_users(
     user_service: UserService = Depends(get_user_service),
-    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    filter: Optional[str] = Query(
+        None, description=SwaggerDocumentationConstants.FILTER_DOC
+    ),
     session: AsyncSession = Depends(get_db),
 ) -> list[UserOutgoingDto]:
     try:
         return await user_service.get_all(session, odata_query=filter)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+
 @router.get("/users/{id}")
 async def get_user(
     id: int,
@@ -42,11 +47,12 @@ async def get_user(
         result = await user_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
     if len(result) > 0:
         return result[0]
     else:
         raise HTTPException(status_code=404)
+
 
 @router.get("/users/azure-id/{azure_id}")
 async def get_user_by_azure_id(

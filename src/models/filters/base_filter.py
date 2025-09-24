@@ -3,7 +3,8 @@ from pydantic import BaseModel
 from sqlalchemy.sql import and_, or_, ColumnElement
 from sqlalchemy.sql._typing import _ColumnExpressionArgument  # type: ignore
 
-T = TypeVar('T')
+T = TypeVar("T")
+
 
 class BaseFilter(BaseModel):
     @staticmethod
@@ -14,7 +15,8 @@ class BaseFilter(BaseModel):
 
     @staticmethod
     def add_condition(
-        conditions: List[_ColumnExpressionArgument[bool]], condition: Optional[_ColumnExpressionArgument[bool]]
+        conditions: List[_ColumnExpressionArgument[bool]],
+        condition: Optional[_ColumnExpressionArgument[bool]],
     ) -> None:
         if condition is not None:
             conditions.append(condition)
@@ -27,4 +29,3 @@ class BaseFilter(BaseModel):
     ) -> None:
         if attribute:
             conditions.append(or_(*[condition_func(value) for value in attribute]))
-

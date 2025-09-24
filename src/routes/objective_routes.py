@@ -13,6 +13,7 @@ from src.dependencies import get_db
 
 router = APIRouter(tags=["objectives"])
 
+
 @router.post("/objectives")
 async def create_objectives(
     dtos: list[ObjectiveIncomingDto],
@@ -25,6 +26,7 @@ async def create_objectives(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/objectives/{id}")
 async def get_objective(
     id: uuid.UUID,
@@ -32,26 +34,34 @@ async def get_objective(
     session: AsyncSession = Depends(get_db),
 ) -> ObjectiveOutgoingDto:
     try:
-        objectives: list[ObjectiveOutgoingDto] = await objective_service.get(session, [id])
+        objectives: list[ObjectiveOutgoingDto] = await objective_service.get(
+            session, [id]
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
     if len(objectives) > 0:
         return objectives[0]
     else:
         raise HTTPException(status_code=404)
-    
+
+
 @router.get("/objectives")
 async def get_all_objective(
     objective_service: ObjectiveService = Depends(get_objective_service),
-    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    filter: Optional[str] = Query(
+        None, description=SwaggerDocumentationConstants.FILTER_DOC
+    ),
     session: AsyncSession = Depends(get_db),
 ) -> list[ObjectiveOutgoingDto]:
     try:
-        objectives: list[ObjectiveOutgoingDto] = await objective_service.get_all(session, odata_query=filter)
+        objectives: list[ObjectiveOutgoingDto] = await objective_service.get_all(
+            session, odata_query=filter
+        )
         return objectives
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.delete("/objectives/{id}")
 async def delete_objective(
@@ -63,7 +73,8 @@ async def delete_objective(
         await objective_service.delete(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
+
 @router.put("/objectives")
 async def update_objectives(
     dtos: list[ObjectiveIncomingDto],

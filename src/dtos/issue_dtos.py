@@ -1,13 +1,8 @@
 import uuid
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, Annotated
-from src.constants import (
-    Type, 
-    Boundary
-)
-from src.models.issue import (
-    Issue
-)
+from src.constants import Type, Boundary
+from src.models.issue import Issue
 from src.dtos.decision_dtos import (
     DecisionMapper,
     DecisionIncomingDto,
@@ -18,11 +13,7 @@ from src.dtos.uncertainty_dtos import (
     UncertaintyIncomingDto,
     UncertaintyOutgoingDto,
 )
-from src.dtos.utility_dtos import (
-    UtilityMapper,
-    UtilityIncomingDto,
-    UtilityOutgoingDto
-)
+from src.dtos.utility_dtos import UtilityMapper, UtilityIncomingDto, UtilityOutgoingDto
 from src.dtos.value_metric_dtos import (
     ValueMetricMapper,
     ValueMetricOutgoingDto,
@@ -36,15 +27,21 @@ from src.dtos.node_dtos import (
 )
 from src.constants import DatabaseConstants, DepricatedIssueTypes, Type
 
+
 class IssueDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     scenario_id: uuid.UUID
-    name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
-    description: Annotated[str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)] = ""
+    name: Annotated[
+        str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)
+    ] = ""
+    description: Annotated[
+        str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)
+    ] = ""
     order: int
 
+
 class IssueIncomingDto(IssueDto):
-    model_config=ConfigDict(use_enum_values=True)
+    model_config = ConfigDict(use_enum_values=True)
 
     type: Type = Type.UNASSIGNED
     boundary: Boundary = Boundary.OUT
@@ -53,6 +50,7 @@ class IssueIncomingDto(IssueDto):
     uncertainty: Optional[UncertaintyIncomingDto]
     utility: Optional[UtilityIncomingDto]
     value_metric: Optional[ValueMetricIncomingDto]
+
 
 class IssueOutgoingDto(IssueDto):
     type: str
@@ -63,6 +61,7 @@ class IssueOutgoingDto(IssueDto):
     utility: Optional[UtilityOutgoingDto]
     value_metric: Optional[ValueMetricOutgoingDto]
 
+
 class IssueViaNodeOutgoingDto(IssueDto):
     type: str
     boundary: str
@@ -71,12 +70,13 @@ class IssueViaNodeOutgoingDto(IssueDto):
     utility: Optional[UtilityOutgoingDto]
     value_metric: Optional[ValueMetricOutgoingDto]
 
+
 class IssueMapper:
     @staticmethod
     def to_outgoing_dto(entity: Issue) -> IssueOutgoingDto:
         if entity.type in DepricatedIssueTypes._value2member_map_:
-            entity.type=Type.UNASSIGNED.value
-        
+            entity.type = Type.UNASSIGNED.value
+
         return IssueOutgoingDto(
             id=entity.id,
             scenario_id=entity.scenario_id,
@@ -86,16 +86,24 @@ class IssueMapper:
             description=entity.description,
             order=entity.order,
             node=NodeMapper.to_outgoing_dto_via_issue(entity.node),
-            decision=DecisionMapper.to_outgoing_dto(entity.decision) if entity.decision else None,
-            uncertainty=UncertaintyMapper.to_outgoing_dto(entity.uncertainty) if entity.uncertainty else None,
-            utility=UtilityMapper.to_outgoing_dto(entity.utility) if entity.utility else None,
-            value_metric=ValueMetricMapper.to_outgoing_dto(entity.value_metric) if entity.value_metric else None,
+            decision=DecisionMapper.to_outgoing_dto(entity.decision)
+            if entity.decision
+            else None,
+            uncertainty=UncertaintyMapper.to_outgoing_dto(entity.uncertainty)
+            if entity.uncertainty
+            else None,
+            utility=UtilityMapper.to_outgoing_dto(entity.utility)
+            if entity.utility
+            else None,
+            value_metric=ValueMetricMapper.to_outgoing_dto(entity.value_metric)
+            if entity.value_metric
+            else None,
         )
 
     @staticmethod
     def to_outgoing_dto_via_node(entity: Issue) -> IssueViaNodeOutgoingDto:
         if entity.type in DepricatedIssueTypes._value2member_map_:
-            entity.type=Type.UNASSIGNED.value
+            entity.type = Type.UNASSIGNED.value
 
         return IssueViaNodeOutgoingDto(
             id=entity.id,
@@ -105,10 +113,18 @@ class IssueMapper:
             name=entity.name,
             description=entity.description,
             order=entity.order,
-            decision=DecisionMapper.to_outgoing_dto(entity.decision) if entity.decision else None,
-            uncertainty=UncertaintyMapper.to_outgoing_dto(entity.uncertainty) if entity.uncertainty else None,
-            utility=UtilityMapper.to_outgoing_dto(entity.utility) if entity.utility else None,
-            value_metric=ValueMetricMapper.to_outgoing_dto(entity.value_metric) if entity.value_metric else None,
+            decision=DecisionMapper.to_outgoing_dto(entity.decision)
+            if entity.decision
+            else None,
+            uncertainty=UncertaintyMapper.to_outgoing_dto(entity.uncertainty)
+            if entity.uncertainty
+            else None,
+            utility=UtilityMapper.to_outgoing_dto(entity.utility)
+            if entity.utility
+            else None,
+            value_metric=ValueMetricMapper.to_outgoing_dto(entity.value_metric)
+            if entity.value_metric
+            else None,
         )
 
     @staticmethod
@@ -125,17 +141,22 @@ class IssueMapper:
             user_id=user_id,
             node=NodeMapper.to_entity(dto.node) if dto.node else None,
             decision=DecisionMapper.to_entity(dto.decision) if dto.decision else None,
-            uncertainty=UncertaintyMapper.to_entity(dto.uncertainty) if dto.uncertainty else None,
+            uncertainty=UncertaintyMapper.to_entity(dto.uncertainty)
+            if dto.uncertainty
+            else None,
             utility=UtilityMapper.to_entity(dto.utility) if dto.utility else None,
-            value_metric=ValueMetricMapper.to_entity(dto.value_metric) if dto.value_metric else None,
+            value_metric=ValueMetricMapper.to_entity(dto.value_metric)
+            if dto.value_metric
+            else None,
         )
-    
+
     @staticmethod
     def to_outgoing_dtos(entities: list[Issue]) -> list[IssueOutgoingDto]:
         return [IssueMapper.to_outgoing_dto(entity) for entity in entities]
-    
+
     @staticmethod
     def to_entities(dtos: list[IssueIncomingDto], user_id: int) -> list[Issue]:
         return [IssueMapper.to_entity(dto, user_id) for dto in dtos]
+
 
 NodeOutgoingDto.model_rebuild()

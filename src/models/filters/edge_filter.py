@@ -6,6 +6,7 @@ from src.models.issue import Issue
 from src.models.filters.base_filter import BaseFilter
 from sqlalchemy.sql import ColumnElement
 
+
 class EdgeFilter(BaseFilter):
     ids: Optional[list[uuid.UUID]] = None
     issue_boundaries: Optional[list[str]] = None
@@ -17,13 +18,23 @@ class EdgeFilter(BaseFilter):
 
         self.add_condition_for_property(self.ids, self._id_condition, conditions)
 
-        self.add_condition_for_property(self.issue_boundaries, self._tail_node_boundary_condition, conditions)
-        self.add_condition_for_property(self.issue_types, self._tail_node_issue_type_condition, conditions)
+        self.add_condition_for_property(
+            self.issue_boundaries, self._tail_node_boundary_condition, conditions
+        )
+        self.add_condition_for_property(
+            self.issue_types, self._tail_node_issue_type_condition, conditions
+        )
 
-        self.add_condition_for_property(self.issue_boundaries, self._head_node_boundary_condition, conditions)
-        self.add_condition_for_property(self.issue_types, self._head_node_issue_type_condition, conditions)
+        self.add_condition_for_property(
+            self.issue_boundaries, self._head_node_boundary_condition, conditions
+        )
+        self.add_condition_for_property(
+            self.issue_types, self._head_node_issue_type_condition, conditions
+        )
 
-        self.add_condition_for_property(self.scenario_ids, self._scenario_id_condition, conditions)
+        self.add_condition_for_property(
+            self.scenario_ids, self._scenario_id_condition, conditions
+        )
 
         return conditions
 
@@ -38,16 +49,16 @@ class EdgeFilter(BaseFilter):
 
     @staticmethod
     def _tail_node_boundary_condition(issue_boundary: str) -> ColumnElement[bool]:
-        return Edge.tail_node.has(Node.issue.has(Issue.boundary==issue_boundary))
+        return Edge.tail_node.has(Node.issue.has(Issue.boundary == issue_boundary))
 
     @staticmethod
     def _tail_node_issue_type_condition(issue_type: str) -> ColumnElement[bool]:
-        return Edge.tail_node.has(Node.issue.has(Issue.type==issue_type))
+        return Edge.tail_node.has(Node.issue.has(Issue.type == issue_type))
 
     @staticmethod
     def _head_node_boundary_condition(issue_boundary: str) -> ColumnElement[bool]:
-        return Edge.head_node.has(Node.issue.has(Issue.boundary==issue_boundary))
+        return Edge.head_node.has(Node.issue.has(Issue.boundary == issue_boundary))
 
     @staticmethod
     def _head_node_issue_type_condition(issue_type: str) -> ColumnElement[bool]:
-        return Edge.head_node.has(Node.issue.has(Issue.type==issue_type))
+        return Edge.head_node.has(Node.issue.has(Issue.type == issue_type))

@@ -27,12 +27,10 @@ class DatabaseAuthenticator:
         token_struct = struct.pack(
             f"<I{len(token_bytes)}s", len(token_bytes), token_bytes
         )
-        SQL_COPT_SS_ACCESS_TOKEN = (
-            1256
-        )
+        SQL_COPT_SS_ACCESS_TOKEN = 1256
         token_dict = {SQL_COPT_SS_ACCESS_TOKEN: token_struct}
         return token_dict
-    
+
     async def close(self):
         """
         Closes the credential session.

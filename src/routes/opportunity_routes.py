@@ -13,6 +13,7 @@ from src.dependencies import get_db
 
 router = APIRouter(tags=["opportunities"])
 
+
 @router.post("/opportunities")
 async def create_opportunities(
     dtos: list[OpportunityIncomingDto],
@@ -25,6 +26,7 @@ async def create_opportunities(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/opportunities/{id}")
 async def get_opportunity(
     id: uuid.UUID,
@@ -32,26 +34,34 @@ async def get_opportunity(
     session: AsyncSession = Depends(get_db),
 ) -> OpportunityOutgoingDto:
     try:
-        opportunities: list[OpportunityOutgoingDto] = await opportunity_service.get(session, [id])
+        opportunities: list[OpportunityOutgoingDto] = await opportunity_service.get(
+            session, [id]
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
     if len(opportunities) > 0:
         return opportunities[0]
     else:
         raise HTTPException(status_code=404)
-    
+
+
 @router.get("/opportunities")
 async def get_all_opportunity(
     opportunity_service: OpportunityService = Depends(get_opportunity_service),
-    filter: Optional[str] = Query(None, description=SwaggerDocumentationConstants.FILTER_DOC),
+    filter: Optional[str] = Query(
+        None, description=SwaggerDocumentationConstants.FILTER_DOC
+    ),
     session: AsyncSession = Depends(get_db),
 ) -> list[OpportunityOutgoingDto]:
     try:
-        opportunities: list[OpportunityOutgoingDto] = await opportunity_service.get_all(session, odata_query=filter)
+        opportunities: list[OpportunityOutgoingDto] = await opportunity_service.get_all(
+            session, odata_query=filter
+        )
         return opportunities
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.delete("/opportunities/{id}")
 async def delete_opportunity(
@@ -63,7 +73,8 @@ async def delete_opportunity(
         await opportunity_service.delete(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
+
 @router.put("/opportunities")
 async def update_opportunities(
     dtos: list[OpportunityIncomingDto],
