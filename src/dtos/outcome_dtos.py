@@ -1,25 +1,25 @@
-
 import uuid
 from typing import Annotated
 from pydantic import BaseModel, Field
-from src.models.outcome import (
-    Outcome
-)
+from src.models.outcome import Outcome
 from src.constants import DatabaseConstants
+
 
 class OutcomeDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
     uncertainty_id: uuid.UUID
-    probability: float = 0.
-    utility: float = 0.
-    
+    probability: float = 0.0
+    utility: float = 0.0
+
 
 class OutcomeIncomingDto(OutcomeDto):
     pass
 
+
 class OutcomeOutgoingDto(OutcomeDto):
     pass
+
 
 class OutcomeMapper:
     @staticmethod
@@ -29,7 +29,7 @@ class OutcomeMapper:
             name=entity.name,
             uncertainty_id=entity.uncertainty_id,
             probability=entity.probability,
-            utility=entity.utility
+            utility=entity.utility,
         )
 
     @staticmethod
@@ -41,11 +41,11 @@ class OutcomeMapper:
             probability=dto.probability,
             utility=dto.utility,
         )
-    
+
     @staticmethod
     def to_outgoing_dtos(entities: list[Outcome]) -> list[OutcomeOutgoingDto]:
         return [OutcomeMapper.to_outgoing_dto(entity) for entity in entities]
-    
+
     @staticmethod
     def to_entities(dtos: list[OutcomeIncomingDto]) -> list[Outcome]:
         return [OutcomeMapper.to_entity(dto) for dto in dtos]

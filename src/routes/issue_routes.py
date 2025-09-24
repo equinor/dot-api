@@ -14,6 +14,7 @@ from src.dependencies import get_db
 
 router = APIRouter(tags=["issues"])
 
+
 @router.post("/issues")
 async def create_issues(
     dtos: list[IssueIncomingDto],
@@ -22,14 +23,15 @@ async def create_issues(
     session: AsyncSession = Depends(get_db),
 ) -> list[IssueOutgoingDto]:
     """
-    Endpoint for creating Issues. 
+    Endpoint for creating Issues.
     If supplied with nodes/decisions/uncertainties they will be created after the issue with the appropriate Id.
-    If node is not supplied an empty node will be created
+    If node is not supplied an empty node will be created.
     """
     try:
         return list(await issue_service.create(session, dtos, current_user))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.get("/issues/{id}")
 async def get_issue(
@@ -41,12 +43,13 @@ async def get_issue(
         issues: list[IssueOutgoingDto] = await issue_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
     if len(issues) > 0:
         return issues[0]
     else:
         raise HTTPException(status_code=404)
-    
+
+
 @router.get("/issues")
 async def get_all_issue(
     issue_service: IssueService = Depends(get_issue_service),
@@ -58,7 +61,8 @@ async def get_all_issue(
         return issues
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+
 @router.get("/projects/{project_id}/issues")
 async def get_all_issues_from_project(
     project_id: uuid.UUID,
@@ -67,11 +71,14 @@ async def get_all_issues_from_project(
     session: AsyncSession = Depends(get_db),
 ) -> list[IssueOutgoingDto]:
     try:
-        issues: list[IssueOutgoingDto] = await issue_service.get_all(session, IssueFilter(project_ids=[project_id]), odata_query=filter)
+        issues: list[IssueOutgoingDto] = await issue_service.get_all(
+            session, IssueFilter(project_ids=[project_id]), odata_query=filter
+        )
         return issues
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+
 @router.get("/scenarios/{scenario_id}/issues")
 async def get_all_issues_from_scenario(
     scenario_id: uuid.UUID,
@@ -80,10 +87,13 @@ async def get_all_issues_from_scenario(
     session: AsyncSession = Depends(get_db),
 ) -> list[IssueOutgoingDto]:
     try:
-        issues: list[IssueOutgoingDto] = await issue_service.get_all(session, IssueFilter(scenario_ids=[scenario_id]), odata_query=filter)
+        issues: list[IssueOutgoingDto] = await issue_service.get_all(
+            session, IssueFilter(scenario_ids=[scenario_id]), odata_query=filter,
+        )
         return issues
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.delete("/issues/{id}")
 async def delete_issue(
@@ -95,7 +105,8 @@ async def delete_issue(
         await issue_service.delete(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
+
 @router.put("/issues")
 async def update_issues(
     dtos: list[IssueIncomingDto],

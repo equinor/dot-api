@@ -3,8 +3,8 @@ from typing import Optional
 from sqlalchemy import String, ForeignKey, INT
 from src.models.guid import GUID
 from sqlalchemy.orm import (
-    Mapped, 
-    relationship, 
+    Mapped,
+    relationship,
     mapped_column,
 )
 from src.models.base import Base
@@ -19,70 +19,66 @@ from src.models.utility import Utility
 from src.models.value_metric import ValueMetric
 from src.constants import DatabaseConstants
 
+
 class Issue(Base, BaseEntity, BaseAuditableEntity):
     __tablename__ = "issue"
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
     scenario_id: Mapped[uuid.UUID] = mapped_column(ForeignKey(Scenario.id), index=True)
 
-    type: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="Undecided")
-    boundary: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="out")
+    type: Mapped[str] = mapped_column(
+        String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="Undecided",
+    )
+    boundary: Mapped[str] = mapped_column(
+        String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="out"
+    )
 
-    name: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True)
-    description: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value), default="")
+    name: Mapped[str] = mapped_column(
+        String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True
+    )
+    description: Mapped[str] = mapped_column(
+        String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value), default=""
+    )
     order: Mapped[int] = mapped_column(INT, default=0)
 
-    scenario: Mapped[Scenario] = relationship(Scenario, foreign_keys=[scenario_id], back_populates="issues")
+    scenario: Mapped[Scenario] = relationship(
+        Scenario, foreign_keys=[scenario_id], back_populates="issues"
+    )
 
     node: Mapped[Node] = relationship(
-        Node, 
-        back_populates="issue",
-        cascade="all, delete-orphan",
-        single_parent=True,
+        Node, back_populates="issue", cascade="all, delete-orphan", single_parent=True,
     )
 
     decision: Mapped[Optional[Decision]] = relationship(
-        Decision, 
-        back_populates="issue",
-        cascade="all, delete-orphan",
-        single_parent=True,
+        Decision, back_populates="issue", cascade="all, delete-orphan", single_parent=True,
     )
     uncertainty: Mapped[Optional[Uncertainty]] = relationship(
-        Uncertainty, 
-        back_populates="issue",
-        cascade="all, delete-orphan",
-        single_parent=True,
+        Uncertainty, back_populates="issue", cascade="all, delete-orphan", single_parent=True,
     )
 
     utility: Mapped[Optional[Utility]] = relationship(
-        Utility,
-        back_populates="issue",
-        cascade="all, delete-orphan",
-        single_parent=True,
+        Utility, back_populates="issue", cascade="all, delete-orphan", single_parent=True,
     )
 
     value_metric: Mapped[Optional[ValueMetric]] = relationship(
-        ValueMetric,
-        back_populates="issue",
-        cascade="all, delete-orphan",
-        single_parent=True,
+        ValueMetric, back_populates="issue", cascade="all, delete-orphan", single_parent=True,
     )
 
     def __init__(
-            self, 
-            id: uuid.UUID, 
-            scenario_id: uuid.UUID, 
-            type: str, 
-            name: str,
-            description: str,
-            boundary: str, 
-            order: int, 
-            user_id: int, 
-            node: Node, 
-            decision: Optional[Decision] = None, 
-            uncertainty: Optional[Uncertainty] = None, 
-            utility: Optional[Utility] = None, 
-            value_metric: Optional[ValueMetric] = None
+        self,
+        id: uuid.UUID,
+        scenario_id: uuid.UUID,
+        type: str,
+        name: str,
+        description: str,
+        boundary: str,
+        order: int,
+        user_id: int,
+        node: Node,
+        decision: Optional[Decision] = None,
+        uncertainty: Optional[Uncertainty] = None,
+        utility: Optional[Utility] = None,
+        value_metric: Optional[ValueMetric] = None,
     ):
         self.id = id
         self.scenario_id = scenario_id
@@ -98,6 +94,7 @@ class Issue(Base, BaseEntity, BaseAuditableEntity):
         self.utility = utility
         self.value_metric = value_metric
 
+
 @listens_for(Issue, "before_insert")
-def set_created_by_id(mapper, connection, target: Issue): # type: ignore
+def set_created_by_id(mapper, connection, target: Issue):  # type: ignore
     target.created_by_id = target.updated_by_id

@@ -3,14 +3,16 @@ from typing import TYPE_CHECKING
 from sqlalchemy import String, ForeignKey
 from src.models.guid import GUID
 from sqlalchemy.orm import (
-    Mapped, 
+    Mapped,
     relationship,
     mapped_column,
 )
 from src.models.base_entity import BaseEntity
 from src.models.base import Base
+
 if TYPE_CHECKING:
     from src.models.issue import Issue
+
 
 class ValueMetric(Base, BaseEntity):
     __tablename__ = "value_metric"
@@ -22,5 +24,5 @@ class ValueMetric(Base, BaseEntity):
 
     def __init__(self, id: uuid.UUID, name: str, issue_id: uuid.UUID):
         self.id = id
-        self.issue_id=issue_id
+        self.issue_id = issue_id
         self.name = name

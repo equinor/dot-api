@@ -14,6 +14,7 @@ from src.dependencies import get_db
 
 router = APIRouter(tags=["edges"])
 
+
 @router.post("/edges")
 async def create_edges(
     dtos: list[EdgeIncomingDto],
@@ -25,6 +26,7 @@ async def create_edges(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/edges/{id}")
 async def get_edge(
     id: uuid.UUID,
@@ -35,12 +37,13 @@ async def get_edge(
         edges: list[EdgeOutgoingDto] = await edge_service.get(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
     if len(edges) > 0:
         return edges[0]
     else:
         raise HTTPException(status_code=404)
-    
+
+
 @router.get("/edges")
 async def get_all_edge(
     edge_service: EdgeService = Depends(get_edge_service),
@@ -53,6 +56,7 @@ async def get_all_edge(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.delete("/edges/{id}")
 async def delete_edge(
     id: uuid.UUID,
@@ -63,7 +67,8 @@ async def delete_edge(
         await edge_service.delete(session, [id])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
+
 @router.put("/edges")
 async def update_edges(
     dtos: list[EdgeIncomingDto],

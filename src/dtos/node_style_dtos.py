@@ -3,17 +3,21 @@ from pydantic import BaseModel, Field
 
 from src.models import NodeStyle
 
+
 class NodeStyleDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     node_id: uuid.UUID
     x_position: int = 0
     y_position: int = 0
 
+
 class NodeStyleIncomingDto(NodeStyleDto):
     pass
 
+
 class NodeStyleOutgoingDto(NodeStyleDto):
     pass
+
 
 class NodeStyleMapper:
     @staticmethod
@@ -24,7 +28,7 @@ class NodeStyleMapper:
             x_position=entity.x_position,
             y_position=entity.y_position,
         )
-    
+
     @staticmethod
     def to_entity(dto: NodeStyleIncomingDto) -> NodeStyle:
         return NodeStyle(
@@ -33,11 +37,11 @@ class NodeStyleMapper:
             x_position=dto.x_position,
             y_position=dto.y_position,
         )
-    
+
     @staticmethod
-    def to_outgoing_dtos(entities: list[NodeStyle]) -> list[NodeStyleOutgoingDto]:
+    def to_outgoing_dtos(entities: list[NodeStyle],) -> list[NodeStyleOutgoingDto]:
         return [NodeStyleMapper.to_outgoing_dto(entity) for entity in entities]
-    
+
     @staticmethod
     def to_entities(dtos: list[NodeStyleIncomingDto]) -> list[NodeStyle]:
         return [NodeStyleMapper.to_entity(dto) for dto in dtos]

@@ -24,17 +24,14 @@ from src.database import get_connection_string_and_token, build_connection_url
 
 
 async def get_sync_engine(environment: str = config.APP_ENV) -> Engine:
-    sync_engine: Engine|None=None
+    sync_engine: Engine | None = None
     db_connection_string, token_dict = await get_connection_string_and_token(environment)
     conn_str = build_connection_url(db_connection_string, driver="pyodbc")
     if token_dict:
-        sync_engine = create_engine(
-            conn_str,
-            echo=False,
-            connect_args={"attrs_before": token_dict}
-        )
+        sync_engine = create_engine(conn_str, echo=False, connect_args={"attrs_before": token_dict})
     assert sync_engine is not None
     return sync_engine
+
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async for session in sessionmanager.get_session():
@@ -44,8 +41,10 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             await session.rollback()
             raise e
 
+
 async def get_project_service() -> ProjectService:
     return ProjectService()
+
 
 async def get_project_role_service() -> ProjectRoleService:
     return ProjectRoleService()
@@ -54,44 +53,58 @@ async def get_project_role_service() -> ProjectRoleService:
 async def get_decision_service() -> DecisionService:
     return DecisionService()
 
+
 async def get_outcome_service() -> OutcomeService:
     return OutcomeService()
+
 
 async def get_option_service() -> OptionService:
     return OptionService()
 
+
 async def get_objective_service() -> ObjectiveService:
     return ObjectiveService()
+
 
 async def get_opportunity_service() -> OpportunityService:
     return OpportunityService()
 
+
 async def get_uncertainty_service() -> UncertaintyService:
     return UncertaintyService()
+
 
 async def get_utility_service() -> UtilityService:
     return UtilityService()
 
+
 async def get_value_metric_service() -> ValueMetricService:
     return ValueMetricService()
+
 
 async def get_scenario_service() -> ScenarioService:
     return ScenarioService()
 
+
 async def get_edge_service() -> EdgeService:
     return EdgeService()
+
 
 async def get_node_service() -> NodeService:
     return NodeService()
 
+
 async def get_node_style_service() -> NodeStyleService:
     return NodeStyleService()
+
 
 async def get_issue_service() -> IssueService:
     return IssueService()
 
+
 async def get_user_service() -> UserService:
     return UserService()
+
 
 async def get_solver_service() -> SolverService:
     return SolverService(await get_scenario_service())

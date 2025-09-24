@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
 from contextlib import asynccontextmanager
 
+
 @asynccontextmanager
 async def session_handler(engine: AsyncEngine):
     async with AsyncSession(engine, autoflush=False, autocommit=False) as session:
