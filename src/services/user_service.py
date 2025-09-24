@@ -1,9 +1,9 @@
-from typing import  Optional
+from typing import Optional
 from src.models.filters.user_filter import UserFilter
 from src.auth.auth import verify_token
 from fastapi import Depends
 
-from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncSession
 from src.dtos.user_dtos import (
     UserMapper,
     UserIncomingDto,
@@ -11,7 +11,6 @@ from src.dtos.user_dtos import (
 )
 from src.repositories.user_repository import UserRepository
 from src.models.user import User
-from src.services.session_handler import session_handler
 from src.auth.graph_api import call_ms_graph_api
 
 async def get_current_user(
@@ -20,28 +19,21 @@ async def get_current_user(
     return await call_ms_graph_api(token)
 
 class UserService:
-    def __init__(self, engine: AsyncEngine):
-        self.engine=engine
-
-    async def get(self, ids: list[int]) -> list[UserOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            users: list[User] = await UserRepository(session).get(ids)
-            result=UserMapper.to_outgoing_dtos(users)
+    async def get(self, session: AsyncSession, ids: list[int]) -> list[UserOutgoingDto]:
+        users: list[User] = await UserRepository(session).get(ids)
+        result = UserMapper.to_outgoing_dtos(users)
         return result
 
-    async def get_all(self, filter: Optional[UserFilter] = None,odata_query: Optional[str]=None) -> list[UserOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            model_filter=filter.construct_filters() if filter else []
-            users: list[User] = await UserRepository(session).get_all(model_filter=model_filter,odata_query=odata_query)
-            result=UserMapper.to_outgoing_dtos(users)
+    async def get_all(self, session: AsyncSession, filter: Optional[UserFilter] = None, odata_query: Optional[str] = None) -> list[UserOutgoingDto]:
+        model_filter = filter.construct_filters() if filter else []
+        users: list[User] = await UserRepository(session).get_all(model_filter=model_filter, odata_query=odata_query)
+        result = UserMapper.to_outgoing_dtos(users)
         return result
     
-    async def get_by_azure_id(self, azure_id: str) -> Optional[UserOutgoingDto]:
-        async with session_handler(self.engine) as session:
-            user: Optional[User] = await UserRepository(session).get_by_azure_id(azure_id)
-            if user is None:
-                return user
-            else:
-                result=UserMapper.to_outgoing_dto(user)
+    async def get_by_azure_id(self, session: AsyncSession, azure_id: str) -> Optional[UserOutgoingDto]:
+        user: Optional[User] = await UserRepository(session).get_by_azure_id(azure_id)
+        if user is None:
+            return user
+        else:
+            result = UserMapper.to_outgoing_dto(user)
         return result
-    

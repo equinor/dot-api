@@ -17,21 +17,21 @@ from src.seed_database import GenerateUuid
 @pytest.mark.asyncio
 async def test_get_scenarios(client: AsyncClient):
     response = await client.get("/scenarios")
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
 
     parse_response_to_dtos_test(response, ScenarioOutgoingDto)
 
 @pytest.mark.asyncio
 async def test_get_scenario(client: AsyncClient):
     response = await client.get(f"/scenarios/{GenerateUuid.as_string(10)}")
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
     
     parse_response_to_dto_test(response, ScenarioOutgoingDto)
 
 @pytest.mark.asyncio
 async def test_get_scenario_populated(client: AsyncClient):
     response = await client.get(f"/scenarios-populated/{GenerateUuid.as_string(10)}")
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
     
     parse_response_to_dto_test(response, PopulatedScenarioDto)
 
@@ -44,7 +44,7 @@ async def test_create_scenario(client: AsyncClient):
     payload = [ScenarioCreateDto(project_id=GenerateUuid.as_uuid(1), name=str(uuid4()), objectives=objectives, opportunities=[]).model_dump(mode="json")]
 
     response = await client.post("/scenarios", json=payload)
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
     response_content = parse_response_to_dtos_test(response, ScenarioOutgoingDto)
     assert response_content[0].objectives.__len__() == 2
 
@@ -66,7 +66,7 @@ async def test_update_scenario(client: AsyncClient):
     payload = [ScenarioIncomingDto(id=GenerateUuid.as_uuid(3), name=new_name, project_id=new_project_id, objectives=objectives, opportunities=[]).model_dump(mode="json")]
 
     response = await client.put("/scenarios", json=payload)
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
     response_content = parse_response_to_dtos_test(response, ScenarioOutgoingDto)
     assert response_content[0].name == new_name and response_content[0].project_id == new_project_id and response_content[0].objectives[0].name == objectives[0].name
 
@@ -81,4 +81,4 @@ async def test_update_scenario_is_default_fails(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_delete_scenario(client: AsyncClient):
     response = await client.delete(f"/scenarios/{GenerateUuid.as_string(2)}")
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"

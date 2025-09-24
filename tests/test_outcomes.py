@@ -29,14 +29,14 @@ async def test_post_outcomes(client: AsyncClient):
 async def test_get_outcomes(client: AsyncClient):
     response = await client.get("/outcomes")
     print(response)
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
 
     parse_response_to_dtos_test(response, OutcomeOutgoingDto)
 
 @pytest.mark.asyncio
 async def test_get_outcome(client: AsyncClient):
     response = await client.get(f"/outcomes/{GenerateUuid.as_string(20)}")
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
 
     parse_response_to_dto_test(response, OutcomeOutgoingDto)
 
@@ -54,7 +54,7 @@ async def test_update_outcome(client: AsyncClient):
     ).model_dump(mode="json")]
 
     response = await client.put("/outcomes", json=payload)
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
 
     response_content = parse_response_to_dtos_test(response, OutcomeOutgoingDto)
     assert response_content[0].probability == new_probability
@@ -62,4 +62,4 @@ async def test_update_outcome(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_delete_outcome(client: AsyncClient):
     response = await client.delete(f"/outcomes/{GenerateUuid.as_string(2)}")
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Response content: {response.content}"
