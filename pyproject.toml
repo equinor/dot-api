@@ -50,6 +50,7 @@ exclude = '''
       | buck-out
       | build
       | dist
+      | src/alembic/versions/
     )/
 '''
 [build-system]
