@@ -81,7 +81,7 @@ class ProjectMapper:
         return PopulatedProjectDto(
             id=entity.id,
             name=entity.name,
-            description=entity.name,
+            description=entity.description,
             public=entity.public,
             end_date=entity.end_date,
             users=ProjectRoleMapper.to_outgoing_dtos(entity.project_role),
