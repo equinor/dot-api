@@ -24,7 +24,8 @@ class ProjectRepository(BaseRepository[Project, uuid.UUID]):
             entity_to_update.project_role = [
                 await self.session.merge(role) for role in entity.project_role
             ]
-            entity_to_update.description = entity.description
+            entity_to_update.public = entity.public
+            entity_to_update.end_date = entity.end_date
 
         await self.session.flush()
         return entities_to_update
