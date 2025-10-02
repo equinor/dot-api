@@ -27,7 +27,7 @@ class ProjectDto(BaseModel):
         str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)
     ] = ""
     public: bool = False
-    end_date: datetime = default_endtime()
+    end_date: datetime = Field(default_factory=default_endtime)
 
 
 class ProjectCreateDto(ProjectDto):
