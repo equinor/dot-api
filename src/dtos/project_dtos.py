@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Annotated
 from src.dtos.project_roles_dtos import (
@@ -6,7 +7,7 @@ from src.dtos.project_roles_dtos import (
     ProjectRoleIncomingDto,
     ProjectRoleMapper,
 )
-from src.models.project import Project
+from src.models.project import Project, default_endtime
 from src.dtos.scenario_dtos import (
     ScenarioMapper,
     ScenarioCreateViaProjectDto,
@@ -25,6 +26,8 @@ class ProjectDto(BaseModel):
     description: Annotated[
         str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)
     ] = ""
+    public: bool = False
+    end_date: datetime = default_endtime()
 
 
 class ProjectCreateDto(ProjectDto):
@@ -55,6 +58,8 @@ class ProjectMapper:
             name=dto.name,
             description=dto.description,
             user_id=user_id,
+            public=dto.public,
+            end_date=dto.end_date,
             project_role=[],
             scenarios=[],  # must create the project first
         )
@@ -65,6 +70,8 @@ class ProjectMapper:
             id=entity.id,
             name=entity.name,
             description=entity.description,
+            public=entity.public,
+            end_date=entity.end_date,
             users=ProjectRoleMapper.to_outgoing_dtos(entity.project_role),
             scenarios=ScenarioMapper.to_outgoing_dtos(entity.scenarios),
         )
@@ -75,6 +82,8 @@ class ProjectMapper:
             id=entity.id,
             name=entity.name,
             description=entity.name,
+            public=entity.public,
+            end_date=entity.end_date,
             users=ProjectRoleMapper.to_outgoing_dtos(entity.project_role),
             scenarios=ScenarioMapper.to_populated_dtos(entity.scenarios),
         )
@@ -86,6 +95,8 @@ class ProjectMapper:
             name=dto.name,
             description=dto.description,
             user_id=user_id,
+            public=dto.public,
+            end_date=dto.end_date,
             project_role=ProjectRoleMapper.to_project_role_entities(dto.users),
             scenarios=ScenarioMapper.to_entities(dto.scenarios, user_id),
         )

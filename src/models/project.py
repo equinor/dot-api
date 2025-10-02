@@ -1,5 +1,6 @@
 import uuid
-from sqlalchemy import String
+from datetime import datetime, timezone
+from sqlalchemy import String, Boolean
 from src.models.guid import GUID
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 from sqlalchemy.event import listens_for
@@ -12,7 +13,11 @@ from src.constants import DatabaseConstants
 if TYPE_CHECKING:
     from models.scenario import Scenario
     from models.project_role import ProjectRole
+from sqlalchemy import DateTime
+from datetime import timedelta
 
+def default_endtime() -> datetime:
+    return datetime.now(timezone.utc) + timedelta(days=30)
 
 class Project(Base, BaseEntity, BaseAuditableEntity):
     __tablename__ = "project"
@@ -22,6 +27,8 @@ class Project(Base, BaseEntity, BaseAuditableEntity):
         String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True
     )
     description: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value))
+
+    public: Mapped[bool] = mapped_column(Boolean, default=False)
 
     scenarios: Mapped[list["Scenario"]] = relationship(
         "Scenario",
@@ -34,6 +41,11 @@ class Project(Base, BaseEntity, BaseAuditableEntity):
         cascade="all, delete-orphan",
     )
 
+    end_date: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=default_endtime()
+    )
+
     def __init__(
         self,
         id: uuid.UUID,
@@ -42,6 +54,8 @@ class Project(Base, BaseEntity, BaseAuditableEntity):
         project_role: list["ProjectRole"],
         user_id: int,
         scenarios: Optional[list["Scenario"]],
+        public: bool = False,
+        end_date: datetime = default_endtime(),
     ):
         self.id = id
 
@@ -52,6 +66,8 @@ class Project(Base, BaseEntity, BaseAuditableEntity):
         self.name = name
         self.description = description
         self.updated_by_id = user_id
+        self.public=public
+        self.end_date=end_date
 
     def __repr__(self):
         return f"id: {self.id}, name: {self.name}"
