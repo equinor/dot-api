@@ -1,4 +1,4 @@
-"""remove opport name
+"""remove opportunity name
 
 Revision ID: 234ed875bf40
 Revises: 589643041c80
