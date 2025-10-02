@@ -19,9 +19,13 @@ from src.services.outcome_service import OutcomeService
 from src.services.option_service import OptionService
 from src.services.user_service import UserService
 from src.services.solver_service import SolverService
+from src.services.structure_service import StructureService
 from src.database import DatabaseConnectionStrings
 from src.models.base import Base
-from src.seed_database import seed_database, create_single_project_with_scenario
+from src.seed_database import (seed_database, create_single_project_with_scenario,
+                               create_decision_tree_project_with_scenario,
+                               create_decision_tree_symmetry_DT_from_ID,
+                               create_decision_tree_symmetry_DT)
 from src.config import Config
 from src.database import database_start_task
 import urllib
@@ -53,6 +57,9 @@ async def get_async_engine() -> AsyncEngine:
                 await conn.run_sync(Base.metadata.create_all)
                 await seed_database(conn, num_projects=10, num_scenarios=10, num_nodes=50)
                 await create_single_project_with_scenario(conn)
+                await create_decision_tree_project_with_scenario(conn)
+                await create_decision_tree_symmetry_DT_from_ID(conn)
+                await create_decision_tree_symmetry_DT(conn)
         else:
             db_connection_string, token_dict = await get_connection_string_and_token(config.APP_ENV)
             conn_str = build_connection_url(db_connection_string, driver="aioodbc")
@@ -129,3 +136,6 @@ async def get_user_service() -> UserService:
 
 async def get_solver_service() -> SolverService:
     return SolverService(await get_scenario_service())
+
+async def get_structure_service() -> StructureService:
+    return StructureService(await get_scenario_service())

@@ -99,12 +99,12 @@ class ScenarioService:
         issue_filter = IssueFilter(
             scenario_ids=[scenario_id],
             boundaries=[Boundary.ON.value, Boundary.IN.value],
-            types=[Type.DECISION.value, Type.UNCERTAINTY.value]
+            types=[Type.DECISION.value, Type.UNCERTAINTY.value, Type.UTILITY.value]
         )
         edge_filter = EdgeFilter(
             scenario_ids=[scenario_id],
             issue_boundaries=[Boundary.ON.value, Boundary.IN.value],
-            issue_types=[Type.DECISION.value, Type.UNCERTAINTY.value]
+            issue_types=[Type.DECISION.value, Type.UNCERTAINTY.value, Type.UTILITY.value]
         )
 
         async with session_handler(self.engine) as session:

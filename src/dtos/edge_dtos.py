@@ -8,11 +8,6 @@ from src.dtos.node_dtos import (
     NodeOutgoingDto
 )
 
-from src.dtos.node_dtos import (
-    NodeMapper,
-    NodeOutgoingDto
-)
-
 class EdgeDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     tail_id: uuid.UUID
@@ -25,6 +20,8 @@ class EdgeIncomingDto(EdgeDto):
 class EdgeOutgoingDto(EdgeDto):
     head_node: NodeOutgoingDto
     tail_node: NodeOutgoingDto
+    head_issue_id: uuid.UUID
+    tail_issue_id: uuid.UUID
 
 class EdgeMapper:
     @staticmethod
@@ -34,6 +31,8 @@ class EdgeMapper:
             tail_id=entity.tail_id,
             head_id=entity.head_id,
             scenario_id=entity.scenario_id,
+            head_issue_id=entity.head_node.issue_id,
+            tail_issue_id=entity.tail_node.issue_id,
             head_node=NodeMapper.to_outgoing_dto(entity.head_node),
             tail_node=NodeMapper.to_outgoing_dto(entity.tail_node),
         )

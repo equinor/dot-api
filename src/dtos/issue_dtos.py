@@ -43,6 +43,12 @@ class IssueDto(BaseModel):
     description: Annotated[str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)] = ""
     order: int
 
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, other):
+        return isinstance(other, IssueOutgoingDto) and self.id == other.id
+
 class IssueIncomingDto(IssueDto):
     model_config=ConfigDict(use_enum_values=True)
 
@@ -62,6 +68,24 @@ class IssueOutgoingDto(IssueDto):
     uncertainty: Optional[UncertaintyOutgoingDto]
     utility: Optional[UtilityOutgoingDto]
     value_metric: Optional[ValueMetricOutgoingDto]
+
+    def get_dict(self):
+        dto = {
+            'name': self.name,
+            'type': self.type,
+            'id': str(self.id),
+            **(
+                {'options': [{'name': option.name, 'utility': option.utility} for option in self.decision.options]}
+                if self.type == Type.DECISION else
+                {'outcomes': [{'name': outcome.name,'probability': outcome.probability, 'utility': outcome.utility} for outcome in self.uncertainty.outcomes]}
+                if self.type == Type.UNCERTAINTY else
+                {'values': self.utility.values}
+                if self.type == Type.UTILITY else
+                {'value metric name': self.value_metric.name}
+                if self.type == Type.VALUE_METRIC else {}
+            )
+        }
+        return dto
 
 class IssueViaNodeOutgoingDto(IssueDto):
     type: str
