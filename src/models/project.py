@@ -66,8 +66,8 @@ class Project(Base, BaseEntity, BaseAuditableEntity):
         self.name = name
         self.description = description
         self.updated_by_id = user_id
-        self.public=public
-        self.end_date=end_date
+        self.public = public
+        self.end_date = end_date
 
     def __repr__(self):
         return f"id: {self.id}, name: {self.name}"
