@@ -19,7 +19,6 @@ class Outcome(Base, BaseEntity):
         String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default=""
     )
 
-    probability: Mapped[float] = mapped_column(Float(), default=0.0)
     utility: Mapped[float] = mapped_column(Float(), default=0.0)
 
     def __init__(
@@ -27,11 +26,9 @@ class Outcome(Base, BaseEntity):
         id: uuid.UUID,
         uncertainty_id: uuid.UUID,
         name: str,
-        probability: float,
         utility: float,
     ):
         self.id = id
         self.uncertainty_id = uncertainty_id
         self.name = name
-        self.probability = probability
         self.utility = utility

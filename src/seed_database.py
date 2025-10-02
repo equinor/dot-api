@@ -19,6 +19,9 @@ from src.models import (
     Edge,
     Option,
     Outcome,
+    OutcomeProbability,
+    OutcomeProbabilityParentOption,
+    OutcomeProbabilityParentOutcome,
 )
 from typing import Protocol, TypeVar, Any
 from src.constants import Type, Boundary
@@ -57,6 +60,20 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
     decision_issue_id_2 = GenerateUuid.as_uuid("test_decision_issue_2")
     decision_issue_id_3 = GenerateUuid.as_uuid("test_decision_issue_3")
     uncertainty_issue_id = GenerateUuid.as_uuid("test_uncertainty_issue_1")
+    outcome_id_1 = GenerateUuid.as_uuid("test_outcome_1")
+    outcome_id_2 = GenerateUuid.as_uuid("test_outcome_2")
+    option_id_1 = GenerateUuid.as_uuid("test_option_1")
+    option_id_2 = GenerateUuid.as_uuid("test_option_2")
+    option_id_3 = GenerateUuid.as_uuid("test_option_3")
+    option_id_4 = GenerateUuid.as_uuid("test_option_4")
+    option_id_5 = GenerateUuid.as_uuid("test_option_5")
+    option_id_6 = GenerateUuid.as_uuid("test_option_6")
+    option_id_7 = GenerateUuid.as_uuid("test_option_7")
+    option_id_8 = GenerateUuid.as_uuid("test_option_8")
+    option_id_9 = GenerateUuid.as_uuid("test_option_9")
+    option_id_10 = GenerateUuid.as_uuid("test_option_10")
+    option_id_11 = GenerateUuid.as_uuid("test_option_11")
+    
 
     edge_id = GenerateUuid.as_uuid("test_edge_1")
     edge_id_2 = GenerateUuid.as_uuid("test_edge_2")
@@ -185,67 +202,65 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
 
     entities.append(
         Option(
-            id=uuid.uuid4(),
+            id=option_id_1,
             decision_id=decision_issue_id,
             name="yes",
-            utility=10,
+            utility=0,
         )
     )
     entities.append(
         Option(
-            id=uuid.uuid4(),
+            id=option_id_2,
             decision_id=decision_issue_id,
             name="no",
-            utility=-5,
+            utility=0,
         )
     )
     entities.append(
         Option(
-            id=uuid.uuid4(),
+            id=option_id_3,
             decision_id=decision_issue_id_2,
             name="yes2",
-            utility=-100,
+            utility=0,
         )
     )
     entities.append(
         Option(
-            id=uuid.uuid4(),
+            id=option_id_4,
             decision_id=decision_issue_id_2,
             name="no2",
-            utility=1.1,
+            utility=0,
         )
     )
     entities.append(
         Option(
-            id=uuid.uuid4(),
+            id=option_id_5,
             decision_id=decision_issue_id_3,
             name="yes",
-            utility=-100,
+            utility=0,
         )
     )
     entities.append(
         Option(
-            id=uuid.uuid4(),
+            id=option_id_6,
             decision_id=decision_issue_id_3,
             name="no",
-            utility=1.1,
+            utility=0,
         )
     )
     entities.append(
         Outcome(
-            id=uuid.uuid4(),
+            id=outcome_id_1,
             uncertainty_id=uncertainty_issue_id,
             name="Outcome 1",
-            probability=0.7,
-            utility=15,
+            utility=-105,
         )
     )
     entities.append(
         Outcome(
-            id=uuid.uuid4(),
+            id=outcome_id_2,
             uncertainty_id=uncertainty_issue_id,
             name="Outcome 2",
-            probability=0.3,
             utility=5,
         )
     )
@@ -270,6 +285,48 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
         scenario_id=scenario_id,
     )
     entities.extend([edge_1, edge_2, edge_3])
+
+    outcome_probability_id_1 = uuid.uuid4()
+
+    outcome_probability_1=OutcomeProbability(
+        id=outcome_probability_id_1,
+        child_outcome_id=outcome_id_1,
+        uncertainty_id=uncertainty_issue_id,
+        probability=0.8,
+        parent_options=[OutcomeProbabilityParentOption(outcome_probability_id=outcome_probability_id_1, parent_option_id=option_id_1)] 
+    )
+
+    outcome_probability_id_2 = uuid.uuid4()
+
+    outcome_probability_2=OutcomeProbability(
+        id=outcome_probability_id_2,
+        child_outcome_id=outcome_id_1,
+        uncertainty_id=uncertainty_issue_id,
+        probability=0.7,
+        parent_options=[OutcomeProbabilityParentOption(outcome_probability_id=outcome_probability_id_2, parent_option_id=option_id_2)]
+    )
+
+    outcome_probability_id_3 = uuid.uuid4()
+
+    outcome_probability_3=OutcomeProbability(
+        id=outcome_probability_id_3,
+        child_outcome_id=outcome_id_2,
+        uncertainty_id=uncertainty_issue_id,
+        probability=0.2,
+        parent_options=[OutcomeProbabilityParentOption(outcome_probability_id=outcome_probability_id_3, parent_option_id=option_id_1)] 
+    )
+
+    outcome_probability_id_4 = uuid.uuid4()
+
+    outcome_probability_4=OutcomeProbability(
+        id=outcome_probability_id_4,
+        child_outcome_id=outcome_id_2,
+        uncertainty_id=uncertainty_issue_id,
+        probability=0.3,
+        parent_options=[OutcomeProbabilityParentOption(outcome_probability_id=outcome_probability_id_4, parent_option_id=option_id_2)]
+    )
+
+    entities.extend([outcome_probability_1, outcome_probability_2, outcome_probability_3, outcome_probability_4])
 
     # Commit all entities to the database
     async with AsyncSession(conn) as session:
@@ -380,14 +437,12 @@ async def seed_database(
                             id=issue_node_id,
                             uncertainty_id=issue_node_id,
                             name="outcome 1",
-                            probability=0.4,
                             utility=4,
                         ),
                         Outcome(
                             id=uuid4(),
                             uncertainty_id=issue_node_id,
                             name="outcome 2",
-                            probability=0.6,
                             utility=2,
                         ),
                     ],

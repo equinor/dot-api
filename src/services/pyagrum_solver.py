@@ -3,12 +3,12 @@ import numpy as np
 from numpy.typing import NDArray
 from itertools import product
 from uuid import UUID
+from pydantic import BaseModel
 from src.constants import Type
 from src.dtos.issue_dtos import IssueOutgoingDto, IssueViaNodeOutgoingDto
 from src.dtos.edge_dtos import EdgeOutgoingDto
 from src.dtos.option_dtos import OptionOutgoingDto
 from src.dtos.model_solution_dtos import SolutionDto
-
 
 class PyagrumSolver:
     def __init__(self):
@@ -93,23 +93,35 @@ class PyagrumSolver:
     def fill_cpt(self, head_issue: IssueViaNodeOutgoingDto):
         if head_issue.type != Type.UNCERTAINTY:
             return
-        assert head_issue.uncertainty is not None
 
         node_id = self.node_lookup[head_issue.id]
+        parent_ids = self.diagram.parents(node_id)
+        parent_labels = [self.diagram.variable(pid).labels() for pid in parent_ids]
 
-        # Get parent nodes
-        parent_ids: list[int] = self.diagram.parents(node_id)
-        parent_states = [self.diagram.variable(parent_id).labels() for parent_id in parent_ids]
-
-        # Generate all combinations of parent states
-        parent_combinations = list(product(*parent_states))
-
-        # Fill the CPT for each combination of parent states
+        # Build all parent state combinations
+        parent_combinations = list(product(*parent_labels))
+        outcome_ids = [o.id.__str__() for o in head_issue.uncertainty.outcomes]
+        outcome_probabilities = { 
+            (op.child_outcome_id.__str__(), tuple(sorted([x.__str__() for x in (op.parent_outcome_ids or []) + (op.parent_option_ids or [])]))): op.probability
+            for op in getattr(head_issue.uncertainty, "outcome_probabilities", [])
+        }
         cpt = self.diagram.cpt(node_id)
-        for i, combination in enumerate(parent_combinations):
-            cpt[dict(zip(parent_ids, combination))] = head_issue.uncertainty.outcomes[
-                i % len(head_issue.uncertainty.outcomes)
-            ].probability
+
+        for parent_state in parent_combinations:
+            probs = []
+            parent_state_key = tuple(sorted(parent_state))
+            for outcome_id in outcome_ids:
+                prob = outcome_probabilities.get((outcome_id, parent_state_key), 0.0)
+                probs.append(prob)
+            total = sum(probs)
+            if total > 0:
+                probs = [p / total for p in probs]
+            else:
+                probs = [1.0 / len(outcome_ids)] * len(outcome_ids)
+            for idx, prob in enumerate(probs):
+                assign = {pid: val for pid, val in zip(parent_ids, parent_state)}
+                assign[node_id] = idx
+                cpt[assign] = prob
 
     def add_utility(self, issue: IssueOutgoingDto):
         node_id = self.diagram.addUtilityNode(

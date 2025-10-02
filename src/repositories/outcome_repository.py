@@ -18,8 +18,8 @@ class OutcomeRepository(BaseRepository[Outcome, uuid.UUID]):
             entity = entities[n]
             entity_to_update.uncertainty_id = entity.uncertainty_id
             entity_to_update.name = entity.name
-            entity_to_update.probability = entity.probability
             entity_to_update.utility = entity.utility
+            
 
         await self.session.flush()
         return entities_to_update

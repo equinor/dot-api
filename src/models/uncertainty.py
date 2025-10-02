@@ -1,5 +1,5 @@
 import uuid
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 from sqlalchemy import ForeignKey
 from src.models.guid import GUID
 from sqlalchemy.orm import (
@@ -10,6 +10,7 @@ from sqlalchemy.orm import (
 from src.models.base import Base
 from src.models.base_entity import BaseEntity
 from src.models.outcome import Outcome
+from src.models.outcome_probability import OutcomeProbability
 
 if TYPE_CHECKING:
     from src.models.issue import Issue
@@ -24,7 +25,16 @@ class Uncertainty(Base, BaseEntity):
 
     outcomes: Mapped[list[Outcome]] = relationship("Outcome", cascade="all, delete-orphan")
 
-    def __init__(self, id: uuid.UUID, issue_id: uuid.UUID, outcomes: list[Outcome]):
+    outcome_probabilities: Mapped[list[OutcomeProbability]] = relationship(
+        "OutcomeProbability",
+        cascade="all, delete-orphan",
+        back_populates="uncertainty",
+        foreign_keys="OutcomeProbability.uncertainty_id"
+    )
+
+    def __init__(self, id: uuid.UUID, issue_id: uuid.UUID, outcomes: list[Outcome], outcome_probabilities: Optional[list[OutcomeProbability]]=[]):
         self.id = id
         self.issue_id = issue_id
         self.outcomes = outcomes
+        if outcome_probabilities is not None:
+            self.outcome_probabilities=outcome_probabilities
