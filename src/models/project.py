@@ -43,7 +43,7 @@ class Project(Base, BaseEntity, BaseAuditableEntity):
 
     end_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=default_endtime()
+        default=default_endtime
     )
 
     def __init__(
