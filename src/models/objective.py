@@ -53,7 +53,7 @@ class Objective(Base, BaseEntity, BaseAuditableEntity):
         self.id = id
         self.scenario_id = scenario_id
         self.name = name
-        self.type=type
+        self.type = type
         self.description = description
         self.updated_by_id = user_id
 
