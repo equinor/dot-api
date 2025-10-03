@@ -83,6 +83,28 @@ class BaseRepository(Generic[T, IDType]):
     async def update(self, entities: List[T]) -> List[T]:
         raise NotImplementedError("Subclasses must implement update_entity method.")
 
+
+    @staticmethod
+    def _check_update_entity_ids_match(entity_lists: List[List[T]]):
+        """
+        For update operations: checks that all entity lists have the same ids in the same order.
+        Raises ValueError if not. Only intended for use in update methods.
+        """
+        if len(entity_lists) < 2:
+            return
+        ids_list = [[entity.id for entity in entity_list] for entity_list in entity_lists]
+        if not all(ids == ids_list[0] for ids in ids_list):
+            raise ValueError("Entity lists do not have matching ids. Possible missing or extra entities during update.")
+
+    @classmethod
+    def prepare_entities_for_update(cls, entity_lists: List[List[T]]):
+        """
+        For update operations: sorts all entity lists by id and checks that their ids match.
+        Only intended for use in update methods.
+        """
+        cls.sort_entity_collections_by_id(entity_lists)
+        cls._check_update_entity_ids_match(entity_lists)
+
     @staticmethod
     def sort_entity_collections_by_id(entity_lists: List[List[T]]):
         for entity_list in entity_lists:
