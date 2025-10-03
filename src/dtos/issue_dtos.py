@@ -29,6 +29,10 @@ from src.dtos.node_dtos import (
     NodeOutgoingDto,
     NodeViaIssueOutgoingDto,
 )
+
+from src.dtos.decision_tree_dtos import (
+    Outcome, Option, Utility, DecisionNode, UncertaintyNode, UtilityNode, BaseNode
+)
 from src.constants import DatabaseConstants, DepricatedIssueTypes
 
 
@@ -62,6 +66,30 @@ class IssueOutgoingDto(IssueDto):
     uncertainty: Optional[UncertaintyOutgoingDto]
     utility: Optional[UtilityOutgoingDto]
     value_metric: Optional[ValueMetricOutgoingDto]
+
+    def get_dict_dto(self):
+        if self.type == Type.DECISION:
+            options = [Option(name=option.name, utility=option.utility) for option in self.decision.options]
+            return DecisionNode(
+                name = self.name,
+                type = self.type,
+                options = options)
+        elif self.type == Type.UNCERTAINTY:
+            outcomes = [Outcome(name=outcome.name, probability=outcome.probability, utility=outcome.utility) for outcome in self.uncertainty.outcomes]
+            return UncertaintyNode(
+                name = self.name,
+                type = self.type,
+                outcomes = outcomes)
+        elif self.type == Type.UTILITY:
+            values = Utility(values=self.utility.values)
+            return UtilityNode(
+                name = self.name,
+                type = self.type,
+                values = values)
+        else:
+            return BaseNode(
+                name = self.name,
+                type = self.type)
 
 
 class IssueViaNodeOutgoingDto(IssueDto):
