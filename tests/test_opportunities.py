@@ -29,7 +29,7 @@ async def test_get_opportunity(client: AsyncClient):
 async def test_create_opportunity(client: AsyncClient):
     payload = [
         OpportunityIncomingDto(
-            scenario_id=GenerateUuid.as_uuid(1), name=str(uuid4()), description=str(uuid4())
+            scenario_id=GenerateUuid.as_uuid(1), description=str(uuid4())
         ).model_dump(mode="json")
     ]
 
@@ -41,13 +41,12 @@ async def test_create_opportunity(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_update_opportunity(client: AsyncClient):
-    new_name = str(uuid4())
+    new_description = str(uuid4())
     new_scenario_id = GenerateUuid.as_uuid(3)
     payload = [
         OpportunityIncomingDto(
             id=GenerateUuid.as_uuid(3),
-            description=str(uuid4()),
-            name=new_name,
+            description=new_description,
             scenario_id=new_scenario_id,
         ).model_dump(mode="json")
     ]
@@ -57,7 +56,7 @@ async def test_update_opportunity(client: AsyncClient):
 
     response_content = parse_response_to_dtos_test(response, OpportunityOutgoingDto)
     assert (
-        response_content[0].name == new_name and response_content[0].scenario_id == new_scenario_id
+        response_content[0].description == new_description and response_content[0].scenario_id == new_scenario_id
     )
 
 

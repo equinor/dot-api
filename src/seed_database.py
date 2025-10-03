@@ -324,7 +324,6 @@ async def seed_database(
             id=project_id,
             scenario_id=project_id,
             description=str(uuid4()),
-            name=str(uuid4()),
             user_id=project.created_by_id,
         )
         opportunity = add_auditable_fields(opportunity, user)
