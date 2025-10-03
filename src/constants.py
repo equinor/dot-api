@@ -9,6 +9,10 @@ class Type(str, Enum):
     FACT = "Fact"
     UTILITY = "Utility"
 
+class ObjectiveTypes(str, Enum):
+    STRATEGIC = "Strategic"
+    FUNDAMENTAL = "Fundamental"
+    MEAN = "Mean"
 
 class DepricatedIssueTypes(str, Enum):
     UNDECIDED = "Undecided"
