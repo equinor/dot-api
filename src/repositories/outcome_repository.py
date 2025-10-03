@@ -12,7 +12,7 @@ class OutcomeRepository(BaseRepository[Outcome, uuid.UUID]):
     async def update(self, entities: list[Outcome]) -> list[Outcome]:
         entities_to_update = await self.get([outcome.id for outcome in entities])
         # sort the entity lists to share the same order according to the entity.id
-        self.sort_entity_collections_by_id([entities, entities_to_update])
+        self.prepare_entities_for_update([entities, entities_to_update])
 
         for n, entity_to_update in enumerate(entities_to_update):
             entity = entities[n]
