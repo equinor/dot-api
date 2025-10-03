@@ -1,8 +1,8 @@
 """add objective type
 
-Revision ID: 70754a323b88
-Revises: 589643041c80
-Create Date: 2025-10-02 10:47:50.333999
+Revision ID: fae2f9a90fcf
+Revises: 234ed875bf40
+Create Date: 2025-10-03 07:47:30.131542
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '70754a323b88'
-down_revision: Union[str, None] = '589643041c80'
+revision: str = 'fae2f9a90fcf'
+down_revision: Union[str, None] = '234ed875bf40'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
