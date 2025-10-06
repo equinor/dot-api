@@ -25,6 +25,12 @@ class Objective(Base, BaseEntity, BaseAuditableEntity):
         index=True,
         default="",
     )
+
+    type: Mapped[str] = mapped_column(
+        String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value),
+        default="Fundamental",
+    )
+
     description: Mapped[str] = mapped_column(
         String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value), default=""
     )
@@ -41,11 +47,13 @@ class Objective(Base, BaseEntity, BaseAuditableEntity):
         scenario_id: uuid.UUID,
         description: str,
         name: str,
+        type: str,
         user_id: int,
     ):
         self.id = id
         self.scenario_id = scenario_id
         self.name = name
+        self.type = type
         self.description = description
         self.updated_by_id = user_id
 
