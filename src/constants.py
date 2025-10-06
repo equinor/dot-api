@@ -20,7 +20,7 @@ class DepricatedIssueTypes(str, Enum):
     ACTION_ITEM = "Action Item"
 
 
-class DepricatedProjectRoleType(str, Enum):
+class DeprecatedProjectRoleType(str, Enum):
     OWNER = "owner"
     CONTRIBUTOR = "contributor"
 
