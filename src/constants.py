@@ -20,10 +20,14 @@ class DepricatedIssueTypes(str, Enum):
     ACTION_ITEM = "Action Item"
 
 
-class ProjectRoleType(str, Enum):
+class DepricatedProjectRoleType(str, Enum):
     OWNER = "owner"
     CONTRIBUTOR = "contributor"
 
+class ProjectRoleType(str, Enum):
+    DECISIONMAKER = "decision_maker"
+    FACILITATOR = "facilitator"
+    MEMBER = "member"
 
 class Boundary(str, Enum):
     IN = "in"
