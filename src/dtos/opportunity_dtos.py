@@ -7,7 +7,6 @@ from src.constants import DatabaseConstants
 
 class OpportunityDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
     description: Annotated[
         str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)
     ] = ""
@@ -37,7 +36,6 @@ class OpportunityMapper:
         return Opportunity(
             id=dto.id,
             scenario_id=project_id,
-            name=dto.name,
             description=dto.description,
             user_id=user_id,
         )
@@ -47,7 +45,6 @@ class OpportunityMapper:
         return OpportunityOutgoingDto(
             id=entity.id,
             scenario_id=entity.scenario_id,
-            name=entity.name,
             description=entity.description,
         )
 
@@ -56,7 +53,6 @@ class OpportunityMapper:
         return Opportunity(
             id=dto.id,
             scenario_id=dto.scenario_id,
-            name=dto.name,
             description=dto.description,
             user_id=user_id,
         )

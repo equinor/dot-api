@@ -24,7 +24,7 @@ from src.models import (
     OutcomeProbabilityParentOutcome,
 )
 from typing import Protocol, TypeVar, Any
-from src.constants import Type, Boundary
+from src.constants import Type, Boundary, ObjectiveTypes
 
 
 class AuditableEntityProtocol(Protocol):
@@ -371,6 +371,7 @@ async def seed_database(
             scenario_id=project_id,
             description=str(uuid4()),
             name=str(uuid4()),
+            type=ObjectiveTypes.FUNDAMENTAL.value,
             user_id=project.created_by_id,
         )
         objective = add_auditable_fields(objective, user)
@@ -380,7 +381,6 @@ async def seed_database(
             id=project_id,
             scenario_id=project_id,
             description=str(uuid4()),
-            name=str(uuid4()),
             user_id=project.created_by_id,
         )
         opportunity = add_auditable_fields(opportunity, user)

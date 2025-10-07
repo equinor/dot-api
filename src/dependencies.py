@@ -29,7 +29,7 @@ async def get_sync_engine(environment: str = config.APP_ENV) -> Engine:
     conn_str = build_connection_url(db_connection_string, driver="pyodbc")
     if token_dict and environment != "local":
         sync_engine = create_engine(conn_str, echo=False, connect_args={"attrs_before": token_dict})
-    else: 
+    else:
         sync_engine = create_engine(conn_str, echo=False)
     assert sync_engine is not None
     return sync_engine
