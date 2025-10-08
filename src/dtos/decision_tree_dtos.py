@@ -1,32 +1,20 @@
-from typing import List, Optional, Union
+from typing import List, Optional
 from pydantic import BaseModel
 from typing import List
+from typing import Optional, List
+from pydantic import BaseModel, Field
+from src.dtos.issue_dtos import IssueOutgoingDto
+import uuid
 
-class Outcome(BaseModel):
-    name: str
-    probability: float
-    utility: float
+class EdgeUUIDDto(BaseModel):
+    tail: uuid.UUID
+    head: uuid.UUID | None
 
-class Option(BaseModel):
-    name: str
-    utility: float
-
-class Utility(BaseModel):
-    values: List[float]
-
-class BaseNode(BaseModel):
-    name: str
-    type: str
-
-class DecisionNode(BaseNode):
-    options: Optional[List[Option]] = None
-
-class UncertaintyNode(BaseNode):
-    outcomes: Optional[List[Outcome]] = None
-
-class UtilityNode(BaseNode):
-    values: Optional[Utility] = None          
+class EndPointNodeDto(BaseModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    scenario_id: uuid.UUID
+    type: str = "EndPoint"
 
 class DecisionTreeDTO(BaseModel):
-    id: Union[UtilityNode, UncertaintyNode, DecisionNode, BaseNode]
+    id: IssueOutgoingDto | EndPointNodeDto
     children: Optional[List["DecisionTreeDTO"]] = None
