@@ -28,6 +28,16 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install ODBC Driver for SQL Server
+        run: |
+          # Add Microsoft GPG key and repository
+          curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft.gpg
+          echo "deb [signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/debian/11/prod bullseye main" > /etc/apt/sources.list.d/mssql-release.list
+
+          # Update package lists and install ODBC Driver
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
+
       - name: Install poetry
         run: |
           python -m pip install --upgrade pip
