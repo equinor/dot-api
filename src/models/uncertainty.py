@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 class Uncertainty(Base, BaseEntity):
     __tablename__ = "uncertainty"
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
-    issue_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("issue.id"))
+    issue_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("issue.id"), index=True)
 
     issue: Mapped["Issue"] = relationship("Issue", back_populates="uncertainty")
 

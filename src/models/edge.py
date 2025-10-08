@@ -17,18 +17,22 @@ class Edge(Base, BaseEntity):
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
 
-    tail_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey(Node.id))
-    head_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey(Node.id))
-    scenario_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey(Scenario.id))
+    tail_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey(Node.id), index=True)
+    head_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey(Node.id), index=True)
+    scenario_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey(Scenario.id), index=True)
 
-    scenario: Mapped[Scenario] = relationship(Scenario, foreign_keys=[scenario_id])
+    scenario: Mapped[Scenario] = relationship(Scenario, foreign_keys=[scenario_id], index=True)
 
     tail_node: Mapped[Node] = relationship(
-        Node, primaryjoin=tail_id == Node.id, back_populates="tail_edges",
+        Node,
+        primaryjoin=tail_id == Node.id,
+        back_populates="tail_edges",
     )
 
     head_node: Mapped[Node] = relationship(
-        Node, primaryjoin=head_id == Node.id, back_populates="head_edges",
+        Node,
+        primaryjoin=head_id == Node.id,
+        back_populates="head_edges",
     )
 
     def __init__(

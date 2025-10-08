@@ -1,0 +1,22 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: 'alembic/versions/'
+      - id: end-of-file-fixer
+        exclude: 'alembic/versions/'
+      - id: check-yaml
+        exclude: 'alembic/versions/'
+
+  - repo: https://github.com/psf/black
+    rev: 25.9.0  # Use the latest stable version
+    hooks:
+      - id: black
+        exclude: 'alembic/versions/'
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.0.0
+    hooks:
+      - id: flake8
+        exclude: 'alembic/versions/'

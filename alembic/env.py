@@ -1,7 +1,7 @@
 import asyncio
 from src.dependencies import get_sync_engine
 from logging.config import fileConfig
-
+from src.config import config as app_config
 from alembic import context
 
 from src.models.base import Base
@@ -26,7 +26,7 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-database_environment_target = "local"
+database_environment_target = app_config.APP_ENV
 
 
 def run_migrations_offline() -> None:
@@ -64,9 +64,7 @@ async def run_migrations_online() -> None:
     connectable = await get_sync_engine(database_environment_target)
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
         with context.begin_transaction():
             context.run_migrations()
 

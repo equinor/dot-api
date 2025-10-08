@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class NodeStyle(Base, BaseEntity):
     __tablename__ = "node_style"
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
-    node_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("node.id"))
+    node_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("node.id"), index=True)
 
     x_position: Mapped[int] = mapped_column(INT)
     y_position: Mapped[int] = mapped_column(INT)
@@ -25,7 +25,11 @@ class NodeStyle(Base, BaseEntity):
     node: Mapped["Node"] = relationship("Node", back_populates="node_style")
 
     def __init__(
-        self, id: uuid.UUID, node_id: Optional[uuid.UUID], x_position: int = 0, y_position: int = 0,
+        self,
+        id: uuid.UUID,
+        node_id: Optional[uuid.UUID],
+        x_position: int = 0,
+        y_position: int = 0,
     ):
         self.id = id
         if node_id:

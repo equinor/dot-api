@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class ValueMetric(Base, BaseEntity):
     __tablename__ = "value_metric"
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
-    issue_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("issue.id"))
+    issue_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("issue.id"), index=True)
 
     name: Mapped[str] = mapped_column(String, default="")
     issue: Mapped["Issue"] = relationship("Issue", back_populates="value_metric")
