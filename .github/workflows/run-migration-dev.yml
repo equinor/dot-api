@@ -23,6 +23,21 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
 
+      - name: Get IP Address
+        id: get_ip
+        run: |
+          echo "::set-output name=ip::$(curl -s ifconfig.me)"
+
+      - name: Add Firewall Rule
+        run: |
+          az sql server firewall-rule create \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --server ${{ secrets.AZURE_SQL_SERVER_NAME }} \
+            --name AllowGitHubActionsIP \
+            --start-ip-address ${{ steps.get_ip.outputs.ip }} \
+            --end-ip-address ${{ steps.get_ip.outputs.ip }} \
+            --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -50,6 +65,13 @@ jobs:
       - name: Run migration
         env:
           APP_ENV: dev
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           poetry run alembic upgrade head
+
+      - name: Remove Firewall Rule
+        run: |
+          az sql server firewall-rule delete \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --server ${{ secrets.AZURE_SQL_SERVER_NAME }} \
+            --name AllowGitHubActionsIP \
+            --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
