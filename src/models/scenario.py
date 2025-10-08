@@ -30,7 +30,9 @@ class Scenario(Base, BaseEntity, BaseAuditableEntity):
     project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey(Project.id), index=True)
 
     name: Mapped[str] = mapped_column(
-        String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True, default="",
+        String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value),
+        index=True,
+        default="",
     )
 
     is_default: Mapped[bool] = mapped_column(Boolean(), default=False)
@@ -38,23 +40,29 @@ class Scenario(Base, BaseEntity, BaseAuditableEntity):
     project: Mapped[Project] = relationship(Project, foreign_keys=[project_id])
 
     opportunities: Mapped[list["Opportunity"]] = relationship(
-        "Opportunity", cascade="all, delete-orphan",
+        "Opportunity",
+        cascade="all, delete-orphan",
     )
 
     objectives: Mapped[list["Objective"]] = relationship(
-        "Objective", cascade="all, delete-orphan",
+        "Objective",
+        cascade="all, delete-orphan",
     )
 
     issues: Mapped[list["Issue"]] = relationship(
-        "Issue", cascade="all, delete-orphan",
+        "Issue",
+        cascade="all, delete-orphan",
     )
 
     nodes: Mapped[list["Node"]] = relationship(
-        "Node", back_populates="scenario", cascade="all, delete-orphan",
+        "Node",
+        back_populates="scenario",
+        cascade="all, delete-orphan",
     )
 
     edges: Mapped[list["Edge"]] = relationship(
-        "Edge", cascade="all, delete-orphan",
+        "Edge",
+        cascade="all, delete-orphan",
     )
 
     def __init__(
@@ -87,7 +95,13 @@ def default_scenario_rule(connection, target: Scenario):
     # According to documentation sync engines should function asyncronously during an event
     session = Session(bind=connection)
 
-    all_scenarios = session.query(Scenario).filter(Scenario.project_id == target.project_id,).all()
+    all_scenarios = (
+        session.query(Scenario)
+        .filter(
+            Scenario.project_id == target.project_id,
+        )
+        .all()
+    )
 
     if len(all_scenarios) == 0:
         return

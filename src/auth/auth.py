@@ -7,7 +7,9 @@ import time
 from src.config import config
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
-    authorizationUrl=config.AUTH_URL, tokenUrl=config.TOKEN_URL, scopes={f"{config.SCOPE}": "Read"},
+    authorizationUrl=config.AUTH_URL,
+    tokenUrl=config.TOKEN_URL,
+    scopes={f"{config.SCOPE}": "Read"},
 )
 
 
@@ -40,5 +42,6 @@ def verify_token(token: str = Depends(oauth2_scheme)) -> dict[str, str]:
         return token
     except JoseError as e:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Token validation failed: {str(e)}",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Token validation failed: {str(e)}",
         )

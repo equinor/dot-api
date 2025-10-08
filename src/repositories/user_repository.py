@@ -9,7 +9,9 @@ from src.repositories.query_extensions import QueryExtensions
 class UserRepository(BaseRepository[User, int]):
     def __init__(self, session: AsyncSession):
         super().__init__(
-            session, User, query_extension_method=QueryExtensions.load_user_with_roles,
+            session,
+            User,
+            query_extension_method=QueryExtensions.load_user_with_roles,
         )
 
     async def get_or_create(self, entity: User) -> User:
@@ -34,7 +36,7 @@ class UserRepository(BaseRepository[User, int]):
     async def update(self, entities: list[User]) -> list[User]:
         entities_to_update = await self.get([decision.id for decision in entities])
         # sort the entity lists to share the same order according to the entity.id
-        self.sort_entity_collections_by_id([entities, entities_to_update])
+        self.prepare_entities_for_update([entities, entities_to_update])
 
         for n, entity_to_update in enumerate(entities_to_update):
             entity = entities[n]

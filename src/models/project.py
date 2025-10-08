@@ -24,10 +24,14 @@ class Project(Base, BaseEntity, BaseAuditableEntity):
     description: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value))
 
     scenarios: Mapped[list["Scenario"]] = relationship(
-        "Scenario", back_populates="project", cascade="all, delete-orphan",
+        "Scenario",
+        back_populates="project",
+        cascade="all, delete-orphan",
     )
     project_role: Mapped[list["ProjectRole"]] = relationship(
-        "ProjectRole", back_populates="project", cascade="all, delete-orphan",
+        "ProjectRole",
+        back_populates="project",
+        cascade="all, delete-orphan",
     )
 
     def __init__(

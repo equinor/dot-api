@@ -33,7 +33,10 @@ from src.models.filters.scenario_filter import ScenarioFilter
 
 class ScenarioService:
     async def create(
-        self, session: AsyncSession, dtos: list[ScenarioCreateDto], user_dto: UserIncomingDto,
+        self,
+        session: AsyncSession,
+        dtos: list[ScenarioCreateDto],
+        user_dto: UserIncomingDto,
     ) -> list[ScenarioOutgoingDto]:
         user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         # create scenario
@@ -58,7 +61,10 @@ class ScenarioService:
         return result
 
     async def update(
-        self, session: AsyncSession, dtos: list[ScenarioIncomingDto], user_dto: UserIncomingDto,
+        self,
+        session: AsyncSession,
+        dtos: list[ScenarioIncomingDto],
+        user_dto: UserIncomingDto,
     ) -> list[ScenarioOutgoingDto]:
         user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         entities: list[Scenario] = await ScenarioRepository(session).update(

@@ -8,12 +8,14 @@ import uuid
 class ProjectRoleRepository(BaseRepository[ProjectRole, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(
-            session, ProjectRole, query_extension_method=QueryExtensions.load_role_with_user,
+            session,
+            ProjectRole,
+            query_extension_method=QueryExtensions.load_role_with_user,
         )
 
     async def update(self, entities: list[ProjectRole]) -> list[ProjectRole]:
         entities_to_update = await self.get([entity.id for entity in entities])
-        self.sort_entity_collections_by_id([entities, entities_to_update])
+        self.prepare_entities_for_update([entities, entities_to_update])
         for n, entity_to_update in enumerate(entities_to_update):
             entity = entities[n]
             entity_to_update.role = entity.role

@@ -8,13 +8,15 @@ from src.repositories.base_repository import BaseRepository
 class NodeRepository(BaseRepository[Node, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(
-            session, Node, query_extension_method=QueryExtensions.load_node_with_relationships,
+            session,
+            Node,
+            query_extension_method=QueryExtensions.load_node_with_relationships,
         )
 
     async def update(self, entities: list[Node]) -> list[Node]:
         entities_to_update = await self.get([node.id for node in entities])
         # sort the entity lists to share the same order according to the entity.id
-        self.sort_entity_collections_by_id([entities, entities_to_update])
+        self.prepare_entities_for_update([entities, entities_to_update])
 
         for n, entity_to_update in enumerate(entities_to_update):
             entity = entities[n]

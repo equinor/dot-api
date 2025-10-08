@@ -8,13 +8,15 @@ from src.repositories.query_extensions import QueryExtensions
 class EdgeRepository(BaseRepository[Edge, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(
-            session, Edge, query_extension_method=QueryExtensions.load_edge_with_relationships,
+            session,
+            Edge,
+            query_extension_method=QueryExtensions.load_edge_with_relationships,
         )
 
     async def update(self, entities: list[Edge]) -> list[Edge]:
         entities_to_update = await self.get([edge.id for edge in entities])
         # sort the entity lists to share the same order according to the entity.id
-        self.sort_entity_collections_by_id([entities, entities_to_update])
+        self.prepare_entities_for_update([entities, entities_to_update])
 
         for n, edge_to_update in enumerate(entities_to_update):
             edge = entities[n]

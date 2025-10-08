@@ -24,10 +24,16 @@ class ValueMetricMapper:
 
     @staticmethod
     def to_entity(dto: ValueMetricIncomingDto) -> ValueMetric:
-        return ValueMetric(id=dto.id, issue_id=dto.issue_id, name=dto.name,)
+        return ValueMetric(
+            id=dto.id,
+            issue_id=dto.issue_id,
+            name=dto.name,
+        )
 
     @staticmethod
-    def to_outgoing_dtos(entities: list[ValueMetric],) -> list[ValueMetricOutgoingDto]:
+    def to_outgoing_dtos(
+        entities: list[ValueMetric],
+    ) -> list[ValueMetricOutgoingDto]:
         return [ValueMetricMapper.to_outgoing_dto(entity) for entity in entities]
 
     @staticmethod

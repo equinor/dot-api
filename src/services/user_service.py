@@ -14,7 +14,9 @@ from src.models.user import User
 from src.auth.graph_api import call_ms_graph_api
 
 
-async def get_current_user(token: str = Depends(verify_token),) -> UserIncomingDto:
+async def get_current_user(
+    token: str = Depends(verify_token),
+) -> UserIncomingDto:
     return await call_ms_graph_api(token)
 
 

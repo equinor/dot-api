@@ -101,7 +101,9 @@ class ProjectMapper:
         return [ProjectMapper.to_outgoing_dto(entity) for entity in entities]
 
     @staticmethod
-    def to_populated_dtos(entities: list[Project],) -> list[PopulatedProjectDto]:
+    def to_populated_dtos(
+        entities: list[Project],
+    ) -> list[PopulatedProjectDto]:
         return [ProjectMapper.to_populated_dto(entity) for entity in entities]
 
     @staticmethod

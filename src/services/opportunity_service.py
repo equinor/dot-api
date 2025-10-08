@@ -18,7 +18,10 @@ from src.repositories.user_repository import UserRepository
 
 class OpportunityService:
     async def create(
-        self, session: AsyncSession, dtos: list[OpportunityIncomingDto], user_dto: UserIncomingDto,
+        self,
+        session: AsyncSession,
+        dtos: list[OpportunityIncomingDto],
+        user_dto: UserIncomingDto,
     ) -> list[OpportunityOutgoingDto]:
         user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         entities: list[Opportunity] = await OpportunityRepository(session).create(
@@ -29,7 +32,10 @@ class OpportunityService:
         return result
 
     async def update(
-        self, session: AsyncSession, dtos: list[OpportunityIncomingDto], user_dto: UserIncomingDto,
+        self,
+        session: AsyncSession,
+        dtos: list[OpportunityIncomingDto],
+        user_dto: UserIncomingDto,
     ) -> list[OpportunityOutgoingDto]:
         user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         entities: list[Opportunity] = await OpportunityRepository(session).update(
