@@ -1,4 +1,4 @@
-name: Pass tests before merge to main branch
+name: run migration in dev environment
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  run-pytest:
+  run-migration-dev:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,4 +30,5 @@ jobs:
         env:
           APP_ENV: dev
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: alembic upgrade head
+        run: |
+          poetry run alembic upgrade head

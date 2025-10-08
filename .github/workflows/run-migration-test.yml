@@ -1,11 +1,11 @@
-name: Pass tests before merge to main branch
+name: run migration in dev environment
 
 on:
   push:
     tags:
       - "v*"
 jobs:
-  run-pytest:
+  run-migration-test:
     runs-on: ubuntu-latest
 
     steps:
