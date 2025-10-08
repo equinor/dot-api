@@ -32,7 +32,7 @@ class Node(Base, BaseEntity):
     scenario: Mapped[Scenario] = relationship(
         Scenario, foreign_keys=[scenario_id], back_populates="nodes"
     )
-    issue: Mapped["Issue"] = relationship("Issue", back_populates="node")
+    issue: Mapped["Issue"] = relationship("Issue", back_populates="node", cascade="all, delete-orphan", single_parent=True)
 
     head_edges: Mapped[list["Edge"]] = relationship(
         "Edge",

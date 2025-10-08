@@ -147,3 +147,13 @@ async def test_delete_issue(client: AsyncClient):
     response = await client.delete(f"/issues/{issue_id}")
 
     assert response.status_code == 200, f"Response content: {response.content}"
+
+@pytest.mark.asyncio
+async def test_delete_issues(client: AsyncClient):
+    ids = [GenerateUuid.as_string(14), GenerateUuid.as_string(15)]
+    response = await client.delete("/issues", params={"ids": ids})
+    assert response.status_code == 200, f"Response content: {response.content}"
+
+    for id in ids:
+        response = await client.get(f"/issues/{id}")
+        assert response.status_code == 404, f"Issue with id: {id} found, but should have been deleted"

@@ -70,6 +70,16 @@ async def delete_objective(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.delete("/objectives")
+async def delete_objectives(
+    ids: list[uuid.UUID] = Query([]),
+    objective_service: ObjectiveService = Depends(get_objective_service),
+    session: AsyncSession = Depends(get_db),
+):
+    try:
+        await objective_service.delete(session, ids)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/objectives")
 async def update_objectives(

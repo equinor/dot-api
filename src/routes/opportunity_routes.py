@@ -73,6 +73,16 @@ async def delete_opportunity(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.delete("/opportunities")
+async def delete_opportunities(
+    ids: list[uuid.UUID] = Query([]),
+    opportunity_service: OpportunityService = Depends(get_opportunity_service),
+    session: AsyncSession = Depends(get_db),
+):
+    try:
+        await opportunity_service.delete(session, ids)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/opportunities")
 async def update_opportunities(

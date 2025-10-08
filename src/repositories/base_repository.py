@@ -75,9 +75,13 @@ class BaseRepository(Generic[T, IDType]):
         return list((await self.session.scalars(query)).unique().all())
 
     async def delete(self, ids: List[IDType]) -> None:
+        # The following commented code is not used as this turns off the sqlalchemy cascade delete
+        # query = delete(self.model).where(self.model.id.in_(ids))
+        # await self.session.execute(query)
         entities = await self.get(ids)
         for entity in entities:
             await self.session.delete(entity)
+
         await self.session.flush()
 
     async def update(self, entities: List[T]) -> List[T]:

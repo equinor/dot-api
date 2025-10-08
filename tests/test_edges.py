@@ -64,3 +64,13 @@ async def test_update_edge(client: AsyncClient):
 async def test_delete_edge(client: AsyncClient):
     response = await client.delete(f"/edges/{GenerateUuid.as_string(2)}")
     assert response.status_code == 200, f"Response content: {response.content}"
+
+@pytest.mark.asyncio
+async def test_delete_edges(client: AsyncClient):
+    ids = [GenerateUuid.as_string(3), GenerateUuid.as_string(4)]
+    response = await client.delete("/edges", params={"ids": ids})
+    assert response.status_code == 200, f"Response content: {response.content}"
+
+    for id in ids:
+        response = await client.get(f"/edges/{id}")
+        assert response.status_code == 404, f"Edge with id: {id} found, but should have been deleted"

@@ -69,3 +69,13 @@ async def test_update_option(client: AsyncClient):
 async def test_delete_option(client: AsyncClient):
     response = await client.delete(f"/options/{GenerateUuid.as_string(2)}")
     assert response.status_code == 200, f"Response content: {response.content}"
+
+@pytest.mark.asyncio
+async def test_delete_options(client: AsyncClient):
+    ids = [GenerateUuid.as_string(4), GenerateUuid.as_string(5)]
+    response = await client.delete("/options", params={"ids": ids})
+    assert response.status_code == 200, f"Response content: {response.content}"
+
+    for id in ids:
+        response = await client.get(f"/options/{id}")
+        assert response.status_code == 404, f"Option with id: {id} found, but should have been deleted"

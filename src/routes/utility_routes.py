@@ -55,6 +55,16 @@ async def delete_utility(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.delete("/utilities")
+async def delete_utilities(
+    ids: list[uuid.UUID] = Query([]),
+    utility_service: UtilityService = Depends(get_utility_service),
+    session: AsyncSession = Depends(get_db),
+):
+    try:
+        await utility_service.delete(session, ids)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/utilities")
 async def update_utilities(
