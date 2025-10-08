@@ -30,7 +30,7 @@ class Config(BaseSettings):
     AUDIENCE: str = Field(default=os.getenv("AUDIENCE", "4251833c-b9c3-4013-afda-cbfd2cc50f3f"))
     JWKS_URI: str = f"https://login.microsoftonline.com/{TENANT_ID}/discovery/v2.0/keys"
     ISSUER: str = f"https://sts.windows.net/{TENANT_ID}/"
-    APP_ENV: str = Field(default=os.getenv("APP_ENV", "local"))
+    APP_ENV: str = Field(default=os.getenv("APP_ENV", "dev"))
     DATABASE_CONN_LOCAL: str = Field(
         default=os.getenv("DATABASE_CONN_LOCAL", "sqlite+aiosqlite:///:memory:")
     )
