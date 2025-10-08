@@ -26,7 +26,7 @@ jobs:
       - name: Get IP Address
         id: get_ip
         run: |
-          echo "::set-output name=ip::$(curl -s ifconfig.me)"
+          echo "ip=$(curl -s ifconfig.me)" >> $GITHUB_OUTPUT
 
       - name: Add Firewall Rule
         run: |
