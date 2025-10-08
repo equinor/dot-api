@@ -21,7 +21,7 @@ class Edge(Base, BaseEntity):
     head_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey(Node.id), index=True)
     scenario_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey(Scenario.id), index=True)
 
-    scenario: Mapped[Scenario] = relationship(Scenario, foreign_keys=[scenario_id], index=True)
+    scenario: Mapped[Scenario] = relationship(Scenario, foreign_keys=[scenario_id])
 
     tail_node: Mapped[Node] = relationship(
         Node,
