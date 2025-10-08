@@ -20,7 +20,7 @@ from src.models import (
     Option,
     Outcome,
 )
-from typing import Protocol, TypeVar, Any
+from typing import Protocol, TypeVar, Any, Union, Dict, Tuple, List
 from src.constants import Type, Boundary, ObjectiveTypes
 
 
@@ -51,10 +51,10 @@ def create_decision_issue(
         scenario_id: uuid.UUID,
         decision_id: uuid.UUID,
         issue_id: uuid.UUID,
-        user_id: uuid.UUID,
+        user_id: int,
         name: str,
         order: int,
-    ):
+    ) -> list[Union[Decision, Node, NodeStyle, Uncertainty]]:
         """Helper function to create a decision issue and its related entities."""
         decision = Decision(id=decision_id, issue_id=issue_id, options=[])
         node = Node(
@@ -82,10 +82,10 @@ def create_uncertainty_issue(
         scenario_id: uuid.UUID,
         uncertainty_id: uuid.UUID,
         issue_id: uuid.UUID,
-        user_id: uuid.UUID,
+        user_id: int,
         name: str,
         order: int,
-    ):
+    ) -> list[Union[Uncertainty, Node, NodeStyle, Issue]]:
         """Helper function to create an uncertainty issue and its related entities."""
         uncertainty = Uncertainty(id=uncertainty_id, issue_id=issue_id, outcomes=[])
         node = Node(
@@ -113,10 +113,10 @@ def create_utility_issue(
         scenario_id: uuid.UUID,
         utility_id: uuid.UUID,
         issue_id: uuid.UUID,
-        user_id: uuid.UUID,
+        user_id: int,
         name: str,
         order: int,
-    ):
+    ) -> list[Union[Utility, Node, NodeStyle, Issue]]:
         """Helper function to create an utility issue and its related entities."""
         utility = Utility(id=utility_id, values='', issue_id=issue_id)
         node = Node(
@@ -417,55 +417,55 @@ async def create_decision_tree_symmetry_DT_from_ID(conn: AsyncConnection):
             id=uuid.uuid4(),
             decision_id=decision_T_id,
             name="yes",
-            utility=None))
+            utility=0))
     entities.append(
         Option(
             id=uuid.uuid4(),
             decision_id=decision_T_id,
             name="no",
-            utility=None))
+            utility=0))
     entities.append(
         Outcome(
             id=uuid.uuid4(),
             uncertainty_id=uncertainty_S_id,
             name="yes",
             probability=0.7,
-            utility=None))
+            utility=0))
     entities.append(
         Outcome(
             id=uuid.uuid4(),
             uncertainty_id=uncertainty_S_id,
             name="no",
             probability=0.3,
-            utility=None))
+            utility=0))
     entities.append(
         Outcome(
             id=uuid.uuid4(),
             uncertainty_id=uncertainty_D_id,
             name="yes",
             probability=0.1,
-            utility=None))
+            utility=0))
     entities.append(
         Outcome(
             id=uuid.uuid4(),
             uncertainty_id=uncertainty_D_id,
             name="no",
             probability=0.9,
-            utility=None))
+            utility=0))
     entities.append(
         Outcome(
             id=uuid.uuid4(),
             uncertainty_id=uncertainty_P_id,
             name="yes",
             probability=0.2,
-            utility=None))
+            utility=0))
     entities.append(
         Outcome(
             id=uuid.uuid4(),
             uncertainty_id=uncertainty_P_id,
             name="no",
             probability=0.8,
-            utility=None))
+            utility=0))
 
     #Add edges
     edges_data = [
@@ -495,7 +495,7 @@ async def create_decision_tree_symmetry_DT(conn: AsyncConnection):
     user_id = 6
     project_uuid = GenerateUuid.as_uuid("dt_project")
     scenario_uuid = GenerateUuid.as_uuid("dt_scenario")
-    uncertainty_S_uuid = GenerateUuid.as_uuid("dt_uncertainty_S")
+    uncertainty_S_uuids = [GenerateUuid.as_uuid("dt_uncertainty_S")]
     uncertainty_P_uuids = [GenerateUuid.as_uuid(f"dt_uncertainty_P_{i}") for i in range(4)]
     uncertainty_D_uuids = [GenerateUuid.as_uuid(f"dt_uncertainty_D_{i}") for i in range(8)]
     decision_uuids = [GenerateUuid.as_uuid(f"dt_decision_T_{i}") for i in range(2)]
@@ -554,7 +554,7 @@ async def create_decision_tree_symmetry_DT(conn: AsyncConnection):
 
     # Add uncertainty issues
     uncertainty_issues = [
-        (uncertainty_S_uuid, symptom),
+        (uncertainty_S_uuids[0], symptom),
         (uncertainty_P_uuids[0], pathological_state),
         (uncertainty_P_uuids[1], pathological_state),
         (uncertainty_P_uuids[2], pathological_state),
@@ -599,25 +599,25 @@ async def create_decision_tree_symmetry_DT(conn: AsyncConnection):
                     id=uuid.uuid4(),
                     decision_id=decision_id,
                     name=option,
-                    utility=None))
+                    utility=0))
 
     # Add uncertainty issues
-    def create_outcome(uncertainty_id, probability):
+    def create_outcome(uncertainty_id: uuid.UUID, probability_name: str, probability_value: float):
         return Outcome(
             id=uuid.uuid4(),
             uncertainty_id=uncertainty_id,
-            name=probability[0],
-            probability=probability[1],
-            utility=None)
+            name=probability_name,
+            probability=probability_value,
+            utility=0)
 
-    probabilities = {
-        'S': [['yes', 0.7], ['no', 0.3]],
-        'P': [['yes', 0.2], ['no', 0.8]],
-        'D': [['yes', 0.1], ['no', 0.9]]
+    probabilities: Dict[str, List[Tuple[str, float]]] = {
+        'S': [('yes', 0.7), ('no', 0.3)],
+        'P': [('yes', 0.2), ('no', 0.8)],
+        'D': [('yes', 0.1), ('no', 0.9)]
     }
 
-    uncertainty_uuids = {
-        'S': uncertainty_S_uuid,
+    uncertainty_uuids : dict[str, list[uuid.UUID]] = {
+        'S': uncertainty_S_uuids,
         'P': uncertainty_P_uuids,
         'D': uncertainty_D_uuids
     }
@@ -626,23 +626,26 @@ async def create_decision_tree_symmetry_DT(conn: AsyncConnection):
         if key == 'S':
             entities.append(
                 create_outcome(
-                    uncertainty_uuids[key],
-                    probability_list[0]))
+                    uncertainty_uuids[key][0],
+                    probability_list[0][0],
+                    probability_list[0][1]))
             entities.append(
                 create_outcome(
-                    uncertainty_uuids[key],
-                    probability_list[1]))
+                    uncertainty_uuids[key][0],
+                    probability_list[1][0],
+                    probability_list[1][1]))
         else:
             for uncertainty_uuid in uncertainty_uuids[key]:
                 for probability in probability_list:
                     entities.append(
                         create_outcome(
                             uncertainty_uuid,
-                            probability))
+                            probability[0],
+                            probability[1]))
 
     #Add edges
     edges_data = [
-        (edge_uuids[0], uncertainty_S_uuid, decision_uuids[0]),
+        (edge_uuids[0], uncertainty_S_uuids[0], decision_uuids[0]),
         (edge_uuids[1], decision_uuids[0], uncertainty_P_uuids[0]),
         (edge_uuids[2], uncertainty_P_uuids[0], uncertainty_D_uuids[0]),
         (edge_uuids[3], uncertainty_D_uuids[0], utility_uuids[0]),
@@ -657,7 +660,7 @@ async def create_decision_tree_symmetry_DT(conn: AsyncConnection):
         (edge_uuids[12], uncertainty_P_uuids[1], uncertainty_D_uuids[3]),
         (edge_uuids[13], uncertainty_D_uuids[3], utility_uuids[6]),
         (edge_uuids[14], uncertainty_D_uuids[3], utility_uuids[7]),
-        (edge_uuids[15], uncertainty_S_uuid, decision_uuids[1]),
+        (edge_uuids[15], uncertainty_S_uuids[0], decision_uuids[1]),
         (edge_uuids[16], decision_uuids[1], uncertainty_P_uuids[2]),
         (edge_uuids[17], uncertainty_P_uuids[2], uncertainty_D_uuids[4]),
         (edge_uuids[18], uncertainty_D_uuids[4], utility_uuids[8]),
