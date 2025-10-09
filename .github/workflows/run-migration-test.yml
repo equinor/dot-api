@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 permissions:
+  id-token: write
   contents: read
-  issues: write
 jobs:
   call-deploy-infra:
     uses: ./.github/workflows/run-migration.yml
