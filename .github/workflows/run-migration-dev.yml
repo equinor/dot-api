@@ -4,8 +4,11 @@ on:
   push:
     branches:
       - main
-
   workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
 
 jobs:
   call-deploy-infra:

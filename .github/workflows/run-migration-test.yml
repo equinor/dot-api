@@ -4,6 +4,11 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
 jobs:
   call-deploy-infra:
     uses: ./.github/workflows/run-migration.yml
