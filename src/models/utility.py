@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 class Utility(Base, BaseEntity):
     __tablename__ = "utility"
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
-    issue_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("issue.id"))
+    issue_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("issue.id"), index=True)
 
     values: Mapped[str] = mapped_column(
         String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default=""
