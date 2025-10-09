@@ -16,5 +16,5 @@ class EndPointNodeDto(BaseModel):
 
 
 class DecisionTreeDTO(BaseModel):
-    id: IssueOutgoingDto | EndPointNodeDto
+    tree_node: IssueOutgoingDto | EndPointNodeDto
     children: Optional[List["DecisionTreeDTO"]] = None

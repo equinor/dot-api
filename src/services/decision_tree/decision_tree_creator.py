@@ -238,7 +238,7 @@ class DecisionTreeCreator():
 
     async def get_tree_node_issue_dto(self, issue: IssueOutgoingDto | EndPointNodeDto, children: list[DecisionTreeDTO] | None = None) -> DecisionTreeDTO:
         return DecisionTreeDTO(
-            id=issue,
+            tree_node=issue,
             children=children
         )
 

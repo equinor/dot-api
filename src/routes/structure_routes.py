@@ -8,7 +8,7 @@ from src.dtos.decision_tree_dtos import DecisionTreeDTO
 
 router = APIRouter(tags=["structure"])
 
-@router.get("/structure/{scenario_id}/DT")
+@router.get("/structure/{scenario_id}/decision_tree")
 async def get_decision_tree(
     scenario_id: uuid.UUID,
     structure_service: StructureService = Depends(get_structure_service)

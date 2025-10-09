@@ -9,7 +9,7 @@ from src.dependencies import get_scenario_service, get_structure_service
 @pytest.mark.asyncio
 async def test_decision_tree_endpoint(client: AsyncClient):
     scenario_id = GenerateUuid.as_uuid("dt_from_id_scenario")
-    response = await client.get(f"/structure/{scenario_id}/DT")
+    response = await client.get(f"/structure/{scenario_id}/decision_tree")
     assert response.status_code == 200, f"Failed to create decision tree: {response.text}"
 
 @pytest.mark.asyncio
