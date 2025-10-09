@@ -16,6 +16,7 @@ from src.dtos.node_dtos import NodeIncomingDto
 from src.dtos.node_style_dtos import NodeStyleIncomingDto
 from src.dtos.option_dtos import OptionIncomingDto
 from src.dtos.outcome_dtos import OutcomeIncomingDto
+from src.dtos.outcome_probability_dtos import OutcomeProbabilityIncomingDto
 from src.seed_database import GenerateUuid
 
 
@@ -100,11 +101,23 @@ async def test_update_issue(client: AsyncClient):
         for x in new_alternatives
     ]
     new_probabilities = [0.1, 0.3, 0.6]
+    new_outcome_ids = [uuid4() for _ in new_probabilities]
     new_outcomes = [
         OutcomeIncomingDto(
-            name=str(x), uncertainty_id=example_issue.uncertainty.id, probability=x, utility=0
+            id=outcome_id, name=f"outcome_{i}", uncertainty_id=example_issue.uncertainty.id, utility=0
         )
-        for x in new_probabilities
+        for i, outcome_id in enumerate(new_outcome_ids)
+    ]
+    new_outcome_probabilities = [
+        OutcomeProbabilityIncomingDto(
+            id=uuid4(),
+            uncertainty_id=example_issue.uncertainty.id,
+            probability=prob,
+            child_outcome_id=outcome_id,
+            parent_option_ids=[],
+            parent_outcome_ids=[],
+        )
+        for prob, outcome_id in zip(new_probabilities, new_outcome_ids)
     ]
     new_type = Type.UNCERTAINTY
     new_boundary = Boundary.IN
@@ -120,7 +133,8 @@ async def test_update_issue(client: AsyncClient):
                 id=example_issue.decision.id, issue_id=example_issue.id, options=new_options
             ),
             uncertainty=UncertaintyIncomingDto(
-                id=example_issue.uncertainty.id, issue_id=example_issue.id, outcomes=new_outcomes
+                id=example_issue.uncertainty.id, issue_id=example_issue.id, outcomes=new_outcomes,
+                outcome_probabilities=new_outcome_probabilities
             ),
             utility=None,
             value_metric=None,
@@ -135,7 +149,7 @@ async def test_update_issue(client: AsyncClient):
 
     assert (
         r.uncertainty is not None
-        and [x.probability for x in r.uncertainty.outcomes] == new_probabilities
+        and [x.probability for x in r.uncertainty.outcome_probabilities] == new_probabilities
     )
     assert r.decision is not None and [x.name for x in r.decision.options] == new_alternatives
     assert r.type == new_type
