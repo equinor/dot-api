@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 from src.models.project_role import ProjectRole
 from src.models.user import User
-from src.constants import DatabaseConstants, ProjectRoleType, DeprecatedProjectRoleType
+from src.constants import DatabaseConstants, ProjectRoleType
 
 
 class UserInfoDto(BaseModel):
@@ -51,12 +51,6 @@ class ProjectRoleMapper:
 
     @staticmethod
     def to_outgoing_dto(entity: ProjectRole) -> ProjectRoleOutgoingDto:
-        if entity.role == DeprecatedProjectRoleType.CONTRIBUTOR.value:
-            entity.role = ProjectRoleType.MEMBER
-
-        if entity.role == DeprecatedProjectRoleType.OWNER.value:
-            entity.role = ProjectRoleType.FACILITATOR
-        
         return ProjectRoleOutgoingDto(
             id=entity.id,
             user_name=entity.user.name,

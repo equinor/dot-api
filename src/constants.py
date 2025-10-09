@@ -19,11 +19,6 @@ class DepricatedIssueTypes(str, Enum):
     OTHER = "Other"
     ACTION_ITEM = "Action Item"
 
-
-class DeprecatedProjectRoleType(str, Enum):
-    OWNER = "owner"
-    CONTRIBUTOR = "contributor"
-
 class ProjectRoleType(str, Enum):
     DECISIONMAKER = "decision_maker"
     FACILITATOR = "facilitator"
