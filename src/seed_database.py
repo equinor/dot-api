@@ -304,7 +304,7 @@ async def seed_database(
             id=project_id,
             project_id=project_id,
             user_id=user.id,
-            role=ProjectRoleType.OWNER,
+            role=ProjectRoleType.FACILITATOR,
         )
         project_role = add_auditable_fields(project_role, user)
         entities.append(project_role)

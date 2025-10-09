@@ -108,7 +108,7 @@ class ProjectService:
                 azure_id=user.azure_id,
                 user_id=user.id,
                 project_id=dto.id,
-                role=ProjectRoleType.OWNER,
+                role=ProjectRoleType.FACILITATOR,
             )
             dto.users.append(owner_role)
 
@@ -153,7 +153,7 @@ class ProjectService:
         ids_to_delete = [
             project_role.project_id
             for project_role in user.project_role
-            if project_role.role == ProjectRoleType.OWNER and project_role.project_id in ids
+            if (project_role.role == ProjectRoleType.FACILITATOR or project_role.role == ProjectRoleType.DECISIONMAKER) and project_role.project_id in ids
         ]
         await ProjectRepository(session).delete(ids=ids_to_delete)
 
