@@ -65,3 +65,13 @@ async def test_update_objective(client: AsyncClient):
 async def test_delete_objective(client: AsyncClient):
     response = await client.delete(f"/objectives/{GenerateUuid.as_string(2)}")
     assert response.status_code == 200, f"Response content: {response.content}"
+
+@pytest.mark.asyncio
+async def test_delete_objectives(client: AsyncClient):
+    ids = [GenerateUuid.as_string(3), GenerateUuid.as_string(4)]
+    response = await client.delete("/objectives", params={"ids": ids})
+    assert response.status_code == 200, f"Response content: {response.content}"
+
+    for id in ids:
+        response = await client.get(f"/objectives/{id}")
+        assert response.status_code == 404, f"Objective with id: {id} found, but should have been deleted"

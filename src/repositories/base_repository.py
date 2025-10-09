@@ -78,6 +78,7 @@ class BaseRepository(Generic[T, IDType]):
         entities = await self.get(ids)
         for entity in entities:
             await self.session.delete(entity)
+
         await self.session.flush()
 
     async def update(self, entities: List[T]) -> List[T]:

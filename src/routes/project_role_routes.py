@@ -1,6 +1,6 @@
 from typing import Optional
 import uuid
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.dtos.project_roles_dtos import (
     ProjectRoleIncomingDto,
@@ -53,6 +53,18 @@ async def delete_project_role(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.delete("/project-roles/{project_id}")
+async def delete_project_roles(
+    project_id: uuid.UUID,
+    ids: list[uuid.UUID] = Query([]),
+    project_role_service: ProjectRoleService = Depends(get_project_role_service),
+    current_user: UserIncomingDto = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+):
+    try:
+        await project_role_service.delete(session, ids, project_id, current_user)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/project-roles/")
 async def update_project_role(

@@ -55,6 +55,16 @@ async def delete_decision(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.delete("/decisions")
+async def delete_decisions(
+    ids: list[uuid.UUID] = Query([]),
+    decision_service: DecisionService = Depends(get_decision_service),
+    session: AsyncSession = Depends(get_db),
+):
+    try:
+        await decision_service.delete(session, ids)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/decisions")
 async def update_decisions(

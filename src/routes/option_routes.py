@@ -65,6 +65,16 @@ async def delete_option(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.delete("/options")
+async def delete_options(
+    ids: list[uuid.UUID] = Query([]),
+    option_service: OptionService = Depends(get_option_service),
+    session: AsyncSession = Depends(get_db),
+):
+    try:
+        await option_service.delete(session, ids)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/options")
 async def update_options(

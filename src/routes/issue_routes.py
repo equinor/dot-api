@@ -108,6 +108,16 @@ async def delete_issue(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.delete("/issues")
+async def delete_issues(
+    ids: list[uuid.UUID] = Query([]),
+    issue_service: IssueService = Depends(get_issue_service),
+    session: AsyncSession = Depends(get_db),
+):
+    try:
+        await issue_service.delete(session, ids)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/issues")
 async def update_issues(
