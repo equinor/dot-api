@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class NodeStyle(Base, BaseEntity):
     __tablename__ = "node_style"
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
-    node_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("node.id"))
+    node_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("node.id"), index=True)
 
     x_position: Mapped[int] = mapped_column(INT)
     y_position: Mapped[int] = mapped_column(INT)
