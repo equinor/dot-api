@@ -67,7 +67,10 @@ class ProjectRoleService:
             else:
                 if not any(
                     userRole.project_id == dto.project_id
-                    and userRole.role == ProjectRoleType.OWNER.value
+                    and (
+                        userRole.role == ProjectRoleType.FACILITATOR.value
+                        or userRole.role == ProjectRoleType.DECISIONMAKER.value
+                    )
                     for userRole in user.project_role
                 ):
                     raise HTTPException(

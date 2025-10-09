@@ -13,7 +13,7 @@ from src.constants import DatabaseConstants
 class Option(Base, BaseEntity):
     __tablename__ = "option"
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
-    decision_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("decision.id"))
+    decision_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("decision.id"), index=True)
 
     name: Mapped[str] = mapped_column(
         String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default=""

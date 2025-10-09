@@ -38,7 +38,7 @@ async def test_update_project_role(client: AsyncClient):
             azure_id=GenerateUuid.as_string(15),
             user_name="",
             project_id=GenerateUuid.as_uuid(2),
-            role=ProjectRoleType.CONTRIBUTOR,
+            role=ProjectRoleType.MEMBER,
         ).model_dump(mode="json")
     ]
     response = await client.put("/project-roles/", json=payload)
