@@ -1,8 +1,8 @@
-"""add project end date
+"""add project end dates
 
-Revision ID: 15e8a840c448
-Revises: fae2f9a90fcf
-Create Date: 2025-10-06 12:06:21.822183
+Revision ID: e915e38cedc2
+Revises: 52ad96deb7bc
+Create Date: 2025-10-09 11:10:30.062876
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '15e8a840c448'
-down_revision: Union[str, None] = 'fae2f9a90fcf'
+revision: str = 'e915e38cedc2'
+down_revision: Union[str, None] = '52ad96deb7bc'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
