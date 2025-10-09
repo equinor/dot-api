@@ -1,7 +1,7 @@
 name: run migration in dev environment
 
 on:
-  push:
+  pull_request:
     branches:
       - main
   workflow_dispatch:
