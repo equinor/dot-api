@@ -10,7 +10,7 @@ from sqlalchemy.orm import (
 from src.models.base import Base
 from src.models.base_entity import BaseEntity
 from src.models.outcome import Outcome
-from src.models.outcome_probability import OutcomeProbability
+from src.models.discrete_probability import DiscreteProbability
 
 if TYPE_CHECKING:
     from src.models.issue import Issue
@@ -25,16 +25,16 @@ class Uncertainty(Base, BaseEntity):
 
     outcomes: Mapped[list[Outcome]] = relationship("Outcome", cascade="all, delete-orphan")
 
-    outcome_probabilities: Mapped[list[OutcomeProbability]] = relationship(
-        "OutcomeProbability",
+    discrete_probabilities: Mapped[list[DiscreteProbability]] = relationship(
+        "DiscreteProbability",
         cascade="all, delete-orphan",
         back_populates="uncertainty",
-        foreign_keys="OutcomeProbability.uncertainty_id"
+        foreign_keys="DiscreteProbability.uncertainty_id"
     )
 
-    def __init__(self, id: uuid.UUID, issue_id: uuid.UUID, outcomes: list[Outcome], outcome_probabilities: Optional[list[OutcomeProbability]]=None):
+    def __init__(self, id: uuid.UUID, issue_id: uuid.UUID, outcomes: list[Outcome], discrete_probabilities: Optional[list[DiscreteProbability]]=None):
         self.id = id
         self.issue_id = issue_id
         self.outcomes = outcomes
-        if outcome_probabilities is not None:
-            self.outcome_probabilities=outcome_probabilities
+        if discrete_probabilities is not None:
+            self.discrete_probabilities=discrete_probabilities

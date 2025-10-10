@@ -16,7 +16,7 @@ from src.dtos.node_dtos import NodeIncomingDto
 from src.dtos.node_style_dtos import NodeStyleIncomingDto
 from src.dtos.option_dtos import OptionIncomingDto
 from src.dtos.outcome_dtos import OutcomeIncomingDto
-from src.dtos.outcome_probability_dtos import OutcomeProbabilityIncomingDto
+from src.dtos.discrete_probability_dtos import DiscreteProbabilityIncomingDto
 from src.seed_database import GenerateUuid
 
 
@@ -108,8 +108,8 @@ async def test_update_issue(client: AsyncClient):
         )
         for i, outcome_id in enumerate(new_outcome_ids)
     ]
-    new_outcome_probabilities = [
-        OutcomeProbabilityIncomingDto(
+    new_discrete_probabilities = [
+        DiscreteProbabilityIncomingDto(
             id=uuid4(),
             uncertainty_id=example_issue.uncertainty.id,
             probability=prob,
@@ -134,7 +134,7 @@ async def test_update_issue(client: AsyncClient):
             ),
             uncertainty=UncertaintyIncomingDto(
                 id=example_issue.uncertainty.id, issue_id=example_issue.id, outcomes=new_outcomes,
-                outcome_probabilities=new_outcome_probabilities
+                discrete_probabilities=new_discrete_probabilities
             ),
             utility=None,
             value_metric=None,
@@ -149,7 +149,7 @@ async def test_update_issue(client: AsyncClient):
 
     assert (
         r.uncertainty is not None
-        and [x.probability for x in r.uncertainty.outcome_probabilities] == new_probabilities
+        and [x.probability for x in r.uncertainty.discrete_probabilities] == new_probabilities
     )
     assert r.decision is not None and [x.name for x in r.decision.options] == new_alternatives
     assert r.type == new_type

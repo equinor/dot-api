@@ -9,10 +9,10 @@ from src.dtos.outcome_dtos import (
     OutcomeMapper,
 )
 
-from src.dtos.outcome_probability_dtos import (
-    OutcomeProbabilityIncomingDto,
-    OutcomeProbabilityOutgoingDto,
-    OutcomeProbabilityMapper,
+from src.dtos.discrete_probability_dtos import (
+    DiscreteProbabilityIncomingDto,
+    DiscreteProbabilityOutgoingDto,
+    DiscreteProbabilityMapper,
 )
 
 
@@ -22,12 +22,12 @@ class UncertaintyDto(BaseModel):
 
 
 class UncertaintyIncomingDto(UncertaintyDto):
-    outcome_probabilities: list[OutcomeProbabilityIncomingDto] = []
+    discrete_probabilities: list[DiscreteProbabilityIncomingDto] = []
     outcomes: List[OutcomeIncomingDto] = []
 
 
 class UncertaintyOutgoingDto(UncertaintyDto):
-    outcome_probabilities: list[OutcomeProbabilityOutgoingDto] = []
+    discrete_probabilities: list[DiscreteProbabilityOutgoingDto] = []
     outcomes: List[OutcomeOutgoingDto] = []
 
 
@@ -38,7 +38,7 @@ class UncertaintyMapper:
             id=entity.id,
             issue_id=entity.issue_id,
             outcomes=OutcomeMapper.to_outgoing_dtos(entity.outcomes),
-            outcome_probabilities=OutcomeProbabilityMapper.to_outgoing_dtos(entity.outcome_probabilities),
+            discrete_probabilities=DiscreteProbabilityMapper.to_outgoing_dtos(entity.discrete_probabilities),
         )
 
     @staticmethod
@@ -47,7 +47,7 @@ class UncertaintyMapper:
             id=dto.id,
             issue_id=dto.issue_id,
             outcomes=OutcomeMapper.to_entities(dto.outcomes),
-            outcome_probabilities=OutcomeProbabilityMapper.to_entities(dto.outcome_probabilities),
+            discrete_probabilities=DiscreteProbabilityMapper.to_entities(dto.discrete_probabilities),
         )
 
     @staticmethod

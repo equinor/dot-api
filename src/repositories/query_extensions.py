@@ -10,7 +10,7 @@ from src.models import (
     Uncertainty,
     ProjectRole,
     User,
-    OutcomeProbability,
+    DiscreteProbability,
 )
 
 # Use joinedload for single relationships
@@ -25,20 +25,20 @@ class QueryExtensions:
     def load_uncertainty_with_relationships() -> list[_AbstractLoad]:
         return [
             selectinload(Uncertainty.outcomes),
-            selectinload(Uncertainty.outcome_probabilities).options(
-                joinedload(OutcomeProbability.child_outcome),
-                selectinload(OutcomeProbability.parent_options),
-                selectinload(OutcomeProbability.parent_outcomes),
+            selectinload(Uncertainty.discrete_probabilities).options(
+                joinedload(DiscreteProbability.child_outcome),
+                selectinload(DiscreteProbability.parent_options),
+                selectinload(DiscreteProbability.parent_outcomes),
             )
         ]
 
     @staticmethod
-    def load_outcome_probability_with_relationships() -> list[_AbstractLoad]:
+    def load_discrete_probability_with_relationships() -> list[_AbstractLoad]:
         return [
-            joinedload(OutcomeProbability.child_outcome),
-            joinedload(OutcomeProbability.uncertainty),
-            selectinload(OutcomeProbability.parent_options),
-            selectinload(OutcomeProbability.parent_outcomes),
+            joinedload(DiscreteProbability.child_outcome),
+            joinedload(DiscreteProbability.uncertainty),
+            selectinload(DiscreteProbability.parent_options),
+            selectinload(DiscreteProbability.parent_outcomes),
         ]
 
     @staticmethod

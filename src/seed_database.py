@@ -19,9 +19,8 @@ from src.models import (
     Edge,
     Option,
     Outcome,
-    OutcomeProbability,
-    OutcomeProbabilityParentOption,
-    OutcomeProbabilityParentOutcome,
+    DiscreteProbability,
+    DiscreteProbabilityParentOption,
 )
 from typing import Protocol, TypeVar, Any, Union, Dict, Tuple, List
 from src.constants import Type, Boundary, ObjectiveTypes
@@ -326,89 +325,89 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
     )
     entities.extend([edge_1, edge_2, edge_3])
 
-    outcome_probability_id_1 = uuid.uuid4()
+    discrete_probability_id_1 = uuid.uuid4()
 
-    outcome_probability_1=OutcomeProbability(
-        id=outcome_probability_id_1,
+    discrete_probability_1=DiscreteProbability(
+        id=discrete_probability_id_1,
         child_outcome_id=outcome_id_1,
         uncertainty_id=uncertainty_issue_id,
         probability=0.8,
-        parent_options=[OutcomeProbabilityParentOption(outcome_probability_id=outcome_probability_id_1, parent_option_id=option_id_1)] 
+        parent_options=[DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_1, parent_option_id=option_id_1)] 
     )
 
-    outcome_probability_id_2 = uuid.uuid4()
+    discrete_probability_id_2 = uuid.uuid4()
 
-    outcome_probability_2=OutcomeProbability(
-        id=outcome_probability_id_2,
+    discrete_probability_2=DiscreteProbability(
+        id=discrete_probability_id_2,
         child_outcome_id=outcome_id_1,
         uncertainty_id=uncertainty_issue_id,
         probability=0.7,
-        parent_options=[OutcomeProbabilityParentOption(outcome_probability_id=outcome_probability_id_2, parent_option_id=option_id_2)]
+        parent_options=[DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_2, parent_option_id=option_id_2)]
     )
 
-    outcome_probability_id_3 = uuid.uuid4()
+    discrete_probability_id_3 = uuid.uuid4()
 
-    outcome_probability_3=OutcomeProbability(
-        id=outcome_probability_id_3,
+    discrete_probability_3=DiscreteProbability(
+        id=discrete_probability_id_3,
         child_outcome_id=outcome_id_2,
         uncertainty_id=uncertainty_issue_id,
         probability=0.2,
-        parent_options=[OutcomeProbabilityParentOption(outcome_probability_id=outcome_probability_id_3, parent_option_id=option_id_1)] 
+        parent_options=[DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_3, parent_option_id=option_id_1)] 
     )
 
-    outcome_probability_id_4 = uuid.uuid4()
+    discrete_probability_id_4 = uuid.uuid4()
 
-    outcome_probability_4=OutcomeProbability(
-        id=outcome_probability_id_4,
+    discrete_probability_4=DiscreteProbability(
+        id=discrete_probability_id_4,
         child_outcome_id=outcome_id_2,
         uncertainty_id=uncertainty_issue_id,
         probability=0.3,
-        parent_options=[OutcomeProbabilityParentOption(outcome_probability_id=outcome_probability_id_4, parent_option_id=option_id_2)]
+        parent_options=[DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_4, parent_option_id=option_id_2)]
     )
 
-    entities.extend([outcome_probability_1, outcome_probability_2, outcome_probability_3, outcome_probability_4])
+    entities.extend([discrete_probability_1, discrete_probability_2, discrete_probability_3, discrete_probability_4])
 
-    outcome_probability_id_1 = uuid.uuid4()
+    discrete_probability_id_1 = uuid.uuid4()
 
-    outcome_probability_1=OutcomeProbability(
-        id=outcome_probability_id_1,
+    discrete_probability_1=DiscreteProbability(
+        id=discrete_probability_id_1,
         child_outcome_id=outcome_id_1,
         uncertainty_id=uncertainty_issue_id,
         probability=0.8,
-        parent_options=[OutcomeProbabilityParentOption(outcome_probability_id=outcome_probability_id_1, parent_option_id=option_id_1)] 
+        parent_options=[DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_1, parent_option_id=option_id_1)] 
     )
 
-    outcome_probability_id_2 = uuid.uuid4()
+    discrete_probability_id_2 = uuid.uuid4()
 
-    outcome_probability_2=OutcomeProbability(
-        id=outcome_probability_id_2,
+    discrete_probability_2=DiscreteProbability(
+        id=discrete_probability_id_2,
         child_outcome_id=outcome_id_1,
         uncertainty_id=uncertainty_issue_id,
         probability=0.7,
-        parent_options=[OutcomeProbabilityParentOption(outcome_probability_id=outcome_probability_id_2, parent_option_id=option_id_2)]
+        parent_options=[DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_2, parent_option_id=option_id_2)]
     )
 
-    outcome_probability_id_3 = uuid.uuid4()
+    discrete_probability_id_3 = uuid.uuid4()
 
-    outcome_probability_3=OutcomeProbability(
-        id=outcome_probability_id_3,
+    discrete_probability_3=DiscreteProbability(
+        id=discrete_probability_id_3,
         child_outcome_id=outcome_id_2,
         uncertainty_id=uncertainty_issue_id,
         probability=0.2,
-        parent_options=[OutcomeProbabilityParentOption(outcome_probability_id=outcome_probability_id_3, parent_option_id=option_id_1)] 
+        parent_options=[DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_3, parent_option_id=option_id_1)] 
     )
 
-    outcome_probability_id_4 = uuid.uuid4()
+    discrete_probability_id_4 = uuid.uuid4()
 
-    outcome_probability_4=OutcomeProbability(
-        id=outcome_probability_id_4,
+    discrete_probability_4=DiscreteProbability(
+        id=discrete_probability_id_4,
         child_outcome_id=outcome_id_2,
         uncertainty_id=uncertainty_issue_id,
         probability=0.3,
-        parent_options=[OutcomeProbabilityParentOption(outcome_probability_id=outcome_probability_id_4, parent_option_id=option_id_2)]
+        parent_options=[DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_4, parent_option_id=option_id_2)]
     )
 
-    entities.extend([outcome_probability_1, outcome_probability_2, outcome_probability_3, outcome_probability_4])
+    entities.extend([discrete_probability_1, discrete_probability_2, discrete_probability_3, discrete_probability_4])
 
     # Commit all entities to the database
     async with AsyncSession(conn) as session:
@@ -891,8 +890,8 @@ async def seed_database(
                             utility=2,
                         ),
                     ],
-                    outcome_probabilities=[
-                        OutcomeProbability(
+                    discrete_probabilities=[
+                        DiscreteProbability(
                             id=outcome_prob1_id,
                             uncertainty_id=issue_node_id,
                             child_outcome_id=outcome1_id,
@@ -900,7 +899,7 @@ async def seed_database(
                             parent_outcomes=[],
                             parent_options=[],
                         ),
-                        OutcomeProbability(
+                        DiscreteProbability(
                             id=outcome_prob2_id,
                             uncertainty_id=issue_node_id,
                             child_outcome_id=outcome2_id,

@@ -101,9 +101,9 @@ class PyagrumSolver:
         # Build all parent state combinations
         parent_combinations = list(product(*parent_labels))
         outcome_ids = [o.id.__str__() for o in head_issue.uncertainty.outcomes]
-        outcome_probabilities = { 
+        discrete_probabilities = { 
             (op.child_outcome_id.__str__(), tuple(sorted([x.__str__() for x in (op.parent_outcome_ids or []) + (op.parent_option_ids or [])]))): op.probability
-            for op in getattr(head_issue.uncertainty, "outcome_probabilities", [])
+            for op in getattr(head_issue.uncertainty, "discrete_probabilities", [])
         }
         cpt = self.diagram.cpt(node_id)
 
@@ -111,7 +111,7 @@ class PyagrumSolver:
             probs = []
             parent_state_key = tuple(sorted(parent_state))
             for outcome_id in outcome_ids:
-                prob = outcome_probabilities.get((outcome_id, parent_state_key), 0.0)
+                prob = discrete_probabilities.get((outcome_id, parent_state_key), 0.0)
                 probs.append(prob)
             total = sum(probs)
             if total > 0:

@@ -8,7 +8,7 @@ from src.services.project_service import ProjectService
 from src.services.objective_service import ObjectiveService
 from src.services.opportunity_service import OpportunityService
 from src.services.uncertainty_service import UncertaintyService
-from src.services.outcome_probability_service import OutcomeProbabilityService
+from src.services.discrete_probability_service import DiscreteProbabilityService
 from src.services.utility_service import UtilityService
 from src.services.value_metric_service import ValueMetricService
 from src.services.scenario_service import ScenarioService
@@ -78,8 +78,8 @@ async def get_uncertainty_service() -> UncertaintyService:
     return UncertaintyService()
 
 
-async def get_outcome_probability_service() -> OutcomeProbabilityService:
-    return OutcomeProbabilityService()
+async def get_discrete_probability_service() -> DiscreteProbabilityService:
+    return DiscreteProbabilityService()
 
 
 async def get_utility_service() -> UtilityService:

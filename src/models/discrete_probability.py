@@ -10,49 +10,49 @@ if TYPE_CHECKING:
     from src.models.option import Option
     from src.models.uncertainty import Uncertainty
 
-class OutcomeProbabilityParentOutcome(Base):
-    __tablename__ = "outcome_probability_parent_outcome"
-    outcome_probability_id = mapped_column(GUID(), ForeignKey("outcome_probability.id"), primary_key=True)
+class DiscreteProbabilityParentOutcome(Base):
+    __tablename__ = "discrete_probability_parent_outcome"
+    discrete_probability_id = mapped_column(GUID(), ForeignKey("discrete_probability.id"), primary_key=True)
     parent_outcome_id = mapped_column(GUID(), ForeignKey("outcome.id"), primary_key=True)
 
-    outcome_probability: Mapped["OutcomeProbability"] = relationship("OutcomeProbability", back_populates="parent_outcomes")
+    discrete_probability: Mapped["DiscreteProbability"] = relationship("DiscreteProbability", back_populates="parent_outcomes")
     parent_outcome: Mapped["Outcome"] = relationship("Outcome")
 
-    def __init__(self, outcome_probability_id: uuid.UUID, parent_outcome_id: uuid.UUID):
-        self.outcome_probability_id = outcome_probability_id
+    def __init__(self, discrete_probability_id: uuid.UUID, parent_outcome_id: uuid.UUID):
+        self.discrete_probability_id = discrete_probability_id
         self.parent_outcome_id = parent_outcome_id
 
-class OutcomeProbabilityParentOption(Base):
-    __tablename__ = "outcome_probability_parent_option"
-    outcome_probability_id = mapped_column(GUID(), ForeignKey("outcome_probability.id"), primary_key=True)
+class DiscreteProbabilityParentOption(Base):
+    __tablename__ = "discrete_probability_parent_option"
+    discrete_probability_id = mapped_column(GUID(), ForeignKey("discrete_probability.id"), primary_key=True)
     parent_option_id = mapped_column(GUID(), ForeignKey("option.id"), primary_key=True)
 
-    outcome_probability: Mapped["OutcomeProbability"] = relationship("OutcomeProbability", back_populates="parent_options")
+    discrete_probability: Mapped["DiscreteProbability"] = relationship("DiscreteProbability", back_populates="parent_options")
     parent_option: Mapped["Option"] = relationship("Option")
 
-    def __init__(self, outcome_probability_id: uuid.UUID, parent_option_id: uuid.UUID):
-        self.outcome_probability_id = outcome_probability_id
+    def __init__(self, discrete_probability_id: uuid.UUID, parent_option_id: uuid.UUID):
+        self.discrete_probability_id = discrete_probability_id
         self.parent_option_id = parent_option_id
 
-class OutcomeProbability(Base, BaseEntity):
-    __tablename__ = "outcome_probability"
+class DiscreteProbability(Base, BaseEntity):
+    __tablename__ = "discrete_probability"
     id = mapped_column(GUID(), primary_key=True)
     child_outcome_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("outcome.id"), index=True)
     uncertainty_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("uncertainty.id"), index=True)
     probability: Mapped[float] = mapped_column(Float(), default=0.0)
 
     child_outcome: Mapped["Outcome"] = relationship("Outcome", foreign_keys=[child_outcome_id])
-    uncertainty: Mapped["Uncertainty"] = relationship("Uncertainty", back_populates="outcome_probabilities", foreign_keys=[uncertainty_id])
+    uncertainty: Mapped["Uncertainty"] = relationship("Uncertainty", back_populates="discrete_probabilities", foreign_keys=[uncertainty_id])
 
-    parent_outcomes: Mapped[list["OutcomeProbabilityParentOutcome"]] = relationship(
-        "OutcomeProbabilityParentOutcome",
-        back_populates="outcome_probability",
+    parent_outcomes: Mapped[list["DiscreteProbabilityParentOutcome"]] = relationship(
+        "DiscreteProbabilityParentOutcome",
+        back_populates="discrete_probability",
         cascade="all, delete-orphan"
     )
 
-    parent_options: Mapped[list["OutcomeProbabilityParentOption"]] = relationship(
-        "OutcomeProbabilityParentOption",
-        back_populates="outcome_probability",
+    parent_options: Mapped[list["DiscreteProbabilityParentOption"]] = relationship(
+        "DiscreteProbabilityParentOption",
+        back_populates="discrete_probability",
         cascade="all, delete-orphan"
     )
 
@@ -62,8 +62,8 @@ class OutcomeProbability(Base, BaseEntity):
         uncertainty_id: uuid.UUID,
         child_outcome_id: uuid.UUID,
         probability: float = 0.0,
-        parent_outcomes: Optional[list["OutcomeProbabilityParentOutcome"]] = None,
-        parent_options: Optional[list["OutcomeProbabilityParentOption"]] = None,
+        parent_outcomes: Optional[list["DiscreteProbabilityParentOutcome"]] = None,
+        parent_options: Optional[list["DiscreteProbabilityParentOption"]] = None,
     ):
         self.id = id
         self.uncertainty_id = uncertainty_id

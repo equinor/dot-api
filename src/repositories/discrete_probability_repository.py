@@ -1,19 +1,19 @@
 import uuid
-from src.models.outcome_probability import OutcomeProbability
+from src.models.discrete_probability import DiscreteProbability
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.base_repository import BaseRepository
 from src.repositories.query_extensions import QueryExtensions
 
 
-class OutcomeProbabilityRepository(BaseRepository[OutcomeProbability, uuid.UUID]):
+class DiscreteProbabilityRepository(BaseRepository[DiscreteProbability, uuid.UUID]):
     def __init__(self, session: AsyncSession):
         super().__init__(
             session,
-            OutcomeProbability,
-            query_extension_method=QueryExtensions.load_outcome_probability_with_relationships,
+            DiscreteProbability,
+            query_extension_method=QueryExtensions.load_discrete_probability_with_relationships,
         )
 
-    async def update(self, entities: list[OutcomeProbability]) -> list[OutcomeProbability]:
+    async def update(self, entities: list[DiscreteProbability]) -> list[DiscreteProbability]:
         entities_to_update = await self.get([entity.id for entity in entities])
         # sort the entity lists to share the same order according to the entity.id
         self.prepare_entities_for_update([entities, entities_to_update])
