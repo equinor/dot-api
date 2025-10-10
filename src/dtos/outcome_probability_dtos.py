@@ -36,8 +36,8 @@ class OutcomeProbabilityMapper:
             child_outcome_id=dto.child_outcome_id,
             uncertainty_id=dto.uncertainty_id,
             probability=dto.probability,
-            parent_outcomes=[OutcomeProbabilityParentOutcome(outcome_probability_id=dto.child_outcome_id, parent_outcome_id=x) for x in dto.parent_outcome_ids],
-            parent_options=[OutcomeProbabilityParentOption(outcome_probability_id=dto.child_outcome_id, parent_option_id=x) for x in dto.parent_option_ids]
+            parent_outcomes=[OutcomeProbabilityParentOutcome(outcome_probability_id=dto.id, parent_outcome_id=x) for x in dto.parent_outcome_ids],
+            parent_options=[OutcomeProbabilityParentOption(outcome_probability_id=dto.id, parent_option_id=x) for x in dto.parent_option_ids]
         )
 
     @staticmethod
