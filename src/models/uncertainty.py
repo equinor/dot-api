@@ -32,7 +32,7 @@ class Uncertainty(Base, BaseEntity):
         foreign_keys="OutcomeProbability.uncertainty_id"
     )
 
-    def __init__(self, id: uuid.UUID, issue_id: uuid.UUID, outcomes: list[Outcome], outcome_probabilities: Optional[list[OutcomeProbability]]=[]):
+    def __init__(self, id: uuid.UUID, issue_id: uuid.UUID, outcomes: list[Outcome], outcome_probabilities: Optional[list[OutcomeProbability]]=None):
         self.id = id
         self.issue_id = issue_id
         self.outcomes = outcomes
