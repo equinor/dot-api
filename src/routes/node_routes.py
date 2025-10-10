@@ -86,6 +86,16 @@ async def delete_node(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.delete("/nodes")
+async def delete_nodes(
+    ids: list[uuid.UUID] = Query([]),
+    node_service: NodeService = Depends(get_node_service),
+    session: AsyncSession = Depends(get_db),
+):
+    try:
+        await node_service.delete(session, ids)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/nodes")
 async def update_nodes(

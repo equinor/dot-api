@@ -68,6 +68,16 @@ async def delete_edge(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.delete("/edges")
+async def delete_edges(
+    ids: list[uuid.UUID] = Query([]),
+    edge_service: EdgeService = Depends(get_edge_service),
+    session: AsyncSession = Depends(get_db),
+):
+    try:
+        await edge_service.delete(session, ids)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/edges")
 async def update_edges(

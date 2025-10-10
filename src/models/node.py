@@ -22,8 +22,8 @@ class Node(Base, BaseEntity):
     __tablename__ = "node"
 
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
-    scenario_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey(Scenario.id))
-    issue_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("issue.id"))
+    scenario_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey(Scenario.id), index=True)
+    issue_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("issue.id"), index=True)
 
     name: Mapped[str] = mapped_column(
         String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True
@@ -32,7 +32,7 @@ class Node(Base, BaseEntity):
     scenario: Mapped[Scenario] = relationship(
         Scenario, foreign_keys=[scenario_id], back_populates="nodes"
     )
-    issue: Mapped["Issue"] = relationship("Issue", back_populates="node")
+    issue: Mapped["Issue"] = relationship("Issue", back_populates="node", cascade="all, delete-orphan", single_parent=True)
 
     head_edges: Mapped[list["Edge"]] = relationship(
         "Edge",

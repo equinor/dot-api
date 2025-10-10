@@ -9,10 +9,12 @@ class Type(str, Enum):
     FACT = "Fact"
     UTILITY = "Utility"
 
+
 class ObjectiveTypes(str, Enum):
     STRATEGIC = "Strategic"
     FUNDAMENTAL = "Fundamental"
     MEAN = "Mean"
+
 
 class DepricatedIssueTypes(str, Enum):
     UNDECIDED = "Undecided"
@@ -21,8 +23,9 @@ class DepricatedIssueTypes(str, Enum):
 
 
 class ProjectRoleType(str, Enum):
-    OWNER = "owner"
-    CONTRIBUTOR = "contributor"
+    DECISIONMAKER = "Decision Maker"
+    FACILITATOR = "Facilitator"
+    MEMBER = "Member"
 
 
 class Boundary(str, Enum):

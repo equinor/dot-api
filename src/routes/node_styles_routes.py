@@ -55,6 +55,16 @@ async def delete_node_style(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.delete("/node-styles")
+async def delete_node_styles(
+    ids: list[uuid.UUID] = Query([]),
+    node_style_service: NodeStyleService = Depends(get_node_style_service),
+    session: AsyncSession = Depends(get_db),
+):
+    try:
+        await node_style_service.delete(session, ids)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/node-styles")
 async def update_node_styles(

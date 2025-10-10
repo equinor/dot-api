@@ -58,6 +58,16 @@ async def delete_uncertainty(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.delete("/uncertainties")
+async def delete_uncertainties(
+    ids: list[uuid.UUID] = Query([]),
+    uncertainty_service: UncertaintyService = Depends(get_uncertainty_service),
+    session: AsyncSession = Depends(get_db),
+):
+    try:
+        await uncertainty_service.delete(session, ids)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/uncertainties")
 async def update_uncertainties(

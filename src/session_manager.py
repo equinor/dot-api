@@ -15,6 +15,8 @@ from src.config import config
 from src.seed_database import (
     seed_database,
     create_single_project_with_scenario,
+    create_decision_tree_symmetry_DT_from_ID,
+    create_decision_tree_symmetry_DT,
 )
 from src.database import (
     DatabaseConnectionStrings,
@@ -46,6 +48,8 @@ class SessionManager:
             await conn.run_sync(Base.metadata.create_all)
             await seed_database(conn, num_projects=10, num_scenarios=10, num_nodes=50)
             await create_single_project_with_scenario(conn)
+            await create_decision_tree_symmetry_DT_from_ID(conn)
+            await create_decision_tree_symmetry_DT(conn)
 
     async def _initialize_persistent_db(self) -> None:
         """Initialize a persistent database."""

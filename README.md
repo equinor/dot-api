@@ -12,6 +12,10 @@ This API follows a service/repositories pattern. The main components are entitie
 1. Each entity should have one or more DTOs representing versions that can be processed in the code.
 1. Transformation between entities and DTOs should be managed by a DTO mapper specific to each entity.
 
+## SQLAlchemy Notes for Developers
+
+When deleting entities, use iterative deletion rather than bulk `delete(self.model).where(self.model.id.in_(ids))`. Bulk deletes bypass SQLAlchemy's ORM cascade rules, so related objects may not be removed as expected. To ensure proper cascading and integrity, delete entities individually through the session.
+
 ## Get Started
 
 ### Add Secrets
