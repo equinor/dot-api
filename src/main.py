@@ -21,8 +21,8 @@ import src.routes.solver_routes as solver_routes
 import src.routes.structure_routes as structure_routes
 from src.config import config
 from src.session_manager import sessionmanager
+from src.middleware.py_instrument_middle_ware import PyInstrumentMiddleWare
 from fastapi.middleware.cors import CORSMiddleware
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -50,6 +50,11 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all HTTP headers
 )
 
+if config.PROFILE:
+    # this will generate a profile.html at repository root when running any endpoint
+    app.add_middleware(
+        PyInstrumentMiddleWare
+    )
 
 @app.get("/", status_code=status.HTTP_200_OK)
 async def root():
