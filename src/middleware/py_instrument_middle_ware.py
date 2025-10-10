@@ -10,5 +10,6 @@ class PyInstrumentMiddleWare(BaseHTTPMiddleware):
         response = await call_next(request)
         profiler.stop()
         # Write result to html file
-        profiler.write_html("profile.html")
+        profiler.write_html(fr"profile{request.url.path.replace('/', '-')}.html")
+        
         return response
