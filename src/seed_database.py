@@ -866,21 +866,47 @@ async def seed_database(
                 )
                 entities.append(decision)
 
+                # Create outcome IDs to reference consistently
+                outcome1_id = issue_node_id
+                outcome2_id = uuid4()
+                
+                # Create unique IDs for outcome probabilities
+                outcome_prob1_id = GenerateUuid.as_uuid(f"{project_index}_{scenario_index}_{issue_node_index}_op1")
+                outcome_prob2_id = GenerateUuid.as_uuid(f"{project_index}_{scenario_index}_{issue_node_index}_op2")
+                
                 uncertainty = Uncertainty(
                     id=issue_node_id,
                     issue_id=issue_node_id,
                     outcomes=[
                         Outcome(
-                            id=issue_node_id,
+                            id=outcome1_id,
                             uncertainty_id=issue_node_id,
                             name="outcome 1",
                             utility=4,
                         ),
                         Outcome(
-                            id=uuid4(),
+                            id=outcome2_id,
                             uncertainty_id=issue_node_id,
                             name="outcome 2",
                             utility=2,
+                        ),
+                    ],
+                    outcome_probabilities=[
+                        OutcomeProbability(
+                            id=outcome_prob1_id,
+                            uncertainty_id=issue_node_id,
+                            child_outcome_id=outcome1_id,
+                            probability=0.6,
+                            parent_outcomes=[],
+                            parent_options=[],
+                        ),
+                        OutcomeProbability(
+                            id=outcome_prob2_id,
+                            uncertainty_id=issue_node_id,
+                            child_outcome_id=outcome2_id,
+                            probability=0.4,
+                            parent_outcomes=[],
+                            parent_options=[],
                         ),
                     ],
                 )
