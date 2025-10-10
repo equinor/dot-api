@@ -3,6 +3,7 @@ from typing import Optional, TYPE_CHECKING
 from sqlalchemy import ForeignKey, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models.base import Base
+from src.models.base_entity import BaseEntity
 from src.models.guid import GUID
 if TYPE_CHECKING:
     from src.models.outcome import Outcome
@@ -33,7 +34,7 @@ class OutcomeProbabilityParentOption(Base):
         self.outcome_probability_id = outcome_probability_id
         self.parent_option_id = parent_option_id
 
-class OutcomeProbability(Base):
+class OutcomeProbability(Base, BaseEntity):
     __tablename__ = "outcome_probability"
     id = mapped_column(GUID(), primary_key=True)
     child_outcome_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("outcome.id"), index=True)

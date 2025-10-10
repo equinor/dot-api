@@ -33,6 +33,15 @@ class QueryExtensions:
         ]
 
     @staticmethod
+    def load_outcome_probability_with_relationships() -> list[_AbstractLoad]:
+        return [
+            joinedload(OutcomeProbability.child_outcome),
+            joinedload(OutcomeProbability.uncertainty),
+            selectinload(OutcomeProbability.parent_options),
+            selectinload(OutcomeProbability.parent_outcomes),
+        ]
+
+    @staticmethod
     def load_issue_with_relationships() -> list[_AbstractLoad]:
         return [
             joinedload(Issue.decision).options(*QueryExtensions.load_decision_with_relationships()),
