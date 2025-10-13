@@ -2,7 +2,7 @@ import pytest
 from httpx import AsyncClient
 from src.seed_database import GenerateUuid
 from src.services.decision_tree.decision_tree_creator import DecisionTreeGraph
-from src.dtos.decision_tree_dtos import EdgeUUIDDto
+from src.dtos.decision_tree_dtos import EdgeUUIDDto, EndPointNodeDto
 from src.session_manager import sessionmanager
 from src.dependencies import get_scenario_service, get_structure_service
 
@@ -13,7 +13,7 @@ async def test_decision_tree_endpoint(client: AsyncClient):
     assert response.status_code == 200, f"Failed to create decision tree: {response.text}"
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="Skipping, need to redesign test due to different approach to utility.")
+#@pytest.mark.skip(reason="Skipping, need to redesign test due to different approach to utility.")
 async def test_decision_tree():
     await sessionmanager.init_db()
     scenario_service = await get_scenario_service()
@@ -52,3 +52,58 @@ async def test_decision_tree():
 
     assert no_edges_id == no_edges_dt
     assert no_nodes_id == no_nodes_dt
+
+# @pytest.mark.asyncio
+# async def test_decision_tree2():
+#     await sessionmanager.init_db()
+#     scenario_service = await get_scenario_service()
+#     structure_service = await get_structure_service()
+
+#     scenario_uuid = GenerateUuid.as_uuid("dt_from_id_scenario")
+#     dt_from_id = await structure_service.create_decision_tree(scenario_uuid)
+
+
+#     endpoint_node = EndPointNodeDto(scenario_id=scenario_uuid2)
+#     await decision_tree_graph.add_node(endpoint_node.id)  
+#     decision_T_id = GenerateUuid.as_uuid("dt_from_id_decision_T")
+#     uncertainty_D_id = GenerateUuid.as_uuid("dt_from_id_uncertainty_D")
+#     uncertainty_P_id = GenerateUuid.as_uuid("dt_from_id_uncertainty_P")
+#     await decision_tree_graph.add_edge(EdgeUUIDDto(tail=decision_T_id, head=endpoint_node.id))
+#     await decision_tree_graph.add_edge(EdgeUUIDDto(tail=uncertainty_D_id, head=endpoint_node.id))
+#     await decision_tree_graph.add_edge(EdgeUUIDDto(tail=uncertainty_P_id, head=endpoint_node.id))
+
+
+#     scenario_uuid2 = GenerateUuid.as_uuid("dt_scenario")
+#     issues = []
+#     edges = []
+#     async for session in sessionmanager.get_session():
+#         (
+#             issues,
+#             edges,
+#         ) = await scenario_service.get_influence_diagram_data(session, scenario_uuid2)
+
+#     root_id = GenerateUuid.as_uuid("dt_uncertainty_S")
+#     root_issue = next((issue for issue in issues if issue.id == root_id), None)
+#     assert root_issue != None
+
+#     decision_tree_graph = DecisionTreeGraph(root=root_issue.id)
+#     for issue in issues:
+#         await decision_tree_graph.add_node(issue.id)
+
+   
+
+#     for edge in edges:
+#         tail_node = [x for x in issues if x.id==edge.tail_node.issue_id][0]
+#         head_node = [x for x in issues if x.id==edge.head_node.issue_id][0]
+#         ee = EdgeUUIDDto(tail=tail_node.id, head=head_node.id)
+#         await decision_tree_graph.add_edge(ee)
+
+
+#     no_nodes_id = dt_from_id.nx.number_of_nodes() # type: ignore
+#     no_edges_id = dt_from_id.nx.number_of_edges() # type: ignore
+
+#     no_nodes_dt = decision_tree_graph.nx.number_of_nodes() # type: ignore
+#     no_edges_dt = decision_tree_graph.nx.number_of_edges()  # type: ignore
+
+#     assert no_edges_id == no_edges_dt
+#     assert no_nodes_id == no_nodes_dt    
