@@ -31,7 +31,7 @@ from src.repositories.user_repository import UserRepository
 from src.repositories.objective_repository import ObjectiveRepository
 from src.repositories.opportunity_repository import OpportunityRepository
 from src.models.filters.scenario_filter import ScenarioFilter
-from src.domain.influance_diagram import InfluenceDiagramDOT
+from src.domain.influence_diagram import InfluenceDiagramDOT
 
 
 class ScenarioService:
@@ -143,15 +143,12 @@ class ScenarioService:
         edge_dtos = EdgeMapper.to_outgoing_dtos(edges_entities)
         
         # Run influence diagram creation and validation in a separate thread
-        influance_diagram = InfluenceDiagramDOT(edge_dtos, issue_dtos)
-        # = await asyncio.to_thread(
-        #     lambda: InfluenceDiagramDOT(edge_dtos, issue_dtos)
-        # )
-        influance_diagram.validate_diagram()
-        # await asyncio.to_thread(
-        #     )
+        influence_diagram = await asyncio.to_thread(
+            lambda: InfluenceDiagramDOT(edge_dtos, issue_dtos)
+        )
+        await asyncio.to_thread(influence_diagram.validate_diagram)
 
         # Return the validated (potentially filtered) issues and edges
-        return influance_diagram.issues, influance_diagram.edges
+        return influence_diagram.issues, influence_diagram.edges
     
 
