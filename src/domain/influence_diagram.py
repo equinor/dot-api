@@ -65,7 +65,7 @@ class InfluenceDiagramDOT:
             )
 
     def _build_graph(self):
-        self.graph=Graph()
+        self.graph = Graph()
         for edge in self.edges:
             self.graph.addEdge(edge.tail_issue_id, edge.head_issue_id)
 
