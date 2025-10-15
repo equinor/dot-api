@@ -1,6 +1,8 @@
+import pytest
 import uuid
 from src.utils.set_joins import join_sets_with_common_elements
 
+@pytest.mark.asyncio
 def test_set_joins():
     # Create some UUIDs for testing
     id1 = uuid.uuid4()
@@ -38,6 +40,3 @@ def test_set_joins():
     assert len(result3) == 2
     assert result3[0] == {id1, id2, id3}
     assert result3[1] == {id4, id5}
-
-if __name__ == "__main__":
-    test_set_joins()

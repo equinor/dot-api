@@ -20,6 +20,9 @@ class InfluenceDiagramDOT:
     graph: Graph
 
     def __init__(self, edges: list[EdgeOutgoingDto], issues: list[IssueOutgoingDto]) -> None:
+        self.constructor(edges, issues)
+
+    def constructor(self, edges: list[EdgeOutgoingDto], issues: list[IssueOutgoingDto]):
         if self.init_counter > self.max_reconstructions:
             raise RecursionError(
                 f"Cyclical reconstruction of InfluenceDiagramDOT object detected. "
@@ -92,7 +95,7 @@ class InfluenceDiagramDOT:
             ]
             
             # reconstruct the instance with filtered data
-            self.__init__(filtered_edges, filtered_issues)
+            self.constructor(filtered_edges, filtered_issues)
             self.validate_diagram()
             self.init_counter=0
 
@@ -115,13 +118,19 @@ class InfluenceDiagramDOT:
         self._reconstruct_for_longest_node_path()
         
         # check that for the final issues, have at least 1 option/outcome
+        validation_message = ""
         for issue in self.issues:
-            if issue.type == Type.UNCERTAINTY:
-                assert issue.uncertainty is not None
-                assert len(issue.uncertainty.outcomes) != 0
-            if issue.type == Type.DECISION:
-                assert issue.uncertainty is not None
-                assert len(issue.uncertainty.outcomes) != 0
+
+            if issue.type == Type.UNCERTAINTY and (issue.uncertainty is None or len(issue.uncertainty.outcomes) == 0):
+                validation_message += f"No Outcomes found for Uncertainty {issue.name}. \n"
+                
+            if issue.type == Type.DECISION and( issue.decision is None or len(issue.decision.options) == 0):
+                validation_message += f"No Options found for Decision {issue.name}. \n"
+
+        if validation_message != "":
+            raise ValueError(validation_message)
+            
+        
 
     def traverse_graph_paths(self):
         paths: dict[uuid.UUID, set[uuid.UUID]] = {}
