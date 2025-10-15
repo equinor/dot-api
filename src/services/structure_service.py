@@ -35,4 +35,4 @@ class StructureService:
                                             nodes = issues,
                                             edges = edges)
         dt = await decision_tree_creator.create_decision_tree()
-        return await decision_tree_creator.to_issue_dtos(dt)
+        return await dt.to_issue_dtos()

@@ -7,9 +7,10 @@ import networkx as nx
 from typing import Optional, Dict, Any, Union, List, Tuple, Iterator
 from fastapi import HTTPException
 from src.constants import Type
+from src.seed_database import GenerateUuid
 from src.dtos.issue_dtos import IssueOutgoingDto
 from src.dtos.edge_dtos import EdgeOutgoingDto
-from src.dtos.decision_tree_dtos import EdgeUUIDDto, EndPointNodeDto, DecisionTreeDTO
+from src.dtos.decision_tree_dtos import EdgeUUIDDto, EndPointNodeDto, DecisionTreeDTO, TreeNodeDto
 
 logger = logging.getLogger(__name__)
 
@@ -21,12 +22,66 @@ class DecisionTreeGraph():
         self.root: Optional[Any] = root
         if self.root is not None:
             self.nx.add_node(self.root)         # type: ignore
+        self.treenode_lookup : Dict[str, TreeNodeDto] = {}
+        self.edge_names : Dict[Tuple[uuid.UUID, uuid.UUID], str] = {}
 
     async def add_node(self, node: uuid.UUID) -> None:
         self.nx.add_node(node) # type: ignore
 
     async def add_edge(self, edge: EdgeUUIDDto) -> None:
-        self.nx.add_edge(edge.tail, edge.head) # type: ignore
+        self.nx.add_edge(edge.tail, edge.head, name=edge.name) # type: ignore
+
+    async def get_parent(self, node: uuid.UUID) -> uuid.UUID | None:
+        parents = list(self.nx.predecessors(node)) # type: ignore
+        return parents[0] if len(parents) > 0 else None # type: ignore
+
+    async def to_issue_dtos(self) -> Optional[DecisionTreeDTO]:
+        self.edge_names = nx.get_edge_attributes(self.nx, "name") # type: ignore
+        tg = nx.readwrite.json_graph.tree_data(self.nx, self.root) # type: ignore
+        tree_structure = await self.create_decision_tree_dto_from_treenode(tg) # type: ignore
+        return tree_structure
+
+    async def get_decision_tree_dto(self, issue: TreeNodeDto, children: list[DecisionTreeDTO] | None = None) -> DecisionTreeDTO:
+        return DecisionTreeDTO(
+            tree_node=issue,
+            children=children
+        )
+
+    async def create_decision_tree_dto_from_treenode(self, tree_data: Dict[str, Any]) -> Optional[DecisionTreeDTO]:
+        # Base case: if the tree data is empty, return None
+        if not tree_data:
+            return None
+
+        # Create the DTO for the current node
+        node = self.treenode_lookup.get(str(tree_data['id']), None)
+
+        if node is None:
+            return None
+
+        # Recursively create DTOs for child nodes
+        children_dtos: list[DecisionTreeDTO] = []
+        for child in tree_data.get('children', []):
+            child_dto = await self.create_decision_tree_dto_from_treenode(child)
+            if child_dto:
+                children_dtos.append(child_dto)
+
+        copy_node = copy.deepcopy(node)
+        copy_node.id = await self.create_treenode_id(copy_node)
+        return await self.get_decision_tree_dto(issue=copy_node, children=children_dtos if children_dtos else None)
+
+    async def create_treenode_id(self, node: TreeNodeDto) -> uuid.UUID:
+        id_string = ""
+        treenode_id = node.id
+
+        parent_id = await self.get_parent(treenode_id)
+        while parent_id is not None:
+            n = self.edge_names[(parent_id, treenode_id)]
+            id_string = n if id_string == "" else n + " - " + id_string
+            treenode_id = parent_id
+            parent_id = await self.get_parent(treenode_id)
+
+        id_string = "root" if id_string == "" else "root" + " - " + id_string
+        return GenerateUuid.as_uuid(id_string)
 
 
 class DecisionTreeCreator():
@@ -34,34 +89,34 @@ class DecisionTreeCreator():
         self.nx = nx.DiGraph() # type: ignore
         self.scenario_id : uuid.UUID
         self.data :  Dict[str, List[Union[uuid.UUID, EdgeUUIDDto]]] = {}
-        self.node_ids: list[uuid.UUID] = []
-        self.edge_dtos: list[EdgeUUIDDto] = []
-        self.node_lookup : Dict[str, IssueOutgoingDto] = {}
-        self.endpoint_lookup : Dict[str, EndPointNodeDto] = {}
+        self.treenode_ids: list[uuid.UUID] = []
+        self.treenode_edge_dtos: list[EdgeUUIDDto] = []
+        self.treenode_lookup : Dict[str, TreeNodeDto] = {}
 
     @classmethod
     async def initialize(cls, scenario_id:uuid.UUID, nodes:list[IssueOutgoingDto], edges:list[EdgeOutgoingDto]) -> DecisionTreeCreator:
         instance = cls()
         instance.scenario_id = scenario_id
-        instance.node_ids, instance.edge_dtos = await instance.create_data_struct(nodes, edges)
-        instance.node_lookup = await instance.populate_node_lookup(nodes)
-        await instance.data_to_networkx(instance.node_ids, instance.edge_dtos)
+        treenodes = [TreeNodeDto(issue=node) for node in nodes]
+        instance.treenode_ids, instance.treenode_edge_dtos = await instance.create_data_struct(treenodes, edges)
+        instance.treenode_lookup = await instance.populate_treenode_lookup(treenodes)
+        await instance.data_to_networkx(instance.treenode_ids, instance.treenode_edge_dtos)
         return instance
 
-    async def populate_node_lookup(self, nodes: list[IssueOutgoingDto]) -> Dict[str, IssueOutgoingDto]:
+    async def populate_treenode_lookup(self, nodes: list[TreeNodeDto]) -> Dict[str, TreeNodeDto]:
         return {str(node.id): node for node in nodes}
 
     async def create_decision_tree(self) -> DecisionTreeGraph:
         return await self.convert_to_decision_tree(scenario_id=self.scenario_id)
 
-    async def create_data_struct(self, nodes:list[IssueOutgoingDto], edges:list[EdgeOutgoingDto]) -> Tuple[List[uuid.UUID], List[EdgeUUIDDto]]:
+    async def create_data_struct(self, nodes:list[TreeNodeDto], edges:list[EdgeOutgoingDto]) -> Tuple[List[uuid.UUID], List[EdgeUUIDDto]]:
         node_ids = [node.id for node in nodes]
         edge_dtos = [await self.to_arc_dto(nodes, edge) for edge in edges]
         return node_ids, edge_dtos
 
-    async def to_arc_dto(self, nodes: list[IssueOutgoingDto], edge: EdgeOutgoingDto) -> EdgeUUIDDto:
-        tail_node = [x for x in nodes if x.id==edge.tail_node.issue_id][0]
-        head_node = [x for x in nodes if x.id==edge.head_node.issue_id][0]
+    async def to_arc_dto(self, nodes: list[TreeNodeDto], edge: EdgeOutgoingDto) -> EdgeUUIDDto:
+        tail_node = [x for x in nodes if x.issue.id==edge.tail_node.issue_id][0]
+        head_node = [x for x in nodes if x.issue.id==edge.head_node.issue_id][0]
         return EdgeUUIDDto(tail=tail_node.id, head=head_node.id)
 
     async def data_to_networkx(self, node_ids: List[uuid.UUID], edge_dtos: List[EdgeUUIDDto]) -> None:
@@ -84,7 +139,7 @@ class DecisionTreeCreator():
         new_id = type(self)()  # Need to instance from the concrete class
         new_id.nx = self.nx.copy() # type: ignore
         new_id.scenario_id = copy.deepcopy(self.scenario_id)
-        new_id.node_lookup = copy.deepcopy(self.node_lookup)
+        new_id.treenode_lookup = copy.deepcopy(self.treenode_lookup)
         return new_id
 
     async def get_parents(self, node: uuid.UUID) -> list[uuid.UUID]:
@@ -93,17 +148,12 @@ class DecisionTreeCreator():
     async def get_children(self, node: uuid.UUID) -> list[uuid.UUID]:
         return list(self.nx.successors(node)) # type: ignore
 
-    async def get_endpoint_node_from_uuid(self, uuid: uuid.UUID) -> Optional[EndPointNodeDto]:
-        return self.endpoint_lookup.get(str(uuid), None)
-
-    async def get_node_from_uuid(self, uuid: uuid.UUID) -> Optional[IssueOutgoingDto]:
-        return self.node_lookup.get(str(uuid), None)    
+    async def get_node_from_uuid(self, uuid: uuid.UUID) -> Optional[TreeNodeDto]:
+        return self.treenode_lookup.get(str(uuid), None)
 
     async def get_type_from_id(self, id: uuid.UUID) -> str:
         node = await self.get_node_from_uuid(id)
-        if node is None:
-            node = await self.get_endpoint_node_from_uuid(id)
-        return node.type if node is not None else "Undefined"
+        return node.issue.type if node is not None else "Undefined"
 
     async def get_nodes_from_type(self, node_type_string: str) -> list[uuid.UUID]:
         node_list :list[uuid.UUID] = []
@@ -185,14 +235,14 @@ class DecisionTreeCreator():
         ) -> Iterator[Tuple[EdgeUUIDDto, uuid.UUID]]:
         tree_stack = []
         node = await self.get_node_from_uuid(node_id)
-        if node is not None:
-            if node.type == Type.DECISION:
+        if node is not None and isinstance(node.issue, IssueOutgoingDto):
+            if node.issue.type == Type.DECISION:
                 tree_stack = [
-                    EdgeUUIDDto(tail=node_id, head=None) for _ in node.decision.options
-                ] if node.decision else []
-            elif node.type == Type.UNCERTAINTY:
+                    EdgeUUIDDto(tail=node_id, head=None, name="option "+ option.name) for option in node.issue.decision.options
+                ] if node.issue.decision else []
+            elif node.issue.type == Type.UNCERTAINTY:
                 # This needs to be re-written according to the way we deal with probabilities
-                tree_stack = [EdgeUUIDDto(tail=node_id, head=None) for _ in node.uncertainty.outcomes] if node.uncertainty else []
+                tree_stack = [EdgeUUIDDto(tail=node_id, head=None, name="outcome " + outcome.name) for outcome in node.issue.uncertainty.outcomes] if node.issue.uncertainty else []
             if flip:
                 tree_stack.reverse()
 
@@ -217,7 +267,7 @@ class DecisionTreeCreator():
                 endpoint_start_index = partial_order.index(element[1])
 
                 if endpoint_start_index < len(partial_order) - 1:
-                    endpoint_end = await self.copy_node(partial_order[endpoint_start_index + 1])
+                    endpoint_end = await self.copy_treenode(partial_order[endpoint_start_index + 1])
                     tree_stack.append(
                         (endpoint_end, partial_order[endpoint_start_index + 1])
                     )
@@ -229,50 +279,21 @@ class DecisionTreeCreator():
                     element[0]
                 )  # node is added when the branch is added
 
+        decision_tree.treenode_lookup = copy.deepcopy(self.treenode_lookup)
         return decision_tree
 
-    async def to_issue_dtos(self, tree: DecisionTreeGraph) -> Optional[DecisionTreeDTO]:
-        tg = nx.readwrite.json_graph.tree_data(tree.nx, tree.root) # type: ignore
-        tree_structure = await self.create_issues_dtos_from_tree(tg) # type: ignore
-        return tree_structure
-
-    async def get_tree_node_issue_dto(self, issue: IssueOutgoingDto | EndPointNodeDto, children: list[DecisionTreeDTO] | None = None) -> DecisionTreeDTO:
-        return DecisionTreeDTO(
-            tree_node=issue,
-            children=children
-        )
-
-    async def create_issues_dtos_from_tree(self, tree_data: Dict[str, Any]) -> Optional[DecisionTreeDTO]:
-        # Base case: if the tree data is empty, return None
-        if not tree_data:
-            return None
-
-        # Create the DTO for the current node
-        node_id = await self.get_node_from_uuid(tree_data['id'])
-        if node_id is None:
-            node_id = await self.get_endpoint_node_from_uuid(tree_data['id'])
-
-        if node_id is None:
-            return None
-
-        # Recursively create DTOs for child nodes
-        children_dtos: list[DecisionTreeDTO] = []
-        for child in tree_data.get('children', []):
-            child_dto = await self.create_issues_dtos_from_tree(child)
-            if child_dto:
-                children_dtos.append(child_dto)
-        return await self.get_tree_node_issue_dto(issue=node_id, children=children_dtos if children_dtos else None)
-
-    async def copy_node(self, node_id: uuid.UUID) -> uuid.UUID:
+    async def copy_treenode(self, node_id: uuid.UUID) -> uuid.UUID:
         # create a copy of the node, return id of the copy
-        node = self.node_lookup[node_id.__str__()]
+        node = self.treenode_lookup[node_id.__str__()]
         copy_node = copy.deepcopy(node)
         copy_node.id = uuid.uuid4()
-        self.node_lookup[copy_node.id.__str__()]=copy_node
+        self.treenode_lookup[copy_node.id.__str__()]=copy_node
         return copy_node.id
 
     async def create_endpoint_node(self, scenario_id: uuid.UUID) -> uuid.UUID:
-        # create endpoint node which is added to endpoint_lookup table, return id of the node
+        # create endpoint node which is added to treenode_lookup table, return id of the node
         node = EndPointNodeDto(scenario_id=scenario_id)
-        self.endpoint_lookup[node.id.__str__()]=node
-        return node.id
+        treenode = TreeNodeDto(issue=node)
+        self.treenode_lookup[treenode.id.__str__()]=treenode
+        return treenode.id
+
