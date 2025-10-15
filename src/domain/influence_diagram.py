@@ -38,8 +38,8 @@ class InfluenceDiagramDOT:
         self._build_graph()
     
     def _construct_lookup(self, edge: EdgeOutgoingDto):
-        self.tail_to_head_lookup[edge.tail_issue_id]=edge.head_issue_id
-        self.head_to_tail_lookup[edge.head_issue_id]=edge.tail_issue_id
+        self.tail_to_head_lookup[edge.tail_issue_id] = edge.head_issue_id
+        self.head_to_tail_lookup[edge.head_issue_id] = edge.tail_issue_id
 
     def _construct_lookups(self):
         list(map(self._construct_lookup, self.edges))
