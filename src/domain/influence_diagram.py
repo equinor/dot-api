@@ -7,7 +7,7 @@ from src.utils.set_joins import join_sets_with_common_elements
 
 class InfluenceDiagramDOT:
     """
-    DOT applications ligth-weight Influance diagram format
+    DOT applications light-weight Influence diagram format
     """
     # since this class can reconstruct itself this counter is checked 
     # and iterated on every init to prevent infinate loops
