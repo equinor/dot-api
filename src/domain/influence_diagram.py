@@ -124,7 +124,7 @@ class InfluenceDiagramDOT:
                 assert len(issue.uncertainty.outcomes) != 0
 
     def traverse_graph_paths(self):
-        paths: dict[uuid.UUID, set[uuid.UUID]]= {}
+        paths: dict[uuid.UUID, set[uuid.UUID]] = {}
         for start_node in self.start_nodes:
             path = self.graph.DFS(start_node)
             paths[start_node]=path
