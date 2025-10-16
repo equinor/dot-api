@@ -1,4 +1,6 @@
 import uuid
+import asyncio
+
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,6 +31,7 @@ from src.repositories.user_repository import UserRepository
 from src.repositories.objective_repository import ObjectiveRepository
 from src.repositories.opportunity_repository import OpportunityRepository
 from src.models.filters.scenario_filter import ScenarioFilter
+from src.domain.influence_diagram import InfluenceDiagramDOT
 
 
 class ScenarioService:
@@ -138,5 +141,14 @@ class ScenarioService:
 
         issue_dtos = IssueMapper.to_outgoing_dtos(issues_entities)
         edge_dtos = EdgeMapper.to_outgoing_dtos(edges_entities)
+        
+        # Run influence diagram creation and validation in a separate thread
+        influence_diagram = await asyncio.to_thread(
+            lambda: InfluenceDiagramDOT(edge_dtos, issue_dtos)
+        )
+        await asyncio.to_thread(influence_diagram.validate_diagram)
 
-        return issue_dtos, edge_dtos
+        # Return the validated (potentially filtered) issues and edges
+        return influence_diagram.issues, influence_diagram.edges
+    
+
