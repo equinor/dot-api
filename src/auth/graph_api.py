@@ -1,20 +1,14 @@
 from fastapi import HTTPException
 from httpx import AsyncClient
 import httpx
-import hashlib
 from src.dtos.user_dtos import UserIncomingDto
 from src.config import config
 from async_lru import alru_cache
 from src.config import config
 
 
-def _get_token_hash(token: str) -> str:
-    """Create a hash of the token for cache key"""
-    return hashlib.sha256(token.encode()).hexdigest()[:16]
-
-
 @alru_cache(maxsize=config.CACHE_MAX_SIZE, ttl=config.CACHE_DURATION)
-async def _call_ms_graph_api_cached(token_hash: str, token: str) -> UserIncomingDto:
+async def call_ms_graph_api(token: str) -> UserIncomingDto:
     """
     Internal cached function that calls Microsoft Graph API.
     Uses token hash as the cache key for security.
@@ -57,11 +51,3 @@ async def _call_ms_graph_api_cached(token_hash: str, token: str) -> UserIncoming
                 status_code=401,
                 detail="Failed to obtain access token from Microsoft Graph API",
             )
-
-
-async def call_ms_graph_api(token: str) -> UserIncomingDto:
-    """
-    Public interface that calls the cached Microsoft Graph API function.
-    """
-    token_hash = _get_token_hash(token)
-    return await _call_ms_graph_api_cached(token_hash, token)
