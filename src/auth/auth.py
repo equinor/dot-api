@@ -5,6 +5,7 @@ from authlib.jose.errors import JoseError
 from authlib.jose import JsonWebToken
 import time
 from src.config import config
+from src.utils.timed_cache import timed_lru_cache
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl=config.AUTH_URL,
@@ -26,7 +27,7 @@ def get_claims_options() -> dict[str, dict[str, object]]:
         "iat": {"essential": True},
     }
 
-
+@timed_lru_cache(seconds=config.CACHE_DURATION, maxsize=config.CACHE_MAX_SIZE)
 def verify_token(token: str = Depends(oauth2_scheme)) -> dict[str, str]:
     try:
         claims_options = get_claims_options()

@@ -58,5 +58,13 @@ class Config(BaseSettings):
     POOL_RECYCLE: int = 1800
     DEBUG: bool = False
 
+    # Cache for 60 minutes
+    CACHE_DURATION: int = 3600
+    CACHE_MAX_SIZE: int = 256
+
+    # use to enable PyInstrumentMiddleWare
+    # this will generate a profile.html at repository root 
+    PROFILE: bool = False
+
 
 config = Config()
