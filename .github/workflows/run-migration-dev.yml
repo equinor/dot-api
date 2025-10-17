@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "alembic/**"
   workflow_dispatch:
 
 permissions:
