@@ -30,10 +30,10 @@ class NodeStyle(Base, BaseEntity):
         self,
         id: uuid.UUID,
         node_id: Optional[uuid.UUID],
-        width: int,
-        height: int,
         x_position: int = 0,
         y_position: int = 0,
+        width: int = 200,
+        height: int = 150,
     ):
         self.id = id
         if node_id:

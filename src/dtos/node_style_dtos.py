@@ -9,8 +9,8 @@ class NodeStyleDto(BaseModel):
     node_id: uuid.UUID
     x_position: int = 0
     y_position: int = 0
-    width: int
-    height: int
+    width: int = 200
+    height: int = 150
 
 
 class NodeStyleIncomingDto(NodeStyleDto):
