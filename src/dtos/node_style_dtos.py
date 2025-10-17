@@ -9,6 +9,8 @@ class NodeStyleDto(BaseModel):
     node_id: uuid.UUID
     x_position: int = 0
     y_position: int = 0
+    width: int
+    height: int
 
 
 class NodeStyleIncomingDto(NodeStyleDto):
@@ -27,6 +29,8 @@ class NodeStyleMapper:
             node_id=entity.node_id,
             x_position=entity.x_position,
             y_position=entity.y_position,
+            width=entity.width,
+            height=entity.height,
         )
 
     @staticmethod
@@ -36,6 +40,8 @@ class NodeStyleMapper:
             node_id=dto.node_id if dto.node_id else None,
             x_position=dto.x_position,
             y_position=dto.y_position,
+            width=dto.width,
+            height=dto.height,
         )
 
     @staticmethod
