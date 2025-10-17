@@ -34,13 +34,19 @@ async def test_update_node(client: AsyncClient):
     )
     new_scenario_id = GenerateUuid.as_uuid(1)
     new_y_position = 500
+    new_width = 150
+    new_height = 250
     payload = [
         NodeIncomingDto(
             id=example_node.id,
             issue_id=example_node.issue_id,
             scenario_id=new_scenario_id,
             node_style=NodeStyleIncomingDto(
-                id=example_node.node_style.id, node_id=example_node.id, y_position=new_y_position
+                id=example_node.node_style.id,
+                node_id=example_node.id,
+                y_position=new_y_position,
+                width=new_width,
+                height=new_height,
             ),
         ).model_dump(mode="json")
     ]
@@ -58,6 +64,7 @@ async def test_delete_node(client: AsyncClient):
     response = await client.delete(f"/nodes/{GenerateUuid.as_string(2)}")
     assert response.status_code == 200, f"Response content: {response.content}"
 
+
 @pytest.mark.asyncio
 async def test_delete_nodes(client: AsyncClient):
     ids = [GenerateUuid.as_string(3), GenerateUuid.as_string(4)]
@@ -66,5 +73,6 @@ async def test_delete_nodes(client: AsyncClient):
 
     for id in ids:
         response = await client.get(f"/nodes/{id}")
-        assert response.status_code == 404, f"Node with id: {id} found, but should have been deleted"
-
+        assert (
+            response.status_code == 404
+        ), f"Node with id: {id} found, but should have been deleted"

@@ -21,6 +21,8 @@ class NodeStyle(Base, BaseEntity):
 
     x_position: Mapped[int] = mapped_column(INT)
     y_position: Mapped[int] = mapped_column(INT)
+    width: Mapped[int] = mapped_column(INT)
+    height: Mapped[int] = mapped_column(INT)
 
     node: Mapped["Node"] = relationship("Node", back_populates="node_style")
 
@@ -30,9 +32,13 @@ class NodeStyle(Base, BaseEntity):
         node_id: Optional[uuid.UUID],
         x_position: int = 0,
         y_position: int = 0,
+        width: int = 200,
+        height: int = 150,
     ):
         self.id = id
         if node_id:
             self.node_id = node_id
         self.x_position = x_position
         self.y_position = y_position
+        self.width = width
+        self.height = height
