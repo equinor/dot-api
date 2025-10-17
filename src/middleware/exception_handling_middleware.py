@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from src.logger import get_dot_api_logger
 from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi.exceptions import RequestValidationError
-import os
+from src.config import config
 
 logger = get_dot_api_logger()
 
@@ -33,8 +33,7 @@ class ExceptionFilterMiddleware(BaseHTTPMiddleware):
                 status_code=400, content={"message": "Validation error.", "errors": exc.errors()}
             )
         except Exception as exc:
-            env = os.getenv("APP_ENVIRONMENT", "dev")
-            if env == "dev":
+            if config.APP_ENV == "local":
                 logger.error(f"Unhandled exception: {str(exc)}")
                 return JSONResponse(
                     status_code=500,

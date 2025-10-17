@@ -25,6 +25,8 @@ from src.middleware.py_instrument_middle_ware import PyInstrumentMiddleWare
 from fastapi.middleware.cors import CORSMiddleware
 from azure.monitor.opentelemetry import configure_azure_monitor  # type: ignore
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor  # type: ignore
+
+from src.middleware.exception_handling_middleware import ExceptionFilterMiddleware
 from src.logger import DOT_API_LOGGER_NAME, get_dot_api_logger
 
 logger = get_dot_api_logger()
@@ -34,20 +36,6 @@ logger = get_dot_api_logger()
 async def lifespan(app: FastAPI):
     await sessionmanager.init_db()
     yield
-    try:
-        if config.APP_ENV == "dev":
-            connection_string = (config.APPINSIGHTS_CONNECTIONSTRING_DEV,)
-        elif config.APP_ENV == "test":
-            connection_string = (config.APPINSIGHTS_CONNECTIONSTRING_TEST,)
-        else:
-            connection_string = config.APPINSIGHTS_CONNECTIONSTRING_PROD
-        configure_azure_monitor(
-            logger_name=DOT_API_LOGGER_NAME, connection_string=connection_string
-        )
-        FastAPIInstrumentor.instrument_app(app)
-        logger.info("Successfully configured telemetry after starting application")
-    except Exception as e:
-        logger.info("Error occurred while configuring telemetry: %s", e)
 
     await sessionmanager.close()
 
@@ -61,6 +49,14 @@ app = FastAPI(
     swagger_ui_parameters={"syntaxHighlight": False},
     lifespan=lifespan,
 )
+try:
+    configure_azure_monitor(
+        logger_name=DOT_API_LOGGER_NAME, connection_string=config.APPINSIGHTS_CONNECTIONSTRING
+    )
+    FastAPIInstrumentor.instrument_app(app)
+    logger.info("Successfully configured telemetry after starting application")
+except Exception as e:
+    logger.info("Error occurred while configuring telemetry: %s", e)
 
 # Adding CORS middleware to the FastAPI application
 app.add_middleware(
@@ -70,7 +66,7 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all HTTP headers
 )
-
+app.add_middleware(ExceptionFilterMiddleware)
 
 if config.PROFILE:
     # this will generate a profile.html at repository root when running any endpoint

@@ -34,15 +34,8 @@ class Config(BaseSettings):
     DATABASE_CONN_LOCAL: str = Field(
         default=os.getenv("DATABASE_CONN_LOCAL", "sqlite+aiosqlite:///:memory:")
     )
-    APPINSIGHTS_CONNECTIONSTRING_DEV: str = Field(
-        default=os.getenv("APPINSIGHTS_CONNECTIONSTRING_DEV", "")
-    )
-    APPINSIGHTS_CONNECTIONSTRING_TEST: str = Field(
-        default=os.getenv("APPINSIGHTS_CONNECTIONSTRING_TEST", "")
-    )
-    APPINSIGHTS_CONNECTIONSTRING_PROD: str = Field(
-        default=os.getenv("APPINSIGHTS_CONNECTIONSTRING_PROD", "")
-    )
+    APPINSIGHTS_CONNECTIONSTRING: str = Field(default=os.getenv("APPINSIGHTS_CONNECTIONSTRING", ""))
+
     DATABASE_CONN_DEV: str = Field(
         default=os.getenv(
             "DATABASE_CONN_DEV",
