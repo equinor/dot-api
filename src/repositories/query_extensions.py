@@ -10,20 +10,36 @@ from src.models import (
     Uncertainty,
     ProjectRole,
     User,
+    DiscreteProbability,
 )
 
 # Use joinedload for single relationships
 # Use selectinload for collections
-
-
 class QueryExtensions:
+
     @staticmethod
     def load_decision_with_relationships() -> list[_AbstractLoad]:
         return [selectinload(Decision.options)]
 
     @staticmethod
     def load_uncertainty_with_relationships() -> list[_AbstractLoad]:
-        return [selectinload(Uncertainty.outcomes)]
+        return [
+            selectinload(Uncertainty.outcomes),
+            selectinload(Uncertainty.discrete_probabilities).options(
+                joinedload(DiscreteProbability.child_outcome),
+                selectinload(DiscreteProbability.parent_options),
+                selectinload(DiscreteProbability.parent_outcomes),
+            )
+        ]
+
+    @staticmethod
+    def load_discrete_probability_with_relationships() -> list[_AbstractLoad]:
+        return [
+            joinedload(DiscreteProbability.child_outcome),
+            joinedload(DiscreteProbability.uncertainty),
+            selectinload(DiscreteProbability.parent_options),
+            selectinload(DiscreteProbability.parent_outcomes),
+        ]
 
     @staticmethod
     def load_issue_with_relationships() -> list[_AbstractLoad]:
