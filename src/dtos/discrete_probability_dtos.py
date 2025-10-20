@@ -1,5 +1,5 @@
 import uuid
-from typing import Annotated, List
+from typing import List
 from pydantic import BaseModel, Field
 from src.models.discrete_probability import DiscreteProbability, DiscreteProbabilityParentOption, DiscreteProbabilityParentOutcome
 
@@ -8,8 +8,8 @@ class DiscreteProbabilityDto(BaseModel):
     uncertainty_id: uuid.UUID
     child_outcome_id: uuid.UUID
     probability: float = 0.0
-    parent_outcome_ids: Annotated[List[uuid.UUID], Field(default_factory=list)] = []
-    parent_option_ids: Annotated[List[uuid.UUID], Field(default_factory=list)] = []
+    parent_outcome_ids: List[uuid.UUID] = []
+    parent_option_ids: List[uuid.UUID] = []
 
 class DiscreteProbabilityIncomingDto(DiscreteProbabilityDto):
     pass
