@@ -67,6 +67,7 @@ class Config(BaseSettings):
     # use to enable PyInstrumentMiddleWare
     # this will generate a profile.html at repository root
     PROFILE: bool = False
+    LOGGER: bool = True
 
 
 config = Config()

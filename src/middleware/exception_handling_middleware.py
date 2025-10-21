@@ -25,7 +25,7 @@ class ExceptionFilterMiddleware(BaseHTTPMiddleware):
         except FileNotFoundError as exc:
             # Log the FileNotFoundError with details
             logger.error(f"FileNotFoundError: {exc}")
-            return JSONResponse(status_code=404, content={"message": "Index not found"})
+            return JSONResponse(status_code=404, content={"message": "File not found"})
         except RequestValidationError as exc:
             # Log and return validation errors
             logger.error(f"Validation error: {exc.errors()}")

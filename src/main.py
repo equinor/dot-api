@@ -49,14 +49,16 @@ app = FastAPI(
     swagger_ui_parameters={"syntaxHighlight": False},
     lifespan=lifespan,
 )
-try:
-    configure_azure_monitor(
-        logger_name=DOT_API_LOGGER_NAME, connection_string=config.APPINSIGHTS_CONNECTIONSTRING
-    )
-    FastAPIInstrumentor.instrument_app(app)
-    logger.info("Successfully configured telemetry after starting application")
-except Exception as e:
-    logger.info("Error occurred while configuring telemetry: %s", e)
+
+if config.LOGGER:
+    try:
+        configure_azure_monitor(
+            logger_name=DOT_API_LOGGER_NAME, connection_string=config.APPINSIGHTS_CONNECTIONSTRING
+        )
+        FastAPIInstrumentor.instrument_app(app)
+        logger.info("Successfully configured telemetry after starting application")
+    except Exception as e:
+        logger.info("Error occurred while configuring telemetry: %s", e)
 
 # Adding CORS middleware to the FastAPI application
 app.add_middleware(
