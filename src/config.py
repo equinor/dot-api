@@ -34,6 +34,8 @@ class Config(BaseSettings):
     DATABASE_CONN_LOCAL: str = Field(
         default=os.getenv("DATABASE_CONN_LOCAL", "sqlite+aiosqlite:///:memory:")
     )
+    APPINSIGHTS_CONNECTIONSTRING: str = Field(default=os.getenv("APPINSIGHTS_CONNECTIONSTRING", ""))
+
     DATABASE_CONN_DEV: str = Field(
         default=os.getenv(
             "DATABASE_CONN_DEV",
@@ -63,8 +65,9 @@ class Config(BaseSettings):
     CACHE_MAX_SIZE: int = 256
 
     # use to enable PyInstrumentMiddleWare
-    # this will generate a profile.html at repository root 
+    # this will generate a profile.html at repository root
     PROFILE: bool = False
+    LOGGER: bool = True
 
 
 config = Config()
