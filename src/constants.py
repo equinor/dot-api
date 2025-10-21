@@ -33,6 +33,10 @@ class Boundary(str, Enum):
     ON = "on"
     OUT = "out"
 
+class DecisionHierarchy(str, Enum):
+    POLICY = "Policy"
+    FOCUS = "Focus"
+    TACTICAL = "Tactical"
 
 class DatabaseConstants(int, Enum):
     MAX_SHORT_STRING_LENGTH = 60

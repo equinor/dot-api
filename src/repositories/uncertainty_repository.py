@@ -23,6 +23,7 @@ class UncertaintyRepository(BaseRepository[Uncertainty, uuid.UUID]):
             entity_to_update.outcomes = [
                 await self.session.merge(outcome) for outcome in entity.outcomes
             ]
+            entity_to_update.is_key = entity.is_key
             if entity.issue_id:
                 entity_to_update = entity.issue_id
 
