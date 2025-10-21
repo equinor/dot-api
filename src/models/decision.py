@@ -31,7 +31,7 @@ class Decision(Base, BaseEntity):
         default=DecisionHierarchy.FOCUS.value,
     )
 
-    def __init__(self, id: uuid.UUID, options: list[Option], issue_id: uuid.UUID, type: str):
+    def __init__(self, id: uuid.UUID, options: list[Option], issue_id: uuid.UUID, type: str = DecisionHierarchy.FOCUS.value):
         self.id = id
         self.issue_id = issue_id
         self.options = options
