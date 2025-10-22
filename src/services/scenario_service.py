@@ -4,7 +4,7 @@ import asyncio
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.constants import Boundary, Type
+from src.constants import Boundary, Type, DecisionHierarchy
 from src.models.scenario import Scenario
 from src.dtos.scenario_dtos import (
     ScenarioMapper,
@@ -125,11 +125,15 @@ class ScenarioService:
             scenario_ids=[scenario_id],
             boundaries=[Boundary.ON.value, Boundary.IN.value],
             types=[Type.DECISION.value, Type.UNCERTAINTY.value],
+            decision_types=[DecisionHierarchy.FOCUS.value],
+            is_key_uncertainties=[True],
         )
         edge_filter = EdgeFilter(
             scenario_ids=[scenario_id],
             issue_boundaries=[Boundary.ON.value, Boundary.IN.value],
             issue_types=[Type.DECISION.value, Type.UNCERTAINTY.value],
+            decision_types=[DecisionHierarchy.FOCUS.value],
+            is_key_uncertainties=[True],
         )
 
         issues_entities = await IssueRepository(session).get_all(
