@@ -6,7 +6,6 @@ from src.dtos.opportunity_dtos import (
     OpportunityMapper,
     OpportunityViaProjectDto,
     OpportunityIncomingDto,
-    OpportunityOutgoingDto,
 )
 from src.dtos.objective_dtos import (
     ObjectiveMapper,
@@ -33,25 +32,24 @@ class ScenarioDto(BaseModel):
 
 class ScenarioCreateViaProjectDto(ScenarioDto):
     objectives: list[ObjectiveViaScenarioDto]
-    opportunities: list[OpportunityViaProjectDto]
+    opportunities: list[OpportunityViaProjectDto] = []
 
 
 class ScenarioCreateDto(ScenarioDto):
     project_id: uuid.UUID
     objectives: list[ObjectiveViaScenarioDto]
-    opportunities: list[OpportunityViaProjectDto]
+    opportunities: list[OpportunityViaProjectDto] = []
 
 
 class ScenarioIncomingDto(ScenarioDto):
     project_id: uuid.UUID
     objectives: list[ObjectiveIncomingDto]
-    opportunities: list[OpportunityIncomingDto]
+    opportunities: list[OpportunityIncomingDto] = []
 
 
 class ScenarioOutgoingDto(ScenarioDto):
     project_id: uuid.UUID
     objectives: list[ObjectiveOutgoingDto]
-    opportunities: list[OpportunityOutgoingDto]
 
 
 class PopulatedScenarioDto(ScenarioOutgoingDto):
@@ -95,7 +93,6 @@ class ScenarioMapper:
             name=entity.name,
             is_default=entity.is_default,
             objectives=ObjectiveMapper.to_outgoing_dtos(entity.objectives),
-            opportunities=OpportunityMapper.to_outgoing_dtos(entity.opportunities),
         )
 
     @staticmethod
@@ -106,7 +103,6 @@ class ScenarioMapper:
             name=entity.name,
             is_default=entity.is_default,
             objectives=ObjectiveMapper.to_outgoing_dtos(entity.objectives),
-            opportunities=OpportunityMapper.to_outgoing_dtos(entity.opportunities),
             issues=IssueMapper.to_outgoing_dtos(entity.issues),
             edges=EdgeMapper.to_outgoing_dtos(entity.edges),
         )

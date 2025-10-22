@@ -23,7 +23,7 @@ from src.dtos.project_roles_dtos import ProjectRoleOutgoingDto
 class ProjectDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)] = ""
-    description: Annotated[
+    opportunityStatement: Annotated[
         str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)
     ] = ""
     public: bool = False
@@ -56,7 +56,7 @@ class ProjectMapper:
         return Project(
             id=dto.id,
             name=dto.name,
-            description=dto.description,
+            opportunityStatement=dto.opportunityStatement,
             user_id=user_id,
             public=dto.public,
             end_date=dto.end_date,
@@ -69,7 +69,7 @@ class ProjectMapper:
         return ProjectOutgoingDto(
             id=entity.id,
             name=entity.name,
-            description=entity.description,
+            opportunityStatement=entity.opportunityStatement,
             public=entity.public,
             end_date=entity.end_date,
             users=ProjectRoleMapper.to_outgoing_dtos(entity.project_role),
@@ -81,7 +81,7 @@ class ProjectMapper:
         return PopulatedProjectDto(
             id=entity.id,
             name=entity.name,
-            description=entity.description,
+            opportunityStatement=entity.opportunityStatement,
             public=entity.public,
             end_date=entity.end_date,
             users=ProjectRoleMapper.to_outgoing_dtos(entity.project_role),
@@ -93,7 +93,7 @@ class ProjectMapper:
         return Project(
             id=dto.id,
             name=dto.name,
-            description=dto.description,
+            opportunityStatement=dto.opportunityStatement,
             user_id=user_id,
             public=dto.public,
             end_date=dto.end_date,
