@@ -17,7 +17,11 @@ from src.models.uncertainty import Uncertainty
 from src.models.node import Node
 from src.models.utility import Utility
 from src.models.value_metric import ValueMetric
-from src.constants import DatabaseConstants
+from src.constants import (
+    DatabaseConstants, 
+    Type,
+    Boundary,
+)
 
 
 class Issue(Base, BaseEntity, BaseAuditableEntity):
@@ -28,10 +32,10 @@ class Issue(Base, BaseEntity, BaseAuditableEntity):
 
     type: Mapped[str] = mapped_column(
         String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value),
-        default="Undecided",
+        default=Type.UNASSIGNED.value,
     )
     boundary: Mapped[str] = mapped_column(
-        String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default="out"
+        String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default=Boundary.OUT.value,
     )
 
     name: Mapped[str] = mapped_column(

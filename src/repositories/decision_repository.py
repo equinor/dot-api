@@ -23,6 +23,7 @@ class DecisionRepository(BaseRepository[Decision, uuid.UUID]):
             entity_to_update.options = [
                 await self.session.merge(option) for option in entity.options
             ]
+            entity_to_update.type = entity.type
             if entity.issue_id:
                 entity_to_update = entity.issue_id
 
