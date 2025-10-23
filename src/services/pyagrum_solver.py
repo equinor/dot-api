@@ -5,6 +5,7 @@ from itertools import product
 from uuid import UUID
 from pydantic import BaseModel
 from src.constants import Type
+from utils.discrete_probability_array_manager import DiscreteProbabilityArrayManager
 from src.dtos.issue_dtos import IssueOutgoingDto, IssueViaNodeOutgoingDto
 from src.dtos.edge_dtos import EdgeOutgoingDto
 from src.dtos.option_dtos import OptionOutgoingDto
@@ -21,17 +22,23 @@ class PyagrumSolver:
     def add_to_lookup(self, issue: IssueOutgoingDto, node_id: int) -> None:
         self.node_lookup[issue.id] = node_id
 
-    def find_optimal_decisions(self, issues: list[IssueOutgoingDto], edges: list[EdgeOutgoingDto]):
+    def build_influance_diagram(self, issues: list[IssueOutgoingDto], edges: list[EdgeOutgoingDto]):
         self.add_nodes(issues)
         self.add_edges(edges)
+        self.fill_cpts(issues)
         self.add_utilities(issues)
 
+    def find_optimal_decisions(self, issues: list[IssueOutgoingDto], edges: list[EdgeOutgoingDto]):
+        self.build_influance_diagram(issues, edges)
+
         ie = gum.ShaferShenoyLIMIDInference(self.diagram)
-        if not ie.isSolvable():
-            raise RuntimeError("Influence diagram is not solvable")
 
         decision_issue_ids = [x.id.__str__() for x in issues if x.type == Type.DECISION]
-        ie.addNoForgettingAssumption(decision_issue_ids)
+        if len(decision_issue_ids) > 1:
+            ie.addNoForgettingAssumption(decision_issue_ids)
+
+        if not ie.isSolvable():
+            raise RuntimeError("Influence diagram is not solvable")
 
         ie.makeInference()
 
@@ -66,7 +73,7 @@ class PyagrumSolver:
                 gum.LabelizedVariable(
                     issue.id.__str__(),
                     issue.description,
-                    [option.id.__str__() for option in issue.decision.options],
+                    sorted([option.id.__str__() for option in issue.decision.options]),
                 )
             )
             self.add_to_lookup(issue, node_id)
@@ -77,7 +84,7 @@ class PyagrumSolver:
                 gum.LabelizedVariable(
                     issue.id.__str__(),
                     issue.description,
-                    [outcome.id.__str__() for outcome in issue.uncertainty.outcomes],
+                    sorted([outcome.id.__str__() for outcome in issue.uncertainty.outcomes]),
                 )
             )
             self.add_to_lookup(issue, node_id)
@@ -88,40 +95,44 @@ class PyagrumSolver:
 
         self.diagram.addArc(tail_id, head_id)
 
-        self.fill_cpt(edge.head_node.issue)
+    def fill_cpts(self, issues: list[IssueOutgoingDto]):
+        [self.fill_cpt(x) for x in issues]
 
-    def fill_cpt(self, head_issue: IssueViaNodeOutgoingDto):
-        if head_issue.type != Type.UNCERTAINTY:
+    def fill_cpt(self, issue: IssueOutgoingDto):
+        if issue.type != Type.UNCERTAINTY:
             return
+        assert issue.uncertainty is not None
 
-        node_id = self.node_lookup[head_issue.id]
+        node_id = self.node_lookup[issue.id]
         parent_ids = self.diagram.parents(node_id)
         parent_labels = [self.diagram.variable(pid).labels() for pid in parent_ids]
 
         # Build all parent state combinations
         parent_combinations = list(product(*parent_labels))
-        outcome_ids = [o.id.__str__() for o in head_issue.uncertainty.outcomes]
-        discrete_probabilities = { 
-            (op.child_outcome_id.__str__(), tuple(sorted([x.__str__() for x in (op.parent_outcome_ids or []) + (op.parent_option_ids or [])]))): op.probability
-            for op in getattr(head_issue.uncertainty, "discrete_probabilities", [])
-        }
-        cpt = self.diagram.cpt(node_id)
 
+        x_array_handler = DiscreteProbabilityArrayManager(issue.uncertainty.discrete_probabilities)
+
+        cpt = self.diagram.cpt(node_id)
+        if len(parent_ids) == 0:
+            probabilities = x_array_handler.get_probabilities_for_combination([])
+            probabilities = self._probability_scaling(probabilities)
+            cpt[:] = probabilities
+            return cpt
+        
         for parent_state in parent_combinations:
-            probs = []
-            parent_state_key = tuple(sorted(parent_state))
-            for outcome_id in outcome_ids:
-                prob = discrete_probabilities.get((outcome_id, parent_state_key), 0.0)
-                probs.append(prob)
-            total = sum(probs)
-            if total > 0:
-                probs = [p / total for p in probs]
-            else:
-                probs = [1.0 / len(outcome_ids)] * len(outcome_ids)
-            for idx, prob in enumerate(probs):
-                assign = {pid: val for pid, val in zip(parent_ids, parent_state)}
-                assign[node_id] = idx
-                cpt[assign] = prob
+            probabilities = x_array_handler.get_probabilities_for_combination(parent_state)
+            probabilities = self._probability_scaling(probabilities)
+            assign = {self.diagram.variable(parent_id).name(): outcome_id for parent_id, outcome_id in zip(parent_ids, parent_state)}
+            cpt[assign] = probabilities
+        return cpt
+    
+    def _probability_scaling(self, probabilities: list[float]):
+        total = sum(probabilities)
+        if total > 0:
+            probabilities = [p / total for p in probabilities]
+        else:
+            probabilities = [1.0 / len(probabilities)] * len(probabilities)
+        return probabilities
 
     def add_utility(self, issue: IssueOutgoingDto):
         node_id = self.diagram.addUtilityNode(
