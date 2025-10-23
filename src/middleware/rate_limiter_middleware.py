@@ -4,33 +4,40 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from src.config import config
 from fastapi import status, HTTPException
 from typing import Dict
+from fastapi.responses import JSONResponse
+import uuid
 
-rate_limit_mapper: Dict[str, int] = {}
-last_request_time = time.time()
+request_counters: Dict[str, int] = {}
+last_request_times: Dict[str, float] = {}
 
 
-async def get_client_ip(request: Request) -> str:
-    return request.client.host  # type: ignore
+async def create_session_id(response: JSONResponse) -> str:
+    """Generate and set a new session ID."""
+    session_id = str(uuid.uuid4())
+    response.set_cookie(key="session_id", value=session_id, secure=True)
+    return session_id
 
 
 class RateLimiterMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):  # type: ignore
-        global last_request_time, rate_limit_mapper
-        client_ip = await get_client_ip(request)
-        if not client_ip:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Client IP missing",
-            )
+        session_id = request.cookies.get("session_id")
 
+        if not session_id:
+            response = JSONResponse(content={"message": "New session created."})
+            session_id = await create_session_id(response)
+            response.headers["X-New-Session-ID"] = session_id
         current_time = time.time()
-        if current_time - last_request_time > config.RATE_LIMIT_WINDOW:
-            rate_limit_mapper = {}
-            last_request_time = current_time
 
-        rate_limit_mapper[client_ip] = rate_limit_mapper.get(client_ip, 0) + 1
+        if (
+            session_id not in last_request_times
+            or current_time - last_request_times[session_id] > config.RATE_LIMIT_WINDOW
+        ):
+            request_counters[session_id] = 0
+            last_request_times[session_id] = current_time
 
-        if rate_limit_mapper[client_ip] > config.MAX_REQUESTS_PER_WINDOW:
+        request_counters[session_id] += 1
+
+        if request_counters[session_id] > config.MAX_REQUESTS_PER_WINDOW:
             raise HTTPException(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 detail="Rate limit exceeded",
