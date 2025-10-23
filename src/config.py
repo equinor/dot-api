@@ -3,7 +3,6 @@ from typing import List
 from pydantic import Field
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
-import time
 
 
 class Config(BaseSettings):
@@ -71,9 +70,6 @@ class Config(BaseSettings):
     LOGGER: bool = True
 
     ##ratelimiter settings
-
-    REQUEST_COUNTER: int = 0
-    LAST_REQUEST_TIME: float = time.time()
     RATE_LIMIT_WINDOW: int = 60  # in seconds
     MAX_REQUESTS_PER_WINDOW: int = 100
 
