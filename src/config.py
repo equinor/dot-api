@@ -3,6 +3,7 @@ from typing import List
 from pydantic import Field
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
+import time
 
 
 class Config(BaseSettings):
@@ -68,6 +69,13 @@ class Config(BaseSettings):
     # this will generate a profile.html at repository root
     PROFILE: bool = False
     LOGGER: bool = True
+
+    ##ratelimiter settings
+
+    REQUEST_COUNTER: int = 0
+    LAST_REQUEST_TIME: float = time.time()
+    RATE_LIMIT_WINDOW: int = 60
+    MAX_REQUESTS_PER_WINDOW: int = 100
 
 
 config = Config()
