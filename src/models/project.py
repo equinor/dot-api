@@ -16,8 +16,10 @@ if TYPE_CHECKING:
 from sqlalchemy import DateTime
 from datetime import timedelta
 
+
 def default_endtime() -> datetime:
     return datetime.now(timezone.utc) + timedelta(days=30)
+
 
 class Project(Base, BaseEntity, BaseAuditableEntity):
     __tablename__ = "project"
@@ -26,7 +28,9 @@ class Project(Base, BaseEntity, BaseAuditableEntity):
     name: Mapped[str] = mapped_column(
         String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), index=True
     )
-    description: Mapped[str] = mapped_column(String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value))
+    opportunityStatement: Mapped[str] = mapped_column(
+        String(DatabaseConstants.MAX_LONG_STRING_LENGTH.value)
+    )
 
     public: Mapped[bool] = mapped_column(Boolean, default=False)
 
@@ -41,15 +45,12 @@ class Project(Base, BaseEntity, BaseAuditableEntity):
         cascade="all, delete-orphan",
     )
 
-    end_date: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=default_endtime
-    )
+    end_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=default_endtime)
 
     def __init__(
         self,
         id: uuid.UUID,
-        description: str,
+        opportunityStatement: str,
         name: str,
         project_role: list["ProjectRole"],
         user_id: int,
@@ -64,7 +65,7 @@ class Project(Base, BaseEntity, BaseAuditableEntity):
 
         self.project_role = project_role
         self.name = name
-        self.description = description
+        self.opportunityStatement = opportunityStatement
         self.updated_by_id = user_id
         self.public = public
         self.end_date = end_date
