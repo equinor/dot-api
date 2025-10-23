@@ -74,7 +74,7 @@ class Config(BaseSettings):
 
     REQUEST_COUNTER: int = 0
     LAST_REQUEST_TIME: float = time.time()
-    RATE_LIMIT_WINDOW: int = 60
+    RATE_LIMIT_WINDOW: int = 60  # in seconds
     MAX_REQUESTS_PER_WINDOW: int = 100
 
 
