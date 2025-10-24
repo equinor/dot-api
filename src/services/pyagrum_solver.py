@@ -2,25 +2,24 @@ import pyagrum as gum
 import numpy as np
 from numpy.typing import NDArray
 from itertools import product
-from uuid import UUID
-from pydantic import BaseModel
 from src.constants import Type
-from utils.discrete_probability_array_manager import DiscreteProbabilityArrayManager
-from src.dtos.issue_dtos import IssueOutgoingDto, IssueViaNodeOutgoingDto
+from src.utils.discrete_probability_array_manager import DiscreteProbabilityArrayManager
+from src.dtos.issue_dtos import IssueOutgoingDto
 from src.dtos.edge_dtos import EdgeOutgoingDto
 from src.dtos.option_dtos import OptionOutgoingDto
+from src.dtos.outcome_dtos import OutcomeOutgoingDto
 from src.dtos.model_solution_dtos import SolutionDto
 
 class PyagrumSolver:
     def __init__(self):
-        self.node_lookup: dict[UUID, int] = {}
+        self.node_lookup: dict[str, int] = {}
         self.diagram = gum.InfluenceDiagram()
 
     def _reset_diagram(self):
         self.diagram = gum.InfluenceDiagram()
 
     def add_to_lookup(self, issue: IssueOutgoingDto, node_id: int) -> None:
-        self.node_lookup[issue.id] = node_id
+        self.node_lookup[issue.id.__str__()] = node_id
 
     def build_influance_diagram(self, issues: list[IssueOutgoingDto], edges: list[EdgeOutgoingDto]):
         self.add_nodes(issues)
@@ -28,14 +27,17 @@ class PyagrumSolver:
         self.fill_cpts(issues)
         self.add_utilities(issues)
 
+    def _sort_state_dtos(self, dtos: list[OptionOutgoingDto]|list[OutcomeOutgoingDto]):
+        return sorted(dtos, key=lambda x: x.id.__str__())
+
     def find_optimal_decisions(self, issues: list[IssueOutgoingDto], edges: list[EdgeOutgoingDto]):
         self.build_influance_diagram(issues, edges)
 
         ie = gum.ShaferShenoyLIMIDInference(self.diagram)
 
         decision_issue_ids = [x.id.__str__() for x in issues if x.type == Type.DECISION]
-        if len(decision_issue_ids) > 1:
-            ie.addNoForgettingAssumption(decision_issue_ids)
+        # if len(decision_issue_ids) > 1:
+        #     ie.addNoForgettingAssumption(decision_issue_ids)
 
         if not ie.isSolvable():
             raise RuntimeError("Influence diagram is not solvable")
@@ -56,7 +58,9 @@ class PyagrumSolver:
         optimal_options: list[OptionOutgoingDto] = []
         for array, decision_issue_id in zip(data, decision_issue_ids):
             issue: IssueOutgoingDto = [x for x in issues if x.id.__str__() == decision_issue_id][0]
-            optimal_options.append(issue.decision.options[array.argmax()])
+            assert issue.decision is not None
+            sorted_options = self._sort_state_dtos(issue.decision.options)
+            optimal_options.append(sorted_options[array.argmax()])
 
         solution = SolutionDto(
             utility_mean=ie.MEU()["mean"],
@@ -90,8 +94,8 @@ class PyagrumSolver:
             self.add_to_lookup(issue, node_id)
 
     def add_edge(self, edge: EdgeOutgoingDto):
-        tail_id = self.node_lookup[edge.tail_node.issue_id]
-        head_id = self.node_lookup[edge.head_node.issue_id]
+        tail_id = self.node_lookup[edge.tail_node.issue_id.__str__()]
+        head_id = self.node_lookup[edge.head_node.issue_id.__str__()]
 
         self.diagram.addArc(tail_id, head_id)
 
@@ -103,7 +107,7 @@ class PyagrumSolver:
             return
         assert issue.uncertainty is not None
 
-        node_id = self.node_lookup[issue.id]
+        node_id = self.node_lookup[issue.id.__str__()]
         parent_ids = self.diagram.parents(node_id)
         parent_labels = [self.diagram.variable(pid).labels() for pid in parent_ids]
 
@@ -127,6 +131,7 @@ class PyagrumSolver:
         return cpt
     
     def _probability_scaling(self, probabilities: list[float]):
+        return probabilities
         total = sum(probabilities)
         if total > 0:
             probabilities = [p / total for p in probabilities]
@@ -147,13 +152,13 @@ class PyagrumSolver:
         if issue.type == Type.DECISION:
             assert issue.decision is not None
 
-            for n, x in enumerate(issue.decision.options):
+            for n, x in enumerate(self._sort_state_dtos(issue.decision.options)):
                 self.diagram.utility(node_id)[{issue.id.__str__(): n}] = x.utility
 
         if issue.type == Type.UNCERTAINTY:
             assert issue.uncertainty is not None
 
-            for n, x in enumerate(issue.uncertainty.outcomes):
+            for n, x in enumerate(self._sort_state_dtos(issue.uncertainty.outcomes)):
                 self.diagram.utility(node_id)[{issue.id.__str__(): n}] = x.utility
 
     def add_edges(self, edges: list[EdgeOutgoingDto]):
