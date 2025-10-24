@@ -17,7 +17,6 @@ class SolverService:
         self.scenario_service = scenario_service
 
     async def find_optimal_decision_pyagrum(self, scenario_id: uuid.UUID):
-        raise NotImplementedError("Solver not yet implemented for conditional probabilities")
         async for session in sessionmanager.get_session():
             (
                 issues,
