@@ -14,7 +14,7 @@ last_request_times: Dict[str, float] = {}
 async def create_session_id(response: JSONResponse) -> str:
     """Generate and set a new session ID."""
     session_id = str(uuid.uuid4())
-    response.set_cookie(key="session_id", value=session_id, secure=True)
+    response.set_cookie(key="session_id", value=session_id, secure=True, httponly=True)
     return session_id
 
 
