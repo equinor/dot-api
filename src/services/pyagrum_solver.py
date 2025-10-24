@@ -21,7 +21,7 @@ class PyagrumSolver:
     def add_to_lookup(self, issue: IssueOutgoingDto, node_id: int) -> None:
         self.node_lookup[issue.id.__str__()] = node_id
 
-    def build_influance_diagram(self, issues: list[IssueOutgoingDto], edges: list[EdgeOutgoingDto]):
+    def build_influence_diagram(self, issues: list[IssueOutgoingDto], edges: list[EdgeOutgoingDto]):
         self.add_nodes(issues)
         self.add_edges(edges)
         self.fill_cpts(issues)
@@ -31,19 +31,14 @@ class PyagrumSolver:
         return sorted(dtos, key=lambda x: x.id.__str__())
 
     def find_optimal_decisions(self, issues: list[IssueOutgoingDto], edges: list[EdgeOutgoingDto]):
-        self.build_influance_diagram(issues, edges)
+        self.build_influence_diagram(issues, edges)
 
         ie = gum.ShaferShenoyLIMIDInference(self.diagram)
-
-        decision_issue_ids = [x.id.__str__() for x in issues if x.type == Type.DECISION]
-        # if len(decision_issue_ids) > 1:
-        #     ie.addNoForgettingAssumption(decision_issue_ids)
-
         if not ie.isSolvable():
             raise RuntimeError("Influence diagram is not solvable")
-
         ie.makeInference()
 
+        decision_issue_ids = [x.id.__str__() for x in issues if x.type == Type.DECISION]
         if len(decision_issue_ids) == 0:
             return SolutionDto(
                 utility_mean=ie.MEU()["mean"],
@@ -114,30 +109,33 @@ class PyagrumSolver:
         # Build all parent state combinations
         parent_combinations = list(product(*parent_labels))
 
-        x_array_handler = DiscreteProbabilityArrayManager(issue.uncertainty.discrete_probabilities)
+        discrete_probability_manager = DiscreteProbabilityArrayManager(issue.uncertainty.discrete_probabilities)
 
         cpt = self.diagram.cpt(node_id)
         if len(parent_ids) == 0:
-            probabilities = x_array_handler.get_probabilities_for_combination([])
+            probabilities = discrete_probability_manager.get_probabilities_for_combination([])
             probabilities = self._probability_scaling(probabilities)
             cpt[:] = probabilities
             return cpt
         
         for parent_state in parent_combinations:
-            probabilities = x_array_handler.get_probabilities_for_combination(parent_state)
+            probabilities = discrete_probability_manager.get_probabilities_for_combination(parent_state)
             probabilities = self._probability_scaling(probabilities)
             assign = {self.diagram.variable(parent_id).name(): outcome_id for parent_id, outcome_id in zip(parent_ids, parent_state)}
             cpt[assign] = probabilities
         return cpt
     
-    def _probability_scaling(self, probabilities: list[float]):
-        return probabilities
-        total = sum(probabilities)
-        if total > 0:
-            probabilities = [p / total for p in probabilities]
-        else:
-            probabilities = [1.0 / len(probabilities)] * len(probabilities)
-        return probabilities
+    def _probability_scaling(self, probabilities: list[float], scale: bool = False):
+        # always default to no scaling for now
+        if scale:
+            total = sum(probabilities)
+            if total > 0:
+                probabilities = [p / total for p in probabilities]
+            else:
+                probabilities = [1.0 / len(probabilities)] * len(probabilities)
+            return probabilities
+        else: 
+            return probabilities
 
     def add_utility(self, issue: IssueOutgoingDto):
         node_id = self.diagram.addUtilityNode(
