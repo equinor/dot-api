@@ -17,8 +17,3 @@ class BaseEntity:
             default=datetime.now(timezone.utc),
             onupdate=datetime.now(timezone.utc),
         )
-        return mapped_column(
-            DateTime(timezone=True),
-            default=datetime.now(timezone.utc),
-            onupdate=datetime.now(timezone.utc),
-        )
