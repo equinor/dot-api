@@ -1,8 +1,8 @@
-"""discrete probabilities
+"""Conditional probabilities
 
-Revision ID: 700efb126021
-Revises: e915e38cedc2
-Create Date: 2025-10-10 10:34:03.239652
+Revision ID: 2c08541c29a4
+Revises: 0fd01ae4d4fe
+Create Date: 2025-10-27 13:30:06.211710
 
 """
 from typing import Sequence, Union
@@ -13,8 +13,8 @@ import sqlalchemy as sa
 from src.models.guid import GUID
 
 # revision identifiers, used by Alembic.
-revision: str = '700efb126021'
-down_revision: Union[str, None] = 'e915e38cedc2'
+revision: str = '2c08541c29a4'
+down_revision: Union[str, None] = '0fd01ae4d4fe'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
