@@ -7,6 +7,7 @@ from src.dtos.option_dtos import (
     OptionOutgoingDto,
     OptionMapper,
 )
+from src.constants import DecisionHierarchy
 
 
 class DecisionDto(BaseModel):
@@ -16,10 +17,12 @@ class DecisionDto(BaseModel):
 
 class DecisionIncomingDto(DecisionDto):
     options: List[OptionIncomingDto]
+    type: DecisionHierarchy = DecisionHierarchy.FOCUS
 
 
 class DecisionOutgoingDto(DecisionDto):
     options: List[OptionOutgoingDto]
+    type: str
 
 
 class DecisionMapper:
@@ -28,6 +31,7 @@ class DecisionMapper:
         return DecisionOutgoingDto(
             id=entity.id,
             issue_id=entity.issue_id,
+            type=entity.type,
             options=OptionMapper.to_outgoing_dtos(entity.options),
         )
 
@@ -36,6 +40,7 @@ class DecisionMapper:
         return Decision(
             id=dto.id,
             issue_id=dto.issue_id,
+            type=dto.type,
             options=OptionMapper.to_entities(dto.options),
         )
 

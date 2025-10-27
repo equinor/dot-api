@@ -19,6 +19,7 @@ from src.dtos.discrete_probability_dtos import (
 class UncertaintyDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     issue_id: uuid.UUID
+    is_key: bool = True
 
 
 class UncertaintyIncomingDto(UncertaintyDto):
@@ -37,6 +38,7 @@ class UncertaintyMapper:
         return UncertaintyOutgoingDto(
             id=entity.id,
             issue_id=entity.issue_id,
+            is_key=entity.is_key,
             outcomes=OutcomeMapper.to_outgoing_dtos(entity.outcomes),
             discrete_probabilities=DiscreteProbabilityMapper.to_outgoing_dtos(entity.discrete_probabilities),
         )
@@ -46,6 +48,7 @@ class UncertaintyMapper:
         return Uncertainty(
             id=dto.id,
             issue_id=dto.issue_id,
+            is_key=dto.is_key,
             outcomes=OutcomeMapper.to_entities(dto.outcomes),
             discrete_probabilities=DiscreteProbabilityMapper.to_entities(dto.discrete_probabilities),
         )

@@ -21,6 +21,7 @@ spec:
       publicPort: http
       secrets:
         - CLIENT_SECRET
+        - APPINSIGHTS_CONNECTIONSTRING
       resources:
         requests:
           memory: '1000Mi'

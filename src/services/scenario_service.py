@@ -1,8 +1,10 @@
 import uuid
+import asyncio
+
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.constants import Boundary, Type
+from src.constants import Boundary, Type, DecisionHierarchy
 from src.models.scenario import Scenario
 from src.dtos.scenario_dtos import (
     ScenarioMapper,
@@ -29,6 +31,7 @@ from src.repositories.user_repository import UserRepository
 from src.repositories.objective_repository import ObjectiveRepository
 from src.repositories.opportunity_repository import OpportunityRepository
 from src.models.filters.scenario_filter import ScenarioFilter
+from src.domain.influence_diagram import InfluenceDiagramDOT
 
 
 class ScenarioService:
@@ -122,11 +125,15 @@ class ScenarioService:
             scenario_ids=[scenario_id],
             boundaries=[Boundary.ON.value, Boundary.IN.value],
             types=[Type.DECISION.value, Type.UNCERTAINTY.value],
+            decision_types=[DecisionHierarchy.FOCUS.value],
+            is_key_uncertainties=[True],
         )
         edge_filter = EdgeFilter(
             scenario_ids=[scenario_id],
             issue_boundaries=[Boundary.ON.value, Boundary.IN.value],
             issue_types=[Type.DECISION.value, Type.UNCERTAINTY.value],
+            decision_types=[DecisionHierarchy.FOCUS.value],
+            is_key_uncertainties=[True],
         )
 
         issues_entities = await IssueRepository(session).get_all(
@@ -138,5 +145,14 @@ class ScenarioService:
 
         issue_dtos = IssueMapper.to_outgoing_dtos(issues_entities)
         edge_dtos = EdgeMapper.to_outgoing_dtos(edges_entities)
+        
+        # Run influence diagram creation and validation in a separate thread
+        influence_diagram = await asyncio.to_thread(
+            lambda: InfluenceDiagramDOT(edge_dtos, issue_dtos)
+        )
+        await asyncio.to_thread(influence_diagram.validate_diagram)
 
-        return issue_dtos, edge_dtos
+        # Return the validated (potentially filtered) issues and edges
+        return influence_diagram.issues, influence_diagram.edges
+    
+

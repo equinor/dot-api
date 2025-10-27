@@ -23,6 +23,7 @@ class UncertaintyRepository(BaseRepository[Uncertainty, uuid.UUID]):
             entity_to_update.outcomes = [
                 await self.session.merge(outcome) for outcome in entity.outcomes
             ]
+            entity_to_update.is_key = entity.is_key
             entity_to_update.discrete_probabilities = [
                 await self.session.merge(x) for x in entity.discrete_probabilities
             ]

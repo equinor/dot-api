@@ -3,11 +3,15 @@ from httpx import AsyncClient
 import httpx
 from src.dtos.user_dtos import UserIncomingDto
 from src.config import config
+from async_lru import alru_cache
+from src.config import config
 
 
+@alru_cache(maxsize=config.CACHE_MAX_SIZE, ttl=config.CACHE_DURATION)
 async def call_ms_graph_api(token: str) -> UserIncomingDto:
     """
-    Calls the Microsoft Graph API to get user information.
+    Internal cached function that calls Microsoft Graph API.
+    Uses token hash as the cache key for security.
     """
     async with AsyncClient() as client:
         # Use the users access token and fetch a new access token for the Graph API

@@ -22,6 +22,8 @@ class NodeStyleRepository(BaseRepository[NodeStyle, uuid.UUID]):
             entity = entities[n]
             entity_to_update.x_position = entity.x_position
             entity_to_update.y_position = entity.y_position
+            entity_to_update.width = entity.width
+            entity_to_update.height = entity.height
             if entity.node_id:
                 entity_to_update = entity.node_id
 

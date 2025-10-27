@@ -49,98 +49,102 @@ class GenerateUuid:
     def as_uuid(x: int | str) -> uuid.UUID:
         return uuid.uuid5(uuid.NAMESPACE_DNS, f"{x}")
 
+
 def create_decision_issue(
-        scenario_id: uuid.UUID,
-        decision_id: uuid.UUID,
-        issue_id: uuid.UUID,
-        user_id: int,
-        name: str,
-        order: int,
-    ) -> list[Union[Decision, Node, NodeStyle, Uncertainty]]:
-        """Helper function to create a decision issue and its related entities."""
-        decision = Decision(id=decision_id, issue_id=issue_id, options=[])
-        node = Node(
-            id=issue_id,
-            scenario_id=scenario_id,
-            issue_id=issue_id,
-            name=name,
-            node_style=None,
-        )
-        node_style = NodeStyle(id=issue_id, node_id=node.id)
-        issue = Issue(
-            id=issue_id,
-            scenario_id=scenario_id,
-            type=Type.DECISION.value,
-            order=order,
-            boundary=Boundary.ON.value,
-            name=name,
-            description=str(uuid.uuid4()),  # Example description
-            user_id=user_id,
-            node=node,
-        )
-        return [decision, node, node_style, issue]
+    scenario_id: uuid.UUID,
+    decision_id: uuid.UUID,
+    issue_id: uuid.UUID,
+    user_id: int,
+    name: str,
+    order: int,
+) -> list[Union[Decision, Node, NodeStyle, Uncertainty]]:
+    """Helper function to create a decision issue and its related entities."""
+    decision = Decision(id=decision_id, issue_id=issue_id, options=[])
+    node = Node(
+        id=issue_id,
+        scenario_id=scenario_id,
+        issue_id=issue_id,
+        name=name,
+        node_style=None,
+    )
+    node_style = NodeStyle(id=issue_id, node_id=node.id, width=100, height=200)
+    issue = Issue(
+        id=issue_id,
+        scenario_id=scenario_id,
+        type=Type.DECISION.value,
+        order=order,
+        boundary=Boundary.ON.value,
+        name=name,
+        description=str(uuid.uuid4()),  # Example description
+        user_id=user_id,
+        node=node,
+    )
+    return [decision, node, node_style, issue]
+
 
 def create_uncertainty_issue(
-        scenario_id: uuid.UUID,
-        uncertainty_id: uuid.UUID,
-        issue_id: uuid.UUID,
-        user_id: int,
-        name: str,
-        order: int,
-    ) -> list[Union[Uncertainty, Node, NodeStyle, Issue]]:
-        """Helper function to create an uncertainty issue and its related entities."""
-        uncertainty = Uncertainty(id=uncertainty_id, issue_id=issue_id, outcomes=[])
-        node = Node(
-            id=issue_id,
-            scenario_id=scenario_id,
-            issue_id=issue_id,
-            name=name,
-            node_style=None,
-        )
-        node_style = NodeStyle(id=issue_id, node_id=node.id)
-        issue = Issue(
-            id=issue_id,
-            scenario_id=scenario_id,
-            type=Type.UNCERTAINTY.value,
-            order=order,
-            boundary=Boundary.IN.value,
-            name=name,
-            description=str(uuid.uuid4()),  # Example description
-            user_id=user_id,
-            node=node,
-        )
-        return [uncertainty, node, node_style, issue]
+    scenario_id: uuid.UUID,
+    uncertainty_id: uuid.UUID,
+    issue_id: uuid.UUID,
+    user_id: int,
+    name: str,
+    order: int,
+) -> list[Union[Uncertainty, Node, NodeStyle, Issue]]:
+    """Helper function to create an uncertainty issue and its related entities."""
+    uncertainty = Uncertainty(id=uncertainty_id, issue_id=issue_id, outcomes=[])
+    node = Node(
+        id=issue_id,
+        scenario_id=scenario_id,
+        issue_id=issue_id,
+        name=name,
+        node_style=None,
+    )
+    node_style = NodeStyle(id=issue_id, node_id=node.id, width=100, height=200)
+    issue = Issue(
+        id=issue_id,
+        scenario_id=scenario_id,
+        type=Type.UNCERTAINTY.value,
+        order=order,
+        boundary=Boundary.IN.value,
+        name=name,
+        description=str(uuid.uuid4()),  # Example description
+        user_id=user_id,
+        node=node,
+    )
+    return [uncertainty, node, node_style, issue]
+
 
 def create_utility_issue(
-        scenario_id: uuid.UUID,
-        utility_id: uuid.UUID,
-        issue_id: uuid.UUID,
-        user_id: int,
-        name: str,
-        order: int,
-    ) -> list[Union[Utility, Node, NodeStyle, Issue]]:
-        """Helper function to create an utility issue and its related entities."""
-        utility = Utility(id=utility_id, values='', issue_id=issue_id)
-        node = Node(
-            id=issue_id,
-            scenario_id=scenario_id,
-            issue_id=issue_id,
-            name=name,
-            node_style=None,
-        )
-        node_style = NodeStyle(id=issue_id, node_id=node.id)
-        issue = Issue(
-            id=issue_id,
-            scenario_id=scenario_id,
-            type=Type.UTILITY.value,
-            order=order,
-            boundary=Boundary.IN.value,
-            name=name,
-            description=str(uuid.uuid4()),  # Example description
-            user_id=user_id,
-            node=node,
-        )
-        return [utility, node, node_style, issue]
+    scenario_id: uuid.UUID,
+    utility_id: uuid.UUID,
+    issue_id: uuid.UUID,
+    user_id: int,
+    name: str,
+    order: int,
+) -> list[Union[Utility, Node, NodeStyle, Issue]]:
+    """Helper function to create an utility issue and its related entities."""
+    utility = Utility(id=utility_id, values="", issue_id=issue_id)
+    node = Node(
+        id=issue_id,
+        scenario_id=scenario_id,
+        issue_id=issue_id,
+        name=name,
+        node_style=None,
+    )
+    node_style = NodeStyle(id=issue_id, node_id=node.id, width=100, height=200)
+    issue = Issue(
+        id=issue_id,
+        scenario_id=scenario_id,
+        type=Type.UTILITY.value,
+        order=order,
+        boundary=Boundary.IN.value,
+        name=name,
+        description=str(uuid.uuid4()),  # Example description
+        user_id=user_id,
+        node=node,
+    )
+    return [utility, node, node_style, issue]
+
 
 async def create_single_project_with_scenario(conn: AsyncConnection):
     # Define all IDs at the beginning of the function
@@ -172,7 +176,7 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
     project = Project(
         id=project_id,
         name="Test Project 1",
-        description="A test project with minimal data",
+        opportunityStatement="A test project with minimal data",
         user_id=user.id,
         project_role=[],
         scenarios=None,
@@ -196,12 +200,8 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
     # Add decision issues
     entities.extend(
         create_decision_issue(
-            scenario_id,
-            decision_issue_id,
-            decision_issue_id,
-            user_id,
-            "Decision Issue 1",
-            order=0)
+            scenario_id, decision_issue_id, decision_issue_id, user_id, "Decision Issue 1", order=0
+        )
     )
     entities.extend(
         create_decision_issue(
@@ -432,7 +432,7 @@ async def create_decision_tree_symmetry_DT_from_ID(conn: AsyncConnection):
     project = Project(
         id=project_id,
         name="Test Project decision tree symmetry",
-        description="A test project with minimal data",
+        opportunityStatement="A test project with minimal data",
         user_id=user.id,
         project_role=[],
         scenarios=None,
@@ -456,63 +456,36 @@ async def create_decision_tree_symmetry_DT_from_ID(conn: AsyncConnection):
     # Add decision issues
     entities.extend(
         create_decision_issue(
-            scenario_id,
-            decision_T_id,
-            decision_T_id,
-            user_id,
-            "Treat for disease",
-            order=0))
+            scenario_id, decision_T_id, decision_T_id, user_id, "Treat for disease", order=0
+        )
+    )
 
     # Add uncertainty issues
     entities.extend(
         create_uncertainty_issue(
-            scenario_id,
-            uncertainty_S_id,
-            uncertainty_S_id,
-            user_id,
-            "Symptom",
-            order=1))
+            scenario_id, uncertainty_S_id, uncertainty_S_id, user_id, "Symptom", order=1
+        )
+    )
 
     entities.extend(
         create_uncertainty_issue(
-            scenario_id,
-            uncertainty_D_id,
-            uncertainty_D_id,
-            user_id,
-            "Disease",
-            order=1))
+            scenario_id, uncertainty_D_id, uncertainty_D_id, user_id, "Disease", order=1
+        )
+    )
 
     entities.extend(
         create_uncertainty_issue(
-            scenario_id,
-            uncertainty_P_id,
-            uncertainty_P_id,
-            user_id,
-            "Pathological state",
-            order=1))
+            scenario_id, uncertainty_P_id, uncertainty_P_id, user_id, "Pathological state", order=1
+        )
+    )
 
     # Add utility issues
     entities.extend(
-        create_utility_issue(
-            scenario_id,
-            utility_id,
-            utility_id,
-            user_id,
-            "Utility",
-            order=1))
+        create_utility_issue(scenario_id, utility_id, utility_id, user_id, "Utility", order=1)
+    )
 
-    entities.append(
-        Option(
-            id=uuid.uuid4(),
-            decision_id=decision_T_id,
-            name="yes",
-            utility=0))
-    entities.append(
-        Option(
-            id=uuid.uuid4(),
-            decision_id=decision_T_id,
-            name="no",
-            utility=0))
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_T_id, name="yes", utility=0))
+    entities.append(Option(id=uuid.uuid4(), decision_id=decision_T_id, name="no", utility=0))
     entities.append(
         Outcome(
             id=uuid.uuid4(),
@@ -550,7 +523,7 @@ async def create_decision_tree_symmetry_DT_from_ID(conn: AsyncConnection):
             name="no",
             utility=0))
 
-    #Add edges
+    # Add edges
     edges_data = [
         (edge_uuids[0], uncertainty_S_id, decision_T_id),
         (edge_uuids[1], uncertainty_P_id, uncertainty_S_id),
@@ -565,7 +538,9 @@ async def create_decision_tree_symmetry_DT_from_ID(conn: AsyncConnection):
                 id=edge_id,
                 tail_node_id=tail_node_id,
                 head_node_id=head_node_id,
-                scenario_id=scenario_id))
+                scenario_id=scenario_id,
+            )
+        )
 
     # Commit all entities to the database
     async with AsyncSession(conn) as session:
@@ -599,7 +574,7 @@ async def create_decision_tree_symmetry_DT(conn: AsyncConnection):
     project = Project(
         id=project_uuid,
         name="Test Project decision tree symmetry",
-        description="A test project with minimal data",
+        opportunityStatement="A test project with minimal data",
         user_id=user.id,
         project_role=[],
         scenarios=None,
@@ -623,17 +598,12 @@ async def create_decision_tree_symmetry_DT(conn: AsyncConnection):
     # Add decision issues
     decision_issues = [
         (decision_uuids[0], treat_for_disease),
-        (decision_uuids[1], treat_for_disease)
+        (decision_uuids[1], treat_for_disease),
     ]
     for decision_id, name in decision_issues:
         entities.extend(
-            create_decision_issue(
-                scenario_uuid,
-                decision_id,
-                decision_id,
-                user_id,
-                name,
-                order=1))
+            create_decision_issue(scenario_uuid, decision_id, decision_id, user_id, name, order=1)
+        )
 
     # Add uncertainty issues
     uncertainty_issues = [
@@ -649,28 +619,20 @@ async def create_decision_tree_symmetry_DT(conn: AsyncConnection):
         (uncertainty_D_uuids[4], disease),
         (uncertainty_D_uuids[5], disease),
         (uncertainty_D_uuids[6], disease),
-        (uncertainty_D_uuids[7], disease)
+        (uncertainty_D_uuids[7], disease),
     ]
     for uncertainty_id, name in uncertainty_issues:
         entities.extend(
             create_uncertainty_issue(
-                scenario_uuid,
-                uncertainty_id,
-                uncertainty_id,
-                user_id,
-                name,
-                order=1))
+                scenario_uuid, uncertainty_id, uncertainty_id, user_id, name, order=1
+            )
+        )
 
     # Add utility issues
     for utility_id in utility_uuids:
         entities.extend(
-            create_utility_issue(
-                scenario_uuid,
-                utility_id,
-                utility_id,
-                user_id,
-                "Utility",
-                order=1))
+            create_utility_issue(scenario_uuid, utility_id, utility_id, user_id, "Utility", order=1)
+        )
 
     # Add decision issues
     options = ["yes", "no"]
@@ -678,11 +640,8 @@ async def create_decision_tree_symmetry_DT(conn: AsyncConnection):
     for decision_id in decision_uuids:
         for option in options:
             entities.append(
-                Option(
-                    id=uuid.uuid4(),
-                    decision_id=decision_id,
-                    name=option,
-                    utility=0))
+                Option(id=uuid.uuid4(), decision_id=decision_id, name=option, utility=0)
+            )
 
     # Add uncertainty issues
     def create_outcome(uncertainty_id: uuid.UUID, probability_name: str):
@@ -693,19 +652,19 @@ async def create_decision_tree_symmetry_DT(conn: AsyncConnection):
             utility=0)
 
     probabilities: Dict[str, List[Tuple[str, float]]] = {
-        'S': [('yes', 0.7), ('no', 0.3)],
-        'P': [('yes', 0.2), ('no', 0.8)],
-        'D': [('yes', 0.1), ('no', 0.9)]
+        "S": [("yes", 0.7), ("no", 0.3)],
+        "P": [("yes", 0.2), ("no", 0.8)],
+        "D": [("yes", 0.1), ("no", 0.9)],
     }
 
-    uncertainty_uuids : dict[str, list[uuid.UUID]] = {
-        'S': uncertainty_S_uuids,
-        'P': uncertainty_P_uuids,
-        'D': uncertainty_D_uuids
+    uncertainty_uuids: dict[str, list[uuid.UUID]] = {
+        "S": uncertainty_S_uuids,
+        "P": uncertainty_P_uuids,
+        "D": uncertainty_D_uuids,
     }
 
     for key, probability_list in probabilities.items():
-        if key == 'S':
+        if key == "S":
             entities.append(
                 create_outcome(
                     uncertainty_uuids[key][0],
@@ -722,7 +681,7 @@ async def create_decision_tree_symmetry_DT(conn: AsyncConnection):
                             uncertainty_uuid,
                             probability[0]))
 
-    #Add edges
+    # Add edges
     edges_data = [
         (edge_uuids[0], uncertainty_S_uuids[0], decision_uuids[0]),
         (edge_uuids[1], decision_uuids[0], uncertainty_P_uuids[0]),
@@ -753,14 +712,17 @@ async def create_decision_tree_symmetry_DT(conn: AsyncConnection):
         (edge_uuids[26], uncertainty_D_uuids[6], utility_uuids[13]),
         (edge_uuids[27], uncertainty_P_uuids[3], uncertainty_D_uuids[7]),
         (edge_uuids[28], uncertainty_D_uuids[7], utility_uuids[14]),
-        (edge_uuids[29], uncertainty_D_uuids[7], utility_uuids[15])
+        (edge_uuids[29], uncertainty_D_uuids[7], utility_uuids[15]),
     ]
     for edge_id, tail_node_id, head_node_id in edges_data:
         entities.append(
-            Edge(id=edge_id,
-                 tail_node_id=tail_node_id,
-                 head_node_id=head_node_id,
-                 scenario_id=scenario_uuid))
+            Edge(
+                id=edge_id,
+                tail_node_id=tail_node_id,
+                head_node_id=head_node_id,
+                scenario_id=scenario_uuid,
+            )
+        )
 
     # Commit all entities to the database
     async with AsyncSession(conn) as session:
@@ -783,7 +745,7 @@ async def seed_database(
         project = Project(
             id=project_id,
             name=str(uuid4()),
-            description=str(uuid4()),
+            opportunityStatement=str(uuid4()),
             user_id=user.id,
             scenarios=None,
             project_role=[],
@@ -929,6 +891,8 @@ async def seed_database(
                     node_id=node.id,
                     x_position=40,
                     y_position=50,
+                    width=100,
+                    height=200,
                 )
 
                 issue = Issue(

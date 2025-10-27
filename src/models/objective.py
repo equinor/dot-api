@@ -12,6 +12,7 @@ from src.models.base_entity import BaseEntity
 from src.models.base_auditable_entity import BaseAuditableEntity
 from src.models.scenario import Scenario
 from src.constants import DatabaseConstants
+from datetime import datetime, timezone
 
 
 class Objective(Base, BaseEntity, BaseAuditableEntity):
@@ -64,3 +65,8 @@ class Objective(Base, BaseEntity, BaseAuditableEntity):
 @listens_for(Objective, "before_insert")
 def set_created_by_id(mapper, connection, target: Objective):  # type: ignore
     target.created_by_id = target.updated_by_id
+
+
+@listens_for(Objective, "before_update")
+def receive_before_update(mapper, connection, target: Objective):  # type: ignore
+    target.updated_at = datetime.now(timezone.utc)  # Automatically update the timestamp

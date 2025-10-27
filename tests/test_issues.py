@@ -46,10 +46,14 @@ async def test_create_issue(client: AsyncClient):
         OptionIncomingDto(name=alt, decision_id=decision_id, utility=0) for alt in alternatives
     ]
     x_position = 600
+    width = 100
+    height = 200
     node = NodeIncomingDto(
         scenario_id=scenario_id,
         issue_id=uuid4(),
-        node_style=NodeStyleIncomingDto(node_id=uuid4(), x_position=x_position),
+        node_style=NodeStyleIncomingDto(
+            node_id=uuid4(), x_position=x_position, width=width, height=height
+        ),
     )
     issue = IssueIncomingDto(
         decision=DecisionIncomingDto(id=decision_id, issue_id=uuid4(), options=options),
@@ -162,6 +166,7 @@ async def test_delete_issue(client: AsyncClient):
 
     assert response.status_code == 200, f"Response content: {response.content}"
 
+
 @pytest.mark.asyncio
 async def test_delete_issues(client: AsyncClient):
     ids = [GenerateUuid.as_string(14), GenerateUuid.as_string(15)]
@@ -170,4 +175,6 @@ async def test_delete_issues(client: AsyncClient):
 
     for id in ids:
         response = await client.get(f"/issues/{id}")
-        assert response.status_code == 404, f"Issue with id: {id} found, but should have been deleted"
+        assert (
+            response.status_code == 404
+        ), f"Issue with id: {id} found, but should have been deleted"

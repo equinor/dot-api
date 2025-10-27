@@ -6,6 +6,7 @@ from src.constants import (
     DatabaseConstants,
     ObjectiveTypes,
 )
+from datetime import datetime
 
 
 class ObjectiveDto(BaseModel):
@@ -13,10 +14,12 @@ class ObjectiveDto(BaseModel):
     name: Annotated[str, Field(max_length=DatabaseConstants.MAX_SHORT_STRING_LENGTH.value)]
     description: Annotated[str, Field(max_length=DatabaseConstants.MAX_LONG_STRING_LENGTH.value)]
 
+
 class ObjectiveViaScenarioDto(ObjectiveDto):
     """
     Class should only be a property of project when creating the project with objective(s)
     """
+
     type: ObjectiveTypes = ObjectiveTypes.FUNDAMENTAL
 
 
@@ -28,6 +31,8 @@ class ObjectiveIncomingDto(ObjectiveDto):
 class ObjectiveOutgoingDto(ObjectiveDto):
     scenario_id: uuid.UUID
     type: str
+    created_at: datetime
+    updated_at: datetime
 
 
 class ObjectiveMapper:
@@ -52,6 +57,8 @@ class ObjectiveMapper:
             name=entity.name,
             type=entity.type,
             description=entity.description,
+            created_at=entity.created_at,
+            updated_at=entity.updated_at,
         )
 
     @staticmethod

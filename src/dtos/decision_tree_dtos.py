@@ -7,6 +7,7 @@ from src.dtos.issue_dtos import IssueOutgoingDto
 class EdgeUUIDDto(BaseModel):
     tail: uuid.UUID
     head: uuid.UUID | None
+    name: str = ""
 
 
 class EndPointNodeDto(BaseModel):
@@ -15,6 +16,11 @@ class EndPointNodeDto(BaseModel):
     type: str = "EndPoint"
 
 
+class TreeNodeDto(BaseModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    issue: IssueOutgoingDto | EndPointNodeDto
+
+
 class DecisionTreeDTO(BaseModel):
-    tree_node: IssueOutgoingDto | EndPointNodeDto
+    tree_node: TreeNodeDto
     children: Optional[List["DecisionTreeDTO"]] = None
