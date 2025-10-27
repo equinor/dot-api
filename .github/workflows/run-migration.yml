@@ -78,7 +78,7 @@ jobs:
 
       - name: Run migration
         env:
-          APP_ENV: dev
+          APP_ENV: ${{ inputs.env-name }}
         run: |
           poetry run alembic upgrade head
 
