@@ -1,4 +1,4 @@
-name: run migration in dev environment
+name: run migration in prod environment
 
 on:
   push:
