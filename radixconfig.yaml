@@ -61,7 +61,7 @@ spec:
             DATABASE_CONN_TEST: 'DRIVER={ODBC Driver 18 for SQL Server};MARS_Connection=Yes;Server=decision-optimization-sqlserver-test.database.windows.net;Database=decision-optimization-sqldb-test;'
           identity:
             azure:
-              clientId: c0d1f6a5-93b5-432b-8c2e-bf26583a7626
+              clientId: 2fdc6cea-f798-4bf1-8b61-5de06ace057f
         - environment: dev
           replicas: 1
           variables:
