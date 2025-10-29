@@ -8,17 +8,17 @@ class EdgeConnection:
     
     outcome_id: uuid.UUID
     edge_id: uuid.UUID
-    connected_node_id: uuid.UUID
-    connected_node_type: NodeStates  # "option" or "outcome"
+    parent_id: uuid.UUID
+    parent_type: NodeStates  # "option" or "outcome"
     
     def __init__(
         self,
         outcome_id: uuid.UUID,
         edge_id: uuid.UUID,
-        connected_node_id: uuid.UUID,
-        connected_node_type: NodeStates,
+        parent_id: uuid.UUID,
+        parent_type: NodeStates,
     ):
         self.outcome_id = outcome_id
         self.edge_id = edge_id
-        self.connected_node_id = connected_node_id
-        self.connected_node_type = connected_node_type
+        self.parent_id = parent_id
+        self.parent_type = parent_type

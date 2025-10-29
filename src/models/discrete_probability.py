@@ -13,9 +13,9 @@ if TYPE_CHECKING:
 
 class DiscreteProbabilityParentOutcome(Base):
     __tablename__ = "discrete_probability_parent_outcome"
-    discrete_probability_id = mapped_column(GUID(), ForeignKey("discrete_probability.id"), primary_key=True)
-    parent_outcome_id = mapped_column(GUID(), ForeignKey("outcome.id"), primary_key=True)
-    edge_id = mapped_column(GUID(), ForeignKey("edge.id"), primary_key=True)
+    discrete_probability_id = mapped_column(GUID(), ForeignKey("discrete_probability.id", ondelete="CASCADE"), primary_key=True)
+    parent_outcome_id = mapped_column(GUID(), ForeignKey("outcome.id", ondelete="CASCADE"), primary_key=True)
+    edge_id = mapped_column(GUID(), ForeignKey("edge.id", ondelete="CASCADE"), index=True)
 
     discrete_probability: Mapped["DiscreteProbability"] = relationship("DiscreteProbability", back_populates="parent_outcomes")
     parent_outcome: Mapped["Outcome"] = relationship("Outcome")
@@ -28,9 +28,9 @@ class DiscreteProbabilityParentOutcome(Base):
 
 class DiscreteProbabilityParentOption(Base):
     __tablename__ = "discrete_probability_parent_option"
-    discrete_probability_id = mapped_column(GUID(), ForeignKey("discrete_probability.id"), primary_key=True)
-    parent_option_id = mapped_column(GUID(), ForeignKey("option.id"), primary_key=True)
-    edge_id = mapped_column(GUID(), ForeignKey("edge.id"), primary_key=True)
+    discrete_probability_id = mapped_column(GUID(), ForeignKey("discrete_probability.id", ondelete="CASCADE"), primary_key=True)
+    parent_option_id = mapped_column(GUID(), ForeignKey("option.id", ondelete="CASCADE"), primary_key=True)
+    edge_id = mapped_column(GUID(), ForeignKey("edge.id", ondelete="CASCADE"), primary_key=True)
 
     discrete_probability: Mapped["DiscreteProbability"] = relationship("DiscreteProbability", back_populates="parent_options")
     parent_option: Mapped["Option"] = relationship("Option")
