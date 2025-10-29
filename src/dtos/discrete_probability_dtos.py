@@ -2,6 +2,8 @@ import uuid
 from typing import List
 from pydantic import BaseModel, Field
 from src.models.discrete_probability import DiscreteProbability, DiscreteProbabilityParentOption, DiscreteProbabilityParentOutcome
+from sqlalchemy.ext.asyncio import AsyncSession
+from src.repositories.outcome_repository import OutcomeRepository
 
 class DiscreteProbabilityDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
@@ -30,14 +32,26 @@ class DiscreteProbabilityMapper:
         )
 
     @staticmethod
-    def to_entity(dto: DiscreteProbabilityIncomingDto) -> DiscreteProbability:
+    async def to_entity(dto: DiscreteProbabilityIncomingDto, session: AsyncSession ) -> DiscreteProbability:
+        if len(dto.parent_option_ids) != 0 or len(dto.parent_outcome_ids) != 0:
+            repo = OutcomeRepository(session)        
+            outcome_edge_connections, option_edge_connections = await repo.find_edge_connections(
+                dto.uncertainty_id, 
+                dto.child_outcome_id, 
+                dto.parent_option_ids, 
+                dto.parent_outcome_ids,
+            )
+        else: 
+            outcome_edge_connections = []
+            option_edge_connections = []
+
         return DiscreteProbability(
             id=dto.id,
             child_outcome_id=dto.child_outcome_id,
             uncertainty_id=dto.uncertainty_id,
             probability=dto.probability,
-            parent_outcomes=[DiscreteProbabilityParentOutcome(discrete_probability_id=dto.id, parent_outcome_id=x) for x in dto.parent_outcome_ids],
-            parent_options=[DiscreteProbabilityParentOption(discrete_probability_id=dto.id, parent_option_id=x) for x in dto.parent_option_ids]
+            parent_outcomes=[DiscreteProbabilityParentOutcome(discrete_probability_id=dto.id, parent_outcome_id=x.connected_node_id, edge_id=x.edge_id) for x in outcome_edge_connections],
+            parent_options=[DiscreteProbabilityParentOption(discrete_probability_id=dto.id, parent_option_id=x.connected_node_id, edge_id=x.edge_id) for x in option_edge_connections]
         )
 
     @staticmethod
@@ -45,5 +59,5 @@ class DiscreteProbabilityMapper:
         return [DiscreteProbabilityMapper.to_outgoing_dto(entity) for entity in entities]
 
     @staticmethod
-    def to_entities(dtos: List[DiscreteProbabilityIncomingDto]) -> List[DiscreteProbability]:
-        return [DiscreteProbabilityMapper.to_entity(dto) for dto in dtos]
+    async def to_entities(dtos: List[DiscreteProbabilityIncomingDto], session: AsyncSession) -> List[DiscreteProbability]:
+        return [await DiscreteProbabilityMapper.to_entity(dto, session) for dto in dtos]

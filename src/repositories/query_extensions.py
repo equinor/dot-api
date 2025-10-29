@@ -68,6 +68,35 @@ class QueryExtensions:
             ),
             joinedload(Node.node_style),
         ]
+    
+    @staticmethod
+    def load_node_with_edge_relationships() -> list[_AbstractLoad]:
+        return [
+            selectinload(Node.head_edges).options(
+                joinedload(Edge.tail_node).options(
+                    joinedload(Node.issue).options(
+                    joinedload(Issue.decision).options(
+                        selectinload(Decision.options)
+                    ),
+                    joinedload(Issue.uncertainty).options(
+                        selectinload(Uncertainty.outcomes)
+                    ),
+                ),
+            )
+            ),
+            selectinload(Node.tail_edges).options(
+                joinedload(Edge.head_node).options(
+                    joinedload(Node.issue).options(
+                    joinedload(Issue.decision).options(
+                        selectinload(Decision.options)
+                    ),
+                    joinedload(Issue.uncertainty).options(
+                        selectinload(Uncertainty.outcomes)
+                    ),
+                ),
+                )
+            )
+        ]
 
     @staticmethod
     def load_scenario_with_relationships() -> list[_AbstractLoad]:
