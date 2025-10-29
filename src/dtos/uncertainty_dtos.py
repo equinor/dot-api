@@ -1,6 +1,7 @@
 import uuid
 from pydantic import BaseModel, Field
 from typing import List
+from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.uncertainty import Uncertainty
 
 from src.dtos.outcome_dtos import (
@@ -44,13 +45,13 @@ class UncertaintyMapper:
         )
 
     @staticmethod
-    def to_entity(dto: UncertaintyIncomingDto) -> Uncertainty:
+    async def to_entity(dto: UncertaintyIncomingDto, session: AsyncSession) -> Uncertainty:
         return Uncertainty(
             id=dto.id,
             issue_id=dto.issue_id,
             is_key=dto.is_key,
             outcomes=OutcomeMapper.to_entities(dto.outcomes),
-            discrete_probabilities=DiscreteProbabilityMapper.to_entities(dto.discrete_probabilities),
+            discrete_probabilities=await DiscreteProbabilityMapper.to_entities(dto.discrete_probabilities, session),
         )
 
     @staticmethod
@@ -60,5 +61,5 @@ class UncertaintyMapper:
         return [UncertaintyMapper.to_outgoing_dto(entity) for entity in entities]
 
     @staticmethod
-    def to_entities(dtos: list[UncertaintyIncomingDto]) -> list[Uncertainty]:
-        return [UncertaintyMapper.to_entity(dto) for dto in dtos]
+    async def to_entities(dtos: list[UncertaintyIncomingDto], session: AsyncSession) -> list[Uncertainty]:
+        return [await UncertaintyMapper.to_entity(dto, session) for dto in dtos]

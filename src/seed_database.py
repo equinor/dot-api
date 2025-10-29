@@ -304,8 +304,8 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
         uncertainty_id=uncertainty_issue_id,
         probability=0.8,
         parent_options=[
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_1, parent_option_id=option_id_1),
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_1, parent_option_id=option_id_3),
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_1, parent_option_id=option_id_1, edge_id=edge_1.id),
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_1, parent_option_id=option_id_3, edge_id=edge_2.id),
         ] 
     )
 
@@ -317,8 +317,8 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
         uncertainty_id=uncertainty_issue_id,
         probability=0.2,
         parent_options=[
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_2, parent_option_id=option_id_2),
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_2, parent_option_id=option_id_3),            
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_2, parent_option_id=option_id_2, edge_id=edge_1.id),
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_2, parent_option_id=option_id_3, edge_id=edge_2.id),            
         ]
     )
 
@@ -330,8 +330,8 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
         uncertainty_id=uncertainty_issue_id,
         probability=0.,
         parent_options=[
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_3, parent_option_id=option_id_1),
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_3, parent_option_id=option_id_4),
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_3, parent_option_id=option_id_1, edge_id=edge_1.id),
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_3, parent_option_id=option_id_4, edge_id=edge_2.id),
         ] 
     )
 
@@ -343,8 +343,8 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
         uncertainty_id=uncertainty_issue_id,
         probability=0.,
         parent_options=[
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_4, parent_option_id=option_id_2),
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_4, parent_option_id=option_id_4),
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_4, parent_option_id=option_id_2, edge_id=edge_1.id),
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_4, parent_option_id=option_id_4, edge_id=edge_2.id),
         ] 
     )
 
@@ -356,8 +356,8 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
         uncertainty_id=uncertainty_issue_id,
         probability=0.,
         parent_options=[
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_5, parent_option_id=option_id_1),
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_5, parent_option_id=option_id_3),
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_5, parent_option_id=option_id_1, edge_id=edge_1.id),
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_5, parent_option_id=option_id_3, edge_id=edge_2.id),
         ] 
     )
 
@@ -369,8 +369,8 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
         uncertainty_id=uncertainty_issue_id,
         probability=1.,
         parent_options=[
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_6, parent_option_id=option_id_2),
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_6, parent_option_id=option_id_3),
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_6, parent_option_id=option_id_2, edge_id=edge_1.id),
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_6, parent_option_id=option_id_3, edge_id=edge_2.id),
         ] 
     )
 
@@ -382,8 +382,8 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
         uncertainty_id=uncertainty_issue_id,
         probability=1.,
         parent_options=[
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_7, parent_option_id=option_id_1),
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_7, parent_option_id=option_id_4),            
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_7, parent_option_id=option_id_1, edge_id=edge_1.id),
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_7, parent_option_id=option_id_4, edge_id=edge_2.id),            
         ]
     )
 
@@ -395,8 +395,8 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
         uncertainty_id=uncertainty_issue_id,
         probability=1.,
         parent_options=[
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_8, parent_option_id=option_id_2),
-            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_8, parent_option_id=option_id_4),
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_8, parent_option_id=option_id_2, edge_id=edge_1.id),
+            DiscreteProbabilityParentOption(discrete_probability_id=discrete_probability_id_8, parent_option_id=option_id_4, edge_id=edge_2.id),
         ] 
     )
 

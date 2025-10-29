@@ -30,8 +30,8 @@ async def test_get_discrete_probability(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_create_discrete_probability(client: AsyncClient):
     new_discrete_probability_id = uuid.uuid4()
-    new_uncertainty_id = GenerateUuid.as_uuid(1)
-    new_child_outcome_id = GenerateUuid.as_uuid(1)
+    new_uncertainty_id = GenerateUuid.as_uuid(2)
+    new_child_outcome_id = GenerateUuid.as_uuid(2)
     parent_option_id = GenerateUuid.as_uuid(1)
     new_probability = 0.75
     
@@ -60,9 +60,9 @@ async def test_update_discrete_probability(client: AsyncClient):
     # Use an existing outcome probability ID from seed data
     discrete_probability_id = GenerateUuid.as_uuid("0_0_0_op1")
     # Use an existing uncertainty and outcome ID from seed data
-    uncertainty_id = GenerateUuid.as_uuid(1)
-    child_outcome_id = GenerateUuid.as_uuid(1)
-    parent_outcome_id = GenerateUuid.as_uuid(4)
+    uncertainty_id = GenerateUuid.as_uuid(2)
+    child_outcome_id = GenerateUuid.as_uuid(2)
+    parent_outcome_id = GenerateUuid.as_uuid(1)
     updated_probability = 0.85
     
     payload = [
