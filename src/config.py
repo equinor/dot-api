@@ -69,5 +69,9 @@ class Config(BaseSettings):
     PROFILE: bool = False
     LOGGER: bool = True
 
+    ##ratelimiter settings
+    RATE_LIMIT_WINDOW: int = 60  # in seconds
+    MAX_REQUESTS_PER_WINDOW: int = 100
+
 
 config = Config()
