@@ -1,8 +1,8 @@
-"""Conditional probabilities
+"""discrete probabilities
 
-Revision ID: 2c08541c29a4
-Revises: 0fd01ae4d4fe
-Create Date: 2025-10-27 13:30:06.211710
+Revision ID: 60779826473d
+Revises: e36ea2b1d4e4
+Create Date: 2025-10-29 07:26:00.083659
 
 """
 from typing import Sequence, Union
@@ -13,8 +13,8 @@ import sqlalchemy as sa
 from src.models.guid import GUID
 
 # revision identifiers, used by Alembic.
-revision: str = '2c08541c29a4'
-down_revision: Union[str, None] = '0fd01ae4d4fe'
+revision: str = '60779826473d'
+down_revision: Union[str, None] = 'e36ea2b1d4e4'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -27,8 +27,8 @@ def upgrade() -> None:
     sa.Column('child_outcome_id', GUID(), nullable=False),
     sa.Column('uncertainty_id', GUID(), nullable=False),
     sa.Column('probability', sa.Float(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['child_outcome_id'], ['outcome.id'], ),
     sa.ForeignKeyConstraint(['uncertainty_id'], ['uncertainty.id'], ),
     sa.PrimaryKeyConstraint('id')
