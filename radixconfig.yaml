@@ -43,7 +43,7 @@ spec:
           variables:
             CLIENT_ID: '706ace43-0266-478e-a047-942162b6e1ff'
             REDIRECT_URL: 'https://api-dot-api-prod.radix.equinor.com/docs/oauth2-redirect'
-            AUDIENCE: "4251833c-b9c3-4013-afda-cbfd2cc50f3f"
+            AUDIENCE: "706ace43-0266-478e-a047-942162b6e1ff"
             SCOPE: '706ace43-0266-478e-a047-942162b6e1ff/Read'
             APP_ENV: 'prod'
             DATABASE_CONN_PROD: 'DRIVER={ODBC Driver 18 for SQL Server};MARS_Connection=Yes;Server=decision-optimization-sqlserver-prod.database.windows.net;Database=decision-optimization-sqldb-prod;'
