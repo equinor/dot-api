@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 from src.models.discrete_probability import DiscreteProbability, DiscreteProbabilityParentOption, DiscreteProbabilityParentOutcome
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.repositories.outcome_repository import OutcomeRepository, UncertaintyConnectionRequest
+from src.repositories.node_repository import NodeRepository, UncertaintyConnectionRequest
 from src.dtos.edge_connection_dtos import EdgeConnection
 
 class DiscreteProbabilityDto(BaseModel):
@@ -35,7 +35,7 @@ class DiscreteProbabilityMapper:
     @staticmethod
     async def to_entity(dto: DiscreteProbabilityIncomingDto, session: AsyncSession, edge_connection_result: Optional[tuple[List[EdgeConnection], List[EdgeConnection]]] = None) -> DiscreteProbability:
         if edge_connection_result is None:
-            repo = OutcomeRepository(session)        
+            repo = NodeRepository(session)        
             outcome_edge_connections, option_edge_connections = await repo.find_edge_connections(
                 dto.uncertainty_id, 
                 dto.child_outcome_id, 
@@ -60,7 +60,7 @@ class DiscreteProbabilityMapper:
 
     @staticmethod
     async def to_entities(dtos: List[DiscreteProbabilityIncomingDto], session: AsyncSession) -> List[DiscreteProbability]:
-        repo = OutcomeRepository(session)
+        repo = NodeRepository(session)
         edge_connections = await repo.find_edge_connections_for_multiple_uncertainties(
             {dto.uncertainty_id: UncertaintyConnectionRequest(
                 outcome_id=dto.child_outcome_id,
