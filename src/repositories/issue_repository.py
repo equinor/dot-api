@@ -1,8 +1,16 @@
 import uuid
-from src.models.issue import Issue
-from src.repositories.query_extensions import QueryExtensions
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session, selectinload, joinedload
+from sqlalchemy import select
+from src.models import (
+    Issue,
+    Edge,
+    Node,
+    Uncertainty,
+)
+from src.repositories.query_extensions import QueryExtensions
 from src.repositories.base_repository import BaseRepository
+from src.constants import Type
 
 
 class IssueRepository(BaseRepository[Issue, uuid.UUID]):
@@ -54,3 +62,28 @@ class IssueRepository(BaseRepository[Issue, uuid.UUID]):
             entity.uncertainty.discrete_probabilities = []
 
         await self.session.flush()
+
+
+def find_effected_uncertainties(session: Session, issue_ids: set[uuid.UUID]) -> set[uuid.UUID]:
+    uncertainty_ids: set[uuid.UUID] = set()
+
+    query = select(Issue).where(Issue.id.in_(issue_ids)).options(
+        joinedload(Issue.node).options(
+            selectinload(Node.tail_edges).options(
+                joinedload(Edge.head_node).options(
+                    joinedload(Node.issue).options(
+                        joinedload(Issue.uncertainty)
+                    )
+                )
+            )
+        )
+    )
+
+    issues: list[Issue] = list((session.scalars(query)).unique().all())
+
+    for issue in issues:
+        for edge in issue.node.tail_edges:
+            if edge.head_node.issue.type == Type.UNCERTAINTY.value and edge.head_node.issue.uncertainty:
+                uncertainty_ids.add(edge.head_node.issue.uncertainty.id)
+
+    return uncertainty_ids

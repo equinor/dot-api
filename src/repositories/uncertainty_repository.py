@@ -146,3 +146,4 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
         return
     except Exception as e:
         print(e)
+

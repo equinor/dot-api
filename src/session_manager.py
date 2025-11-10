@@ -16,7 +16,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import get_history
 
 from src.models.base import Base
-from src.models import (Edge, Issue, Outcome, Option, DiscreteProbabilityParentOption, DiscreteProbabilityParentOutcome, DiscreteProbability)
+from src.models import (Edge, Issue, Outcome, Option, DiscreteProbabilityParentOption, DiscreteProbabilityParentOutcome, DiscreteProbability, Uncertainty, Decision)
+from src.constants import (Type, DecisionHierarchy, Boundary)
 from src.config import config
 from src.seed_database import (
     seed_database,
@@ -31,7 +32,7 @@ from src.database import (
     validate_default_scenarios,
 )
 
-from src.repositories import option_repository, outcome_repository, edge_repository, uncertainty_repository
+from src.repositories import option_repository, outcome_repository, edge_repository, uncertainty_repository, issue_repository
 
 class SessionManager:
     """Manages asynchronous DB sessions with connection pooling."""
@@ -149,30 +150,55 @@ sessionmanager = SessionManager()
 @event.listens_for(Session, 'before_flush')
 def test_before_flush_event(session: Session, flush_context: Any, instances: Any) -> None:
     print(rf"In {test_before_flush_event.__name__}, session state: deleted: {session.deleted}, new: {session.new}, dirty: {session.dirty}")
-    subscribed_entities = (Edge, DiscreteProbabilityParentOption, DiscreteProbabilityParentOutcome)
+    subscribed_entities = (Edge, DiscreteProbabilityParentOption, DiscreteProbabilityParentOutcome, Issue, Decision, Uncertainty)
     if not (session.dirty or session.new or session.deleted):
         return
     
-    relevant_new: set[Edge|DiscreteProbabilityParentOption|DiscreteProbabilityParentOutcome] = {obj for obj in session.new if isinstance(obj, subscribed_entities)}
-    relevant_dirty: set[Edge|DiscreteProbabilityParentOption|DiscreteProbabilityParentOutcome] = {obj for obj in session.dirty if isinstance(obj, subscribed_entities)}
-    relevant_deleted: set[Edge|DiscreteProbabilityParentOption|DiscreteProbabilityParentOutcome] = {obj for obj in session.deleted if isinstance(obj, subscribed_entities)}
+    relevant_new: set[Edge|DiscreteProbabilityParentOption|DiscreteProbabilityParentOutcome|Issue|Decision|Uncertainty] = {obj for obj in session.new if isinstance(obj, subscribed_entities)}
+    relevant_dirty: set[Edge|DiscreteProbabilityParentOption|DiscreteProbabilityParentOutcome|Issue|Decision|Uncertainty] = {obj for obj in session.dirty if isinstance(obj, subscribed_entities)}
+    relevant_deleted: set[Edge|DiscreteProbabilityParentOption|DiscreteProbabilityParentOutcome]|Issue|Decision|Uncertainty = {obj for obj in session.deleted if isinstance(obj, subscribed_entities)}
     if not (relevant_new or relevant_dirty or relevant_deleted): return
     
     deleted_edges: set[uuid.UUID] = set()
+
+    effected_uncertainties = session.info.get('effected_uncertainties', set())
+
+    issues_to_search: set[uuid.UUID] = set()
     
-    # for changed_entity in relevant_dirty:
-    #     if isinstance(changed_entity, Issue) and get_history(changed_entity, Issue.boundary.name).has_changes():
-    #         pass
-        
+    for changed_entity in relevant_dirty:
+        if isinstance(changed_entity, Issue) and get_history(changed_entity, Issue.boundary.name).has_changes():
+            # find effected uncertainties
+            insp = get_history(changed_entity, Issue.boundary.name)
+            if insp.added == [Boundary.OUT.value] or insp.deleted == [Boundary.OUT.value]:
+                issues_to_search.add(changed_entity.id)
+            
+            insp = get_history(changed_entity, Issue.type.name)
+            if insp.added == [Type.UNCERTAINTY.value] or insp.deleted == [Type.UNCERTAINTY.value]:
+                effected_uncertainties.add(changed_entity.id)
+            if (
+                (insp.added == [Type.UNCERTAINTY.value] or insp.deleted == [Type.UNCERTAINTY.value]) or
+                (insp.added == [Type.DECISION.value] or insp.deleted == [Type.DECISION.value])
+            ):
+                issues_to_search.add(changed_entity.id)
+
+
+        if isinstance(changed_entity, Uncertainty) and get_history(changed_entity, Uncertainty.is_key.name).has_changes():
+            # find effected uncertainties
+            issues_to_search.add(changed_entity.issue_id)
+
+        if isinstance(changed_entity, Decision) and get_history(changed_entity, Decision.type.name).has_changes():
+            # find effected uncertainties
+            insp = get_history(changed_entity, Decision.type.name)
+            if insp.added == [DecisionHierarchy.FOCUS.value] or insp.deleted == [DecisionHierarchy.FOCUS.value]:
+                issues_to_search.add(changed_entity.issue_id)
+            
     for deleted_entity in relevant_deleted:
         if isinstance(deleted_entity, Edge):
             deleted_edges.add(deleted_entity.id)
-        if isinstance(deleted_entity, (DiscreteProbabilityParentOption, DiscreteProbabilityParentOutcome)):
-            # from deleted_entity.discrete_probability_id delete the parent DiscreteProbability
-            dp_entity = session.get(DiscreteProbability, deleted_entity.discrete_probability_id)
-            session.delete(dp_entity)
 
-    effected_uncertainties = session.info.get('effected_uncertainties', set())
+    if issues_to_search:
+        effected_uncertainties = effected_uncertainties.union(issue_repository.find_effected_uncertainties(session, issues_to_search))
+
     if deleted_edges:
         effected_uncertainties = effected_uncertainties.union(edge_repository.find_effected_uncertainties(session, deleted_edges))
 
