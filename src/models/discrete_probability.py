@@ -1,9 +1,11 @@
 import uuid
-from typing import Optional, TYPE_CHECKING
-from sqlalchemy import ForeignKey, Float
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import Optional, TYPE_CHECKING, Any
+from sqlalchemy import ForeignKey, Float, select
+from sqlalchemy.orm import Mapped, mapped_column, relationship, Session
+from sqlalchemy.engine import Connection
 from src.models.base import Base
 from src.models.base_entity import BaseEntity
+from sqlalchemy.event import listens_for
 from src.models.guid import GUID
 if TYPE_CHECKING:
     from src.models.outcome import Outcome
@@ -13,37 +15,31 @@ if TYPE_CHECKING:
 
 class DiscreteProbabilityParentOutcome(Base):
     __tablename__ = "discrete_probability_parent_outcome"
-    discrete_probability_id = mapped_column(GUID(), ForeignKey("discrete_probability.id"), primary_key=True)
-    parent_outcome_id = mapped_column(GUID(), ForeignKey("outcome.id", ondelete="CASCADE"), primary_key=True)
-    edge_id = mapped_column(GUID(), ForeignKey("edge.id", ondelete="CASCADE"), nullable=False, index=True)
+    discrete_probability_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("discrete_probability.id"), primary_key=True)
+    parent_outcome_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("outcome.id", ondelete="CASCADE"), primary_key=True)
 
     discrete_probability: Mapped["DiscreteProbability"] = relationship("DiscreteProbability", back_populates="parent_outcomes")
     parent_outcome: Mapped["Outcome"] = relationship("Outcome")
-    edge: Mapped["Edge"] = relationship("Edge")
 
-    def __init__(self, discrete_probability_id: uuid.UUID, parent_outcome_id: uuid.UUID, edge_id: uuid.UUID):
+    def __init__(self, discrete_probability_id: uuid.UUID, parent_outcome_id: uuid.UUID):
         self.discrete_probability_id = discrete_probability_id
         self.parent_outcome_id = parent_outcome_id
-        self.edge_id = edge_id
 
 class DiscreteProbabilityParentOption(Base):
     __tablename__ = "discrete_probability_parent_option"
-    discrete_probability_id = mapped_column(GUID(), ForeignKey("discrete_probability.id"), primary_key=True)
-    parent_option_id = mapped_column(GUID(), ForeignKey("option.id", ondelete="CASCADE"), primary_key=True)
-    edge_id = mapped_column(GUID(), ForeignKey("edge.id", ondelete="CASCADE"), nullable=False, index=True)
+    discrete_probability_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("discrete_probability.id"), primary_key=True)
+    parent_option_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("option.id", ondelete="CASCADE"), primary_key=True)
 
     discrete_probability: Mapped["DiscreteProbability"] = relationship("DiscreteProbability", back_populates="parent_options")
-    parent_option: Mapped["Option"] = relationship("Option")
-    edge: Mapped["Edge"] = relationship("Edge")
+    parent_option: Mapped["Option"] = relationship("Option", )
 
-    def __init__(self, discrete_probability_id: uuid.UUID, parent_option_id: uuid.UUID, edge_id: uuid.UUID):
+    def __init__(self, discrete_probability_id: uuid.UUID, parent_option_id: uuid.UUID):
         self.discrete_probability_id = discrete_probability_id
         self.parent_option_id = parent_option_id
-        self.edge_id = edge_id
 
 class DiscreteProbability(Base, BaseEntity):
     __tablename__ = "discrete_probability"
-    id = mapped_column(GUID(), primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
     child_outcome_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("outcome.id", ondelete="CASCADE"), index=True)
     uncertainty_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("uncertainty.id"), index=True) # cascade delete handled in uncertainty model
     probability: Mapped[float] = mapped_column(Float(), default=0.0)
@@ -79,3 +75,34 @@ class DiscreteProbability(Base, BaseEntity):
         self.parent_outcomes = parent_outcomes or []
         self.parent_options = parent_options or []
 
+
+# Event listeners to clean up orphaned DiscreteProbability records
+@listens_for(DiscreteProbabilityParentOutcome, "after_delete")
+def cleanup_orphaned_discrete_probability_after_outcome_delete(mapper: Any, connection: Connection, target: DiscreteProbabilityParentOutcome) -> None:
+    _cleanup_orphaned_discrete_probability(connection, target.discrete_probability_id)
+
+
+@listens_for(DiscreteProbabilityParentOption, "after_delete")
+def cleanup_orphaned_discrete_probability_after_option_delete(mapper: Any, connection: Connection, target: DiscreteProbabilityParentOption) -> None:
+    _cleanup_orphaned_discrete_probability(connection, target.discrete_probability_id)
+
+
+def _cleanup_orphaned_discrete_probability(connection: Connection, discrete_probability_id: uuid.UUID) -> None:
+
+    # First delete all parent outcome relationships
+    connection.execute(
+        DiscreteProbabilityParentOutcome.__table__.delete()
+        .where(DiscreteProbabilityParentOutcome.discrete_probability_id == discrete_probability_id)
+    )
+    
+    # Then delete all parent option relationships
+    connection.execute(
+        DiscreteProbabilityParentOption.__table__.delete()
+        .where(DiscreteProbabilityParentOption.discrete_probability_id == discrete_probability_id)
+    )
+    
+    # Finally delete the DiscreteProbability record itself
+    connection.execute(
+        DiscreteProbability.__table__.delete()
+        .where(DiscreteProbability.id == discrete_probability_id)
+    )

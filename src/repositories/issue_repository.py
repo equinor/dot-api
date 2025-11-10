@@ -44,3 +44,13 @@ class IssueRepository(BaseRepository[Issue, uuid.UUID]):
 
         await self.session.flush()
         return entities_to_update
+    
+    async def clear_discrete_probability_tables(self, ids: list[uuid.UUID]):
+        
+        entities = await self.get(ids)
+
+        for entity in entities:
+            if entity.uncertainty == None: continue
+            entity.uncertainty.discrete_probabilities = []
+
+        await self.session.flush()

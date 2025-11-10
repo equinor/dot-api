@@ -1,13 +1,19 @@
 import uuid
+from typing import TYPE_CHECKING
 from sqlalchemy import String, ForeignKey, Float
 from src.models.guid import GUID
 from sqlalchemy.orm import (
     Mapped,
     mapped_column,
+    relationship,
 )
+from sqlalchemy.event import listens_for
 from src.models.base import Base
 from src.models.base_entity import BaseEntity
 from src.constants import DatabaseConstants
+
+if TYPE_CHECKING:
+    from src.models.discrete_probability import DiscreteProbabilityParentOption
 
 
 class Option(Base, BaseEntity):
@@ -20,6 +26,11 @@ class Option(Base, BaseEntity):
     )
 
     utility: Mapped[float] = mapped_column(Float(), default=0.0)
+
+    discrete_probability_parent_options: Mapped[list["DiscreteProbabilityParentOption"]] = relationship(
+        "DiscreteProbabilityParentOption",
+        cascade="all, delete-orphan",
+    )
 
     def __init__(self, id: uuid.UUID, decision_id: uuid.UUID, name: str, utility: float):
         self.id = id

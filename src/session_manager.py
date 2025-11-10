@@ -1,6 +1,6 @@
-from __future__ import annotations
+import uuid
 
-from typing import AsyncGenerator, Optional
+from typing import AsyncGenerator, Optional, Any
 
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -8,9 +8,15 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from src.models.base import Base
 from sqlalchemy.pool import AsyncAdaptedQueuePool
 
+from typing import Any
+from sqlalchemy import event
+from sqlalchemy.orm import Session
+from sqlalchemy.orm.attributes import get_history
+
+from src.models.base import Base
+from src.models import (Edge, Issue, Outcome, Option, DiscreteProbabilityParentOption, DiscreteProbabilityParentOutcome, DiscreteProbability)
 from src.config import config
 from src.seed_database import (
     seed_database,
@@ -25,6 +31,7 @@ from src.database import (
     validate_default_scenarios,
 )
 
+from src.repositories import option_repository, outcome_repository, edge_repository, uncertainty_repository
 
 class SessionManager:
     """Manages asynchronous DB sessions with connection pooling."""
@@ -138,3 +145,95 @@ class SessionManager:
 
 # Global instances
 sessionmanager = SessionManager()
+
+@event.listens_for(Session, 'before_flush')
+def test_before_flush_event(session: Session, flush_context: Any, instances: Any) -> None:
+    print(rf"In {test_before_flush_event.__name__}, session state: deleted: {session.deleted}, new: {session.new}, dirty: {session.dirty}")
+    subscribed_entities = (Edge, DiscreteProbabilityParentOption, DiscreteProbabilityParentOutcome)
+    if not (session.dirty or session.new or session.deleted):
+        return
+    
+    relevant_new: set[Edge|DiscreteProbabilityParentOption|DiscreteProbabilityParentOutcome] = {obj for obj in session.new if isinstance(obj, subscribed_entities)}
+    relevant_dirty: set[Edge|DiscreteProbabilityParentOption|DiscreteProbabilityParentOutcome] = {obj for obj in session.dirty if isinstance(obj, subscribed_entities)}
+    relevant_deleted: set[Edge|DiscreteProbabilityParentOption|DiscreteProbabilityParentOutcome] = {obj for obj in session.deleted if isinstance(obj, subscribed_entities)}
+    if not (relevant_new or relevant_dirty or relevant_deleted): return
+    
+    deleted_edges: set[uuid.UUID] = set()
+    
+    # for changed_entity in relevant_dirty:
+    #     if isinstance(changed_entity, Issue) and get_history(changed_entity, Issue.boundary.name).has_changes():
+    #         pass
+        
+    for deleted_entity in relevant_deleted:
+        if isinstance(deleted_entity, Edge):
+            deleted_edges.add(deleted_entity.id)
+        if isinstance(deleted_entity, (DiscreteProbabilityParentOption, DiscreteProbabilityParentOutcome)):
+            # from deleted_entity.discrete_probability_id delete the parent DiscreteProbability
+            dp_entity = session.get(DiscreteProbability, deleted_entity.discrete_probability_id)
+            session.delete(dp_entity)
+
+    effected_uncertainties = session.info.get('effected_uncertainties', set())
+    if deleted_edges:
+        effected_uncertainties = effected_uncertainties.union(edge_repository.find_effected_uncertainties(session, deleted_edges))
+
+    session.info['effected_uncertainties'] = effected_uncertainties
+
+    return
+
+@event.listens_for(Session, 'after_flush')
+def test_after_flush_event(session: Session, flush_context: Any) -> None:
+    """Log after flush event."""
+    print(rf"In {test_after_flush_event.__name__}, session state: deleted: {session.deleted}, new: {session.new}, dirty: {session.dirty}")
+    subscribed_entities = (Edge, Outcome, Option, Issue)
+    if not (session.dirty or session.new or session.deleted):
+        return
+    
+    relevant_new: set[Edge|Outcome|Option|Issue] = {obj for obj in session.new if isinstance(obj, subscribed_entities)}
+    relevant_dirty: set[Edge|Outcome|Option|Issue] = {obj for obj in session.dirty if isinstance(obj, subscribed_entities)}
+    relevant_deleted: set[Edge|Outcome|Option|Issue] = {obj for obj in session.deleted if isinstance(obj, subscribed_entities)}
+    if not (relevant_new or relevant_dirty or relevant_deleted): return
+
+    added_edges: set[uuid.UUID] = set()
+    added_options: set[Option] = set()
+    added_outcomes: set[Outcome] = set()
+
+    for created_entity in relevant_new:
+        if isinstance(created_entity, Edge): 
+            added_edges.add(created_entity.id)
+        
+        if isinstance(created_entity, Outcome):
+            added_outcomes.add(created_entity)
+            
+        if isinstance(created_entity, Option):
+            added_options.add(created_entity)
+
+    effected_uncertainties = session.info.get('effected_uncertainties', set())
+    
+    if added_edges:
+        effected_uncertainties = effected_uncertainties.union(edge_repository.find_effected_uncertainties(session, added_edges))
+
+    if added_options:
+        effected_uncertainties = effected_uncertainties.union(option_repository.find_effected_uncertainties(session, added_options))
+
+    if added_outcomes:
+        effected_uncertainties = effected_uncertainties.union(outcome_repository.find_effected_uncertainties(session, added_outcomes))
+
+    session.info['effected_uncertainties'] = effected_uncertainties
+    return
+
+@event.listens_for(Session, 'before_commit')
+def test_before_commit_event(session: Session) -> None:
+    """Log before commit event."""
+    print(rf"In {test_before_commit_event.__name__}, session state: deleted: {session.deleted}, new: {session.new}, dirty: {session.dirty}")
+    effected_uncertainties = session.info.get('effected_uncertainties', None)
+    if effected_uncertainties is None: return 
+    if effected_uncertainties:
+        [uncertainty_repository.recalculate_discrete_probability_table(session, x) for x in effected_uncertainties]
+    return
+
+@event.listens_for(Session, 'after_commit')
+def test_after_commit_event(session: Session) -> None:
+    """Log after commit event."""
+    print(rf"In {test_after_commit_event.__name__}, session state: deleted: {session.deleted}, new: {session.new}, dirty: {session.dirty}")
+    return
+

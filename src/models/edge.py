@@ -11,9 +11,6 @@ from src.models.base import Base
 from src.models.node import Node
 from src.models.scenario import Scenario
 from src.models.base_entity import BaseEntity
-if TYPE_CHECKING:
-    from src.models.discrete_probability import DiscreteProbabilityParentOption
-    from src.models.discrete_probability import DiscreteProbabilityParentOutcome
 
 
 class Edge(Base, BaseEntity):
@@ -37,18 +34,6 @@ class Edge(Base, BaseEntity):
         Node,
         primaryjoin=head_id == Node.id,
         back_populates="head_edges",
-    )
-
-    discrete_probability_parent_outcomes: Mapped[list["DiscreteProbabilityParentOutcome"]] = relationship(
-        "DiscreteProbabilityParentOutcome",
-        back_populates="edge",
-        cascade="all, delete-orphan"
-    )
-
-    discrete_probability_parent_options: Mapped[list["DiscreteProbabilityParentOption"]] = relationship(
-        "DiscreteProbabilityParentOption",
-        back_populates="edge",
-        cascade="all, delete-orphan"
     )
 
     def __init__(
