@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import get_history
 
-from src.models import (Edge, Issue, Outcome, Option, DiscreteProbabilityParentOption, DiscreteProbabilityParentOutcome, Uncertainty, Decision)
+from src.models import (Edge, Issue, Outcome, Option, Uncertainty, Decision)
 from src.constants import (Type, DecisionHierarchy, Boundary)
 
 from src.repositories import option_repository, outcome_repository, edge_repository, uncertainty_repository, issue_repository
@@ -11,10 +11,6 @@ from src.utils.session_info_handler import SessionInfoHandler
 
 class DiscreteProbabilityEventHandler:
     """Handles events that require discrete probability table recalculation."""
-    
-    def __init__(self):
-        self.tracked_entities = (Edge, Issue, Outcome, Option, DiscreteProbabilityParentOption, 
-                               DiscreteProbabilityParentOutcome, Decision, Uncertainty)
     
     def process_session_changes_before_flush(self, session: Session) -> None:
         """Process all session changes and determine which uncertainties need recalculation."""
