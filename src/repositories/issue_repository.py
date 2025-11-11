@@ -6,7 +6,6 @@ from src.models import (
     Issue,
     Edge,
     Node,
-    Uncertainty,
 )
 from src.repositories.query_extensions import QueryExtensions
 from src.repositories.base_repository import BaseRepository
@@ -58,7 +57,7 @@ class IssueRepository(BaseRepository[Issue, uuid.UUID]):
         entities = await self.get(ids)
 
         for entity in entities:
-            if entity.uncertainty == None: continue
+            if entity.uncertainty is None: continue
             entity.uncertainty.discrete_probabilities = []
 
         await self.session.flush()

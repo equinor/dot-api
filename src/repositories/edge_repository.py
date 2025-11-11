@@ -1,4 +1,4 @@
-from sqlalchemy.orm import joinedload, selectinload, Session
+from sqlalchemy.orm import joinedload, Session
 from sqlalchemy.sql import select 
 import uuid
 from src.models.edge import Edge

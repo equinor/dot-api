@@ -54,7 +54,7 @@ class NodeRepository(BaseRepository[Node, uuid.UUID]):
         entities = await self.get(ids)
 
         for entity in entities:
-            if entity.issue.uncertainty == None: continue
+            if entity.issue.uncertainty is None: continue
             entity.issue.uncertainty.discrete_probabilities = []
 
         await self.session.flush()

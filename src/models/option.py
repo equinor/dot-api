@@ -7,7 +7,6 @@ from sqlalchemy.orm import (
     mapped_column,
     relationship,
 )
-from sqlalchemy.event import listens_for
 from src.models.base import Base
 from src.models.base_entity import BaseEntity
 from src.constants import DatabaseConstants

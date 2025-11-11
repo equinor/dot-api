@@ -7,20 +7,9 @@ from sqlalchemy.orm import joinedload, selectinload, Session
 from sqlalchemy.sql import select
 from src.repositories.base_repository import BaseRepository
 from src.repositories.query_extensions import QueryExtensions
-from src.repositories.node_repository import EdgeConnection
 from src.constants import Type, DecisionHierarchy, Boundary
 
-from pydantic import BaseModel
-
-from src.models import *
-
-class OutcomeToEdge(BaseModel):
-    outcome_id: uuid.UUID
-    edge_id: uuid.UUID
-
-class OptionToEdge(BaseModel):
-    option_id: uuid.UUID
-    edge_id: uuid.UUID
+from src.models import Issue, Node, Edge, Decision, Uncertainty
 
 class UncertaintyRepository(BaseRepository[Uncertainty, uuid.UUID]):
     def __init__(self, session: AsyncSession):
@@ -114,36 +103,33 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
             if not issue.decision or issue.decision.type != DecisionHierarchy.FOCUS.value: continue
             parent_options_list.append([x.id for x in issue.decision.options])
 
-    try:
-        # check if no valid edges and thus cannot be empty, but should be 1 row
-        if len(parent_outcomes_list) == 0 and len(parent_options_list) == 0:
-            entity.discrete_probabilities = [DiscreteProbability(id = uuid.uuid4(), uncertainty_id=entity.id, child_outcome_id=x.id, probability=0) for x in entity.outcomes]
-            session.flush()
-            return
-        
-        parent_compinations = list(product(*parent_outcomes_list, *parent_options_list))
-        # get all options and outcomes to filter on later
-        all_options: List[uuid.UUID] = list(chain(*parent_options_list))
-        all_outcomes: List[uuid.UUID] = list(chain(*parent_outcomes_list))
-
-        for child_outcome in entity.outcomes:
-            for parent_combination in parent_compinations:
-                parent_option_ids = filter(lambda x: x in all_options, parent_combination)
-                parent_outcome_ids = filter(lambda x: x in all_outcomes, parent_combination)
-                probability_id = uuid.uuid4() 
-                entity.discrete_probabilities.append(
-                    DiscreteProbability(
-                        id = probability_id,
-                        uncertainty_id=entity.id,
-                        child_outcome_id=child_outcome.id,
-                        probability=0,
-                        parent_outcomes=[DiscreteProbabilityParentOutcome(discrete_probability_id=probability_id, parent_outcome_id=x) for x in parent_outcome_ids],
-                        parent_options=[DiscreteProbabilityParentOption(discrete_probability_id=probability_id, parent_option_id=x) for x in parent_option_ids],
-                    )
-                )
-
+    # check if no valid edges and thus cannot be empty, but should be 1 row
+    if len(parent_outcomes_list) == 0 and len(parent_options_list) == 0:
+        entity.discrete_probabilities = [DiscreteProbability(id = uuid.uuid4(), uncertainty_id=entity.id, child_outcome_id=x.id, probability=0) for x in entity.outcomes]
         session.flush()
         return
-    except Exception as e:
-        print(e)
+    
+    parent_compinations = list(product(*parent_outcomes_list, *parent_options_list))
+    # get all options and outcomes to filter on later
+    all_options: List[uuid.UUID] = list(chain(*parent_options_list))
+    all_outcomes: List[uuid.UUID] = list(chain(*parent_outcomes_list))
+
+    for child_outcome in entity.outcomes:
+        for parent_combination in parent_compinations:
+            parent_option_ids = filter(lambda x: x in all_options, parent_combination)
+            parent_outcome_ids = filter(lambda x: x in all_outcomes, parent_combination)
+            probability_id = uuid.uuid4() 
+            entity.discrete_probabilities.append(
+                DiscreteProbability(
+                    id = probability_id,
+                    uncertainty_id=entity.id,
+                    child_outcome_id=child_outcome.id,
+                    probability=0,
+                    parent_outcomes=[DiscreteProbabilityParentOutcome(discrete_probability_id=probability_id, parent_outcome_id=x) for x in parent_outcome_ids],
+                    parent_options=[DiscreteProbabilityParentOption(discrete_probability_id=probability_id, parent_option_id=x) for x in parent_option_ids],
+                )
+            )
+
+    session.flush()
+    return
 

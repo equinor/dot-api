@@ -1,10 +1,10 @@
 import uuid
 
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 class SessionInfo(BaseModel):
-    affected_uncertainties: set[uuid.UUID] = set()
+    affected_uncertainties: set[uuid.UUID] = Field(default_factory=set) # type: ignore
 
 class SessionInfoHandler:
     @staticmethod
