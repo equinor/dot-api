@@ -110,7 +110,7 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
             parent_outcomes_list.append([x.id for x in issue.uncertainty.outcomes])
 
         elif issue.type == Type.DECISION:
-            # check that the decision is in foucus
+            # check that the decision is in focus
             if not issue.decision or issue.decision.type != DecisionHierarchy.FOCUS.value: continue
             parent_options_list.append([x.id for x in issue.decision.options])
 
