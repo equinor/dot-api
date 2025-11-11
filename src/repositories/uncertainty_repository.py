@@ -99,7 +99,7 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
             parent_outcomes_list.append([x.id for x in issue.uncertainty.outcomes])
 
         elif issue.type == Type.DECISION:
-            # check that the decision is in foucus
+            # check that the decision is in focus
             if not issue.decision or issue.decision.type != DecisionHierarchy.FOCUS.value: continue
             parent_options_list.append([x.id for x in issue.decision.options])
 
@@ -109,13 +109,13 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
         session.flush()
         return
     
-    parent_compinations = list(product(*parent_outcomes_list, *parent_options_list))
+    parent_combinations = list(product(*parent_outcomes_list, *parent_options_list))
     # get all options and outcomes to filter on later
     all_options: List[uuid.UUID] = list(chain(*parent_options_list))
     all_outcomes: List[uuid.UUID] = list(chain(*parent_outcomes_list))
 
     for child_outcome in entity.outcomes:
-        for parent_combination in parent_compinations:
+        for parent_combination in parent_combinations:
             parent_option_ids = filter(lambda x: x in all_options, parent_combination)
             parent_outcome_ids = filter(lambda x: x in all_outcomes, parent_combination)
             probability_id = uuid.uuid4() 
