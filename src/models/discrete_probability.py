@@ -1,7 +1,7 @@
 import uuid
 from typing import Optional, TYPE_CHECKING, Any
-from sqlalchemy import ForeignKey, Float, select
-from sqlalchemy.orm import Mapped, mapped_column, relationship, Session
+from sqlalchemy import ForeignKey, Float
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.engine import Connection
 from src.models.base import Base
 from src.models.base_entity import BaseEntity
@@ -11,7 +11,6 @@ if TYPE_CHECKING:
     from src.models.outcome import Outcome
     from src.models.option import Option
     from src.models.uncertainty import Uncertainty
-    from src.models import Edge
 
 class DiscreteProbabilityParentOutcome(Base):
     __tablename__ = "discrete_probability_parent_outcome"
@@ -42,7 +41,7 @@ class DiscreteProbability(Base, BaseEntity):
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
     child_outcome_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("outcome.id", ondelete="CASCADE"), index=True)
     uncertainty_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("uncertainty.id"), index=True) # cascade delete handled in uncertainty model
-    probability: Mapped[float] = mapped_column(Float(), default=0.0)
+    probability: Mapped[Optional[float]] = mapped_column(Float(precision=14), default=None, nullable=True)
 
     child_outcome: Mapped["Outcome"] = relationship("Outcome", foreign_keys=[child_outcome_id])
     uncertainty: Mapped["Uncertainty"] = relationship("Uncertainty", back_populates="discrete_probabilities", foreign_keys=[uncertainty_id])

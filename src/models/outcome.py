@@ -29,6 +29,7 @@ class Outcome(Base, BaseEntity):
 
     discrete_probability_parent_outcomes: Mapped[list["DiscreteProbabilityParentOutcome"]] = relationship(
         "DiscreteProbabilityParentOutcome",
+        back_populates="parent_outcome",
         cascade="all, delete-orphan",
     )
 

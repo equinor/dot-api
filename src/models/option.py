@@ -29,6 +29,7 @@ class Option(Base, BaseEntity):
 
     discrete_probability_parent_options: Mapped[list["DiscreteProbabilityParentOption"]] = relationship(
         "DiscreteProbabilityParentOption",
+        back_populates="parent_option",
         cascade="all, delete-orphan",
     )
 
