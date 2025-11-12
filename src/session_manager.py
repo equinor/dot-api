@@ -1,6 +1,5 @@
-from __future__ import annotations
-
-from typing import AsyncGenerator, Optional
+import asyncio
+from typing import AsyncGenerator, Optional, Any
 
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -32,6 +31,8 @@ class SessionManager:
     def __init__(self) -> None:
         self.engine: Optional[AsyncEngine] = None
         self.session_factory: Optional[async_sessionmaker[AsyncSession]] = None
+        self._token_refresh_task: Optional[asyncio.Task[Any]] = None
+        self._shutdown_event = asyncio.Event()
 
     async def _initialize_in_memory_db(self, db_connection_string: str) -> None:
         """Initialize an in-memory database, and populate with test data."""
@@ -109,10 +110,48 @@ class SessionManager:
             # implyes that a different thread is performing the start task
             pass
 
-    async def close(self) -> None:
-        """Dispose of the database engine."""
+        if config.APP_ENV != "local" and ":memory:" not in db_connection_string:
+            self._token_refresh_task = asyncio.create_task(self._token_refresh_loop())
+
+    async def dispose_engine(self) -> None:
         if self.engine:
             await self.engine.dispose()
+
+    async def close(self) -> None:
+        """Dispose of the database engine."""
+        self._shutdown_event.set()
+        if self._token_refresh_task:
+            self._token_refresh_task.cancel()
+            try:
+                await self._token_refresh_task
+            except asyncio.CancelledError:
+                pass
+            except:
+                # must dispose of the engine anyway
+                pass
+
+        await self.dispose_engine()
+
+    async def _refresh_database_engine(self):
+        """Refresh database engine with new token."""
+        await self.dispose_engine()
+        
+        # Recreate engine with fresh token
+        await self._initialize_persistent_db()
+        self._initialize_session_factory()
+
+    async def _token_refresh_loop(self):
+        """Background task to refresh database tokens periodically."""
+        while not self._shutdown_event.is_set():
+            try:
+                await asyncio.wait_for(self._shutdown_event.wait(), timeout=config.DB_TOKEN_DURATION)  # 50 minutes
+            except asyncio.TimeoutError:
+                try:
+                    print("Refreshing database engine")
+                    await self._refresh_database_engine()
+                except Exception as e:
+                    # Log error but continue the loop
+                    print(f"Refreshing database engine failed: {e}")
 
     async def run_start_task(self) -> None:
         """Run the database start task."""

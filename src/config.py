@@ -58,6 +58,7 @@ class Config(BaseSettings):
     POOL_SIZE: int = 10
     MAX_OVERFLOW: int = 20
     POOL_RECYCLE: int = 1800
+    DB_TOKEN_DURATION: int = 3000
     DEBUG: bool = False
 
     # Cache for 60 minutes
