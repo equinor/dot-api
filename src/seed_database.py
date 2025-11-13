@@ -67,7 +67,7 @@ def create_decision_issue(
         name=name,
         node_style=None,
     )
-    node_style = NodeStyle(id=issue_id, node_id=node.id, width=100, height=200)
+    node_style = NodeStyle(id=issue_id, node_id=node.id, )
     issue = Issue(
         id=issue_id,
         scenario_id=scenario_id,
@@ -99,7 +99,7 @@ def create_uncertainty_issue(
         name=name,
         node_style=None,
     )
-    node_style = NodeStyle(id=issue_id, node_id=node.id, width=100, height=200)
+    node_style = NodeStyle(id=issue_id, node_id=node.id,)
     issue = Issue(
         id=issue_id,
         scenario_id=scenario_id,
@@ -131,7 +131,7 @@ def create_utility_issue(
         name=name,
         node_style=None,
     )
-    node_style = NodeStyle(id=issue_id, node_id=node.id, width=100, height=200)
+    node_style = NodeStyle(id=issue_id, node_id=node.id,)
     issue = Issue(
         id=issue_id,
         scenario_id=scenario_id,
@@ -891,8 +891,6 @@ async def seed_database(
                     node_id=node.id,
                     x_position=40,
                     y_position=50,
-                    width=100,
-                    height=200,
                 )
 
                 issue = Issue(
