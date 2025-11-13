@@ -46,43 +46,6 @@ async def get_all_discrete_probability(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@router.post("/discrete_probabilities")
-async def create_discrete_probabilities(
-    dtos: list[DiscreteProbabilityIncomingDto],
-    discrete_probability_service: DiscreteProbabilityService = Depends(get_discrete_probability_service),
-    session: AsyncSession = Depends(get_db),
-) -> list[DiscreteProbabilityOutgoingDto]:
-    try:
-        return list(await discrete_probability_service.create(session, dtos))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.delete("/discrete_probabilities/{id}")
-async def delete_discrete_probability(
-    id: uuid.UUID,
-    discrete_probability_service: DiscreteProbabilityService = Depends(get_discrete_probability_service),
-    session: AsyncSession = Depends(get_db),
-):
-    try:
-        await discrete_probability_service.delete(session, [id])
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.delete("/discrete_probabilities")
-async def delete_discrete_probabilities(
-    ids: list[uuid.UUID] = Query([]),
-    discrete_probability_service: DiscreteProbabilityService = Depends(get_discrete_probability_service),
-    session: AsyncSession = Depends(get_db),
-):
-    try:
-        await discrete_probability_service.delete(session, ids)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 @router.put("/discrete_probabilities")
 async def update_discrete_probabilities(
     dtos: list[DiscreteProbabilityIncomingDto],

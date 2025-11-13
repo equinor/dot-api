@@ -106,7 +106,7 @@ class IssueService:
         if uncertainty_dto:
             uncertainty_dto.issue_id = entity.id
             uncertainty = await UncertaintyRepository(session).create_single(
-                UncertaintyMapper.to_entity(uncertainty_dto)
+                await UncertaintyMapper.to_entity(uncertainty_dto, session)
             )
             entity.uncertainty = uncertainty
         if utility_dto:
@@ -140,7 +140,7 @@ class IssueService:
             value_metric_dtos,
         ) = self._extract_related_entities(dtos)
         entities: list[Issue] = await IssueRepository(session).create(
-            IssueMapper.to_entities(dtos, user.id)
+            await IssueMapper.to_entities(dtos, user.id, session)
         )
         # get the dtos while the entities are still connected to the session
         for (
@@ -178,7 +178,7 @@ class IssueService:
     ) -> list[IssueOutgoingDto]:
         user = await UserRepository(session).get_or_create(UserMapper.to_entity(user_dto))
         entities: list[Issue] = await IssueRepository(session).update(
-            IssueMapper.to_entities(dtos, user.id)
+            await IssueMapper.to_entities(dtos, user.id, session)
         )
         # get the dtos while the entities are still connected to the session
         result: list[IssueOutgoingDto] = IssueMapper.to_outgoing_dtos(entities)

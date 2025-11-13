@@ -1,14 +1,18 @@
 import uuid
+from typing import TYPE_CHECKING
 from sqlalchemy import String, ForeignKey, Float
 from src.models.guid import GUID
 from sqlalchemy.orm import (
     Mapped,
     mapped_column,
+    relationship,
 )
 from src.models.base import Base
 from src.models.base_entity import BaseEntity
 from src.constants import DatabaseConstants
 
+if TYPE_CHECKING:
+    from src.models.discrete_probability import DiscreteProbabilityParentOutcome
 
 class Outcome(Base, BaseEntity):
     __tablename__ = "outcome"
@@ -22,6 +26,12 @@ class Outcome(Base, BaseEntity):
     )
 
     utility: Mapped[float] = mapped_column(Float(), default=0.0)
+
+    discrete_probability_parent_outcomes: Mapped[list["DiscreteProbabilityParentOutcome"]] = relationship(
+        "DiscreteProbabilityParentOutcome",
+        back_populates="parent_outcome",
+        cascade="all, delete-orphan",
+    )
 
     def __init__(
         self,

@@ -36,3 +36,4 @@ class DiscreteProbabilityRepository(BaseRepository[DiscreteProbability, uuid.UUI
 
         await self.session.flush()
         return entities_to_update
+    

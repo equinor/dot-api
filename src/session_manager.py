@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import AsyncGenerator, Optional
 
 from sqlalchemy.ext.asyncio import (
@@ -8,9 +6,9 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from src.models.base import Base
 from sqlalchemy.pool import AsyncAdaptedQueuePool
 
+from src.models.base import Base
 from src.config import config
 from src.seed_database import (
     seed_database,
@@ -25,6 +23,13 @@ from src.database import (
     validate_default_scenarios,
 )
 
+# import events to activate them
+from src.events import (
+    before_flush_event_handler, # type: ignore
+    after_flush_event_handler, # type: ignore
+    before_commit_event_handler, # type: ignore
+    after_commit_event_handler, # type: ignore
+)
 
 class SessionManager:
     """Manages asynchronous DB sessions with connection pooling."""
