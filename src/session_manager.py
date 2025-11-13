@@ -23,6 +23,7 @@ from src.database import (
     build_connection_url,
     validate_default_scenarios,
 )
+from src.logger import get_dot_api_logger
 
 
 class SessionManager:
@@ -33,6 +34,7 @@ class SessionManager:
         self.session_factory: Optional[async_sessionmaker[AsyncSession]] = None
         self._token_refresh_task: Optional[asyncio.Task[Any]] = None
         self._shutdown_event = asyncio.Event()
+        self._logger = get_dot_api_logger()
 
     async def _initialize_in_memory_db(self, db_connection_string: str) -> None:
         """Initialize an in-memory database, and populate with test data."""
@@ -125,14 +127,14 @@ class SessionManager:
             try:
                 await self._token_refresh_task
             except asyncio.CancelledError:
+                # Task cancellation is expected during shutdown; no action needed.
                 pass
-            except:
-                # must dispose of the engine anyway
-                pass
+            except Exception as e:
+                self._logger.warning(f"Error while cancelling token refresh task: {e}")
 
         await self.dispose_engine()
 
-    async def _refresh_database_engine(self):
+    async def _refresh_database_engine(self) -> None:
         """Refresh database engine with new token."""
         await self.dispose_engine()
         
@@ -140,18 +142,18 @@ class SessionManager:
         await self._initialize_persistent_db()
         self._initialize_session_factory()
 
-    async def _token_refresh_loop(self):
+    async def _token_refresh_loop(self) -> None:
         """Background task to refresh database tokens periodically."""
         while not self._shutdown_event.is_set():
             try:
-                await asyncio.wait_for(self._shutdown_event.wait(), timeout=config.DB_TOKEN_DURATION)  # 50 minutes
+                await asyncio.wait_for(self._shutdown_event.wait(), timeout=config.DB_TOKEN_DURATION)
             except asyncio.TimeoutError:
                 try:
                     print("Refreshing database engine")
                     await self._refresh_database_engine()
                 except Exception as e:
                     # Log error but continue the loop
-                    print(f"Refreshing database engine failed: {e}")
+                    self._logger.warning(f"Refreshing database engine failed: {e}")
 
     async def run_start_task(self) -> None:
         """Run the database start task."""
