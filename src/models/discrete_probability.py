@@ -63,7 +63,7 @@ class DiscreteProbability(Base, BaseEntity):
         id: uuid.UUID,
         uncertainty_id: uuid.UUID,
         child_outcome_id: uuid.UUID,
-        probability: float = 0.0,
+        probability: Optional[float] = None,
         parent_outcomes: Optional[list["DiscreteProbabilityParentOutcome"]] = None,
         parent_options: Optional[list["DiscreteProbabilityParentOption"]] = None,
     ):
