@@ -1,7 +1,7 @@
 """discrete probabilities
 
 Revision ID: 60779826473d
-Revises: e36ea2b1d4e4
+Revises: c9f840341a96
 Create Date: 2025-10-29 07:26:00.083659
 
 """
@@ -14,7 +14,7 @@ from src.models.guid import GUID
 
 # revision identifiers, used by Alembic.
 revision: str = '60779826473d'
-down_revision: Union[str, None] = 'e36ea2b1d4e4'
+down_revision: Union[str, None] = 'c9f840341a96'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
