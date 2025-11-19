@@ -16,3 +16,8 @@ from src.models.node_style import NodeStyle  # type: ignore
 from src.models.outcome import Outcome  # type: ignore
 from src.models.option import Option  # type: ignore
 from src.models.project_role import ProjectRole  # type: ignore
+from src.models.discrete_probability import (
+    DiscreteProbabilityParentOutcome, # type: ignore
+    DiscreteProbabilityParentOption, # type: ignore
+    DiscreteProbability, # type: ignore
+)  

@@ -30,7 +30,7 @@ class EdgeService:
         head_nodes = await NodeRepository(session).get([x.head_id for x in dtos])
         for edge, tail_node, head_node in zip(entities, tail_nodes, head_nodes):
             self._connect_nodes_to_edge(edge, tail_node, head_node)
-
+        await NodeRepository(session).clear_discrete_probability_tables([x.id for x in head_nodes])
         # get the dtos while the entities are still connected to the session
         result: list[EdgeOutgoingDto] = EdgeMapper.to_outgoing_dtos(entities)
         return result

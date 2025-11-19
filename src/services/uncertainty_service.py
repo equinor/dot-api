@@ -16,7 +16,7 @@ class UncertaintyService:
         self, session: AsyncSession, dtos: list[UncertaintyIncomingDto]
     ) -> list[UncertaintyOutgoingDto]:
         entities: list[Uncertainty] = await UncertaintyRepository(session).create(
-            UncertaintyMapper.to_entities(dtos)
+            await UncertaintyMapper.to_entities(dtos, session)
         )
         # get the dtos while the entities are still connected to the session
         result: list[UncertaintyOutgoingDto] = UncertaintyMapper.to_outgoing_dtos(entities)
@@ -26,7 +26,7 @@ class UncertaintyService:
         self, session: AsyncSession, dtos: list[UncertaintyIncomingDto]
     ) -> list[UncertaintyOutgoingDto]:
         entities: list[Uncertainty] = await UncertaintyRepository(session).update(
-            UncertaintyMapper.to_entities(dtos)
+            await UncertaintyMapper.to_entities(dtos, session)
         )
         # get the dtos while the entities are still connected to the session
         result: list[UncertaintyOutgoingDto] = UncertaintyMapper.to_outgoing_dtos(entities)

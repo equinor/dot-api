@@ -1,4 +1,5 @@
 import pytest
+import uuid
 from httpx import AsyncClient
 from tests.utils import (
     parse_response_to_dto_test,
@@ -6,6 +7,7 @@ from tests.utils import (
 )
 from src.dtos.uncertainty_dtos import UncertaintyIncomingDto, UncertaintyOutgoingDto
 from src.dtos.outcome_dtos import OutcomeIncomingDto
+from src.dtos.discrete_probability_dtos import DiscreteProbabilityIncomingDto
 from src.seed_database import GenerateUuid
 
 
@@ -28,14 +30,23 @@ async def test_get_uncertainty(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_update_uncertainty(client: AsyncClient):
     uncert_id = GenerateUuid.as_uuid(1)
-    new_probabilities = [0.2, 0.8]
+    new_outcome_id = uuid.uuid4()
+    new_probability = 0.2
+    new_probabilities = [DiscreteProbabilityIncomingDto(
+        id = uuid.uuid4(),
+        uncertainty_id=uncert_id,
+        probability=new_probability,
+        child_outcome_id= new_outcome_id,
+        parent_option_ids=[],
+        parent_outcome_ids=[],
+    )]
     new_outcomes = [
-        OutcomeIncomingDto(probability=x, name=str(x), utility=0, uncertainty_id=uncert_id)
-        for x in new_probabilities
+        OutcomeIncomingDto(id=new_outcome_id, name=str(new_outcome_id), utility=0, uncertainty_id=uncert_id, )
     ]
     payload = [
         UncertaintyIncomingDto(
-            id=uncert_id, issue_id=GenerateUuid.as_uuid(1), outcomes=new_outcomes
+            id=uncert_id, issue_id=GenerateUuid.as_uuid(1), outcomes=new_outcomes,
+            discrete_probabilities=new_probabilities
         ).model_dump(mode="json")
     ]
 
@@ -43,7 +54,7 @@ async def test_update_uncertainty(client: AsyncClient):
     assert response.status_code == 200, f"Response content: {response.content}"
 
     response_content = parse_response_to_dtos_test(response, UncertaintyOutgoingDto)
-    assert [x.probability for x in response_content[0].outcomes] == new_probabilities
+    assert response_content[0].discrete_probabilities[0].probability == new_probability
 
 
 @pytest.mark.asyncio

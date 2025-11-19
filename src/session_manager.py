@@ -7,9 +7,9 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from src.models.base import Base
 from sqlalchemy.pool import AsyncAdaptedQueuePool
 
+from src.models.base import Base
 from src.config import config
 from src.seed_database import (
     seed_database,
@@ -25,6 +25,13 @@ from src.database import (
 )
 from src.logger import get_dot_api_logger
 
+# import events to activate them
+from src.events import (
+    before_flush_event_handler, # type: ignore
+    after_flush_event_handler, # type: ignore
+    before_commit_event_handler, # type: ignore
+    after_commit_event_handler, # type: ignore
+)
 
 class SessionManager:
     """Manages asynchronous DB sessions with connection pooling."""

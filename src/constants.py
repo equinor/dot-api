@@ -42,6 +42,10 @@ class DatabaseConstants(int, Enum):
     MAX_SHORT_STRING_LENGTH = 60
     MAX_LONG_STRING_LENGTH = 600
 
+class NodeStates(str, Enum):
+    OPTION = "option"
+    OUTCOME = "outcome"
+
 
 class SwaggerDocumentationConstants:
     FILTER_DOC = """
