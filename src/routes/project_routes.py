@@ -32,7 +32,9 @@ async def create_projects(
     If Objectives/Opportunities are supplied with the Scenario, then they will be created after the Scenario with the appropriate Id.
     """
     try:
-        return list(await project_service.create(session, dtos, current_user))
+        result = list(await project_service.create(session, dtos, current_user))
+        await session.commit()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -113,6 +115,7 @@ async def delete_project(
 ):
     try:
         await project_service.delete(session, [id], current_user)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -125,6 +128,8 @@ async def update_projects(
     session: AsyncSession = Depends(get_db),
 ) -> list[ProjectOutgoingDto]:
     try:
-        return list(await project_service.update(session, dtos, current_user))
+        result = list(await project_service.update(session, dtos, current_user))
+        await session.commit()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

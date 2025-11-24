@@ -55,6 +55,7 @@ async def delete_value_metric(
 ):
     try:
         await value_metric_service.delete(session, [id])
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -66,6 +67,7 @@ async def delete_value_metrics(
 ):
     try:
         await value_metric_service.delete(session, ids)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -76,6 +78,8 @@ async def update_value_metrics(
     session: AsyncSession = Depends(get_db),
 ) -> list[ValueMetricOutgoingDto]:
     try:
-        return list(await value_metric_service.update(session, dtos))
+        result = list(await value_metric_service.update(session, dtos))
+        await session.commit()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

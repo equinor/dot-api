@@ -52,6 +52,7 @@ async def delete_utility(
 ):
     try:
         await utility_service.delete(session, [id])
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -63,6 +64,7 @@ async def delete_utilities(
 ):
     try:
         await utility_service.delete(session, ids)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -73,6 +75,8 @@ async def update_utilities(
     session: AsyncSession = Depends(get_db),
 ) -> list[UtilityOutgoingDto]:
     try:
-        return list(await utility_service.update(session, dtos))
+        result = list(await utility_service.update(session, dtos))
+        await session.commit()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -55,6 +55,7 @@ async def delete_uncertainty(
 ):
     try:
         await uncertainty_service.delete(session, [id])
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -66,6 +67,7 @@ async def delete_uncertainties(
 ):
     try:
         await uncertainty_service.delete(session, ids)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -76,6 +78,8 @@ async def update_uncertainties(
     session: AsyncSession = Depends(get_db),
 ) -> list[UncertaintyOutgoingDto]:
     try:
-        return list(await uncertainty_service.update(session, dtos))
+        result = list(await uncertainty_service.update(session, dtos))
+        await session.commit()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -178,7 +178,6 @@ class SessionManager:
         async with self.session_factory() as session:
             try:
                 yield session
-                await session.commit()
             except Exception as e:
                 await session.rollback()
                 raise e

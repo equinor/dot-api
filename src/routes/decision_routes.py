@@ -52,6 +52,7 @@ async def delete_decision(
 ):
     try:
         await decision_service.delete(session, [id])
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -63,6 +64,7 @@ async def delete_decisions(
 ):
     try:
         await decision_service.delete(session, ids)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -73,6 +75,8 @@ async def update_decisions(
     session: AsyncSession = Depends(get_db),
 ) -> list[DecisionOutgoingDto]:
     try:
-        return list(await decision_service.update(session, dtos))
+        result = list(await decision_service.update(session, dtos))
+        await session.commit()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

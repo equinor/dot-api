@@ -22,7 +22,9 @@ async def create_objectives(
     session: AsyncSession = Depends(get_db),
 ) -> list[ObjectiveOutgoingDto]:
     try:
-        return list(await objective_service.create(session, dtos, current_user))
+        result = list(await objective_service.create(session, dtos, current_user))
+        await session.commit()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -67,6 +69,7 @@ async def delete_objective(
 ):
     try:
         await objective_service.delete(session, [id])
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -78,6 +81,7 @@ async def delete_objectives(
 ):
     try:
         await objective_service.delete(session, ids)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -89,6 +93,8 @@ async def update_objectives(
     session: AsyncSession = Depends(get_db),
 ) -> list[ObjectiveOutgoingDto]:
     try:
-        return list(await objective_service.update(session, dtos, current_user))
+        result = list(await objective_service.update(session, dtos, current_user))
+        await session.commit()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
