@@ -178,6 +178,8 @@ class SessionManager:
         async with self.session_factory() as session:
             try:
                 yield session
+                if session.deleted or session.new or session.dirty:
+                    await session.commit()
             except Exception as e:
                 await session.rollback()
                 raise e
