@@ -22,7 +22,9 @@ async def create_edges(
     session: AsyncSession = Depends(get_db),
 ) -> list[EdgeOutgoingDto]:
     try:
-        return list(await edge_service.create(session, dtos))
+        result = list(await edge_service.create(session, dtos))
+        await session.commit()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -35,6 +37,7 @@ async def get_edge(
 ) -> EdgeOutgoingDto:
     try:
         edges: list[EdgeOutgoingDto] = await edge_service.get(session, [id])
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -65,6 +68,7 @@ async def delete_edge(
 ):
     try:
         await edge_service.delete(session, [id])
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -76,6 +80,7 @@ async def delete_edges(
 ):
     try:
         await edge_service.delete(session, ids)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -86,6 +91,8 @@ async def update_edges(
     session: AsyncSession = Depends(get_db),
 ) -> list[EdgeOutgoingDto]:
     try:
-        return list(await edge_service.update(session, dtos))
+        result = list(await edge_service.update(session, dtos))
+        await session.commit()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

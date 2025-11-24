@@ -53,6 +53,8 @@ async def update_discrete_probabilities(
     session: AsyncSession = Depends(get_db),
 ) -> list[DiscreteProbabilityOutgoingDto]:
     try:
-        return list(await discrete_probability_service.update(session, dtos))
+        result = list(await discrete_probability_service.update(session, dtos))
+        await session.commit()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

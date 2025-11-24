@@ -28,7 +28,9 @@ async def create_issues(
     If node is not supplied an empty node will be created.
     """
     try:
-        return list(await issue_service.create(session, dtos, current_user))
+        result = list(await issue_service.create(session, dtos, current_user))
+        await session.commit()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -105,6 +107,7 @@ async def delete_issue(
 ):
     try:
         await issue_service.delete(session, [id])
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -116,6 +119,7 @@ async def delete_issues(
 ):
     try:
         await issue_service.delete(session, ids)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -127,6 +131,8 @@ async def update_issues(
     session: AsyncSession = Depends(get_db),
 ) -> list[IssueOutgoingDto]:
     try:
-        return list(await issue_service.update(session, dtos, current_user))
+        result = list(await issue_service.update(session, dtos, current_user))
+        await session.commit()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

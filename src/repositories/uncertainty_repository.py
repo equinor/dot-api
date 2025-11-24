@@ -87,8 +87,8 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
     parent_outcomes_list: List[List[uuid.UUID]] = []
     parent_options_list: List[List[uuid.UUID]] = []
 
-
-    edges = entity.issue.node.head_edges
+    # filter out duplicate edges (fix later)
+    edges = list({(edge.tail_id, edge.head_id): edge for edge in entity.issue.node.head_edges}.values())
     for edge in edges:
         issue = edge.tail_node.issue
         if not issue.boundary in [Boundary.IN.value, Boundary.ON.value]: continue

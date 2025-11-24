@@ -25,7 +25,9 @@ async def create_opportunities(
     session: AsyncSession = Depends(get_db),
 ) -> list[OpportunityOutgoingDto]:
     try:
-        return list(await opportunity_service.create(session, dtos, current_user))
+        result = list(await opportunity_service.create(session, dtos, current_user))
+        await session.commit()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -70,6 +72,7 @@ async def delete_opportunity(
 ):
     try:
         await opportunity_service.delete(session, [id])
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -81,6 +84,7 @@ async def delete_opportunities(
 ):
     try:
         await opportunity_service.delete(session, ids)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -92,6 +96,8 @@ async def update_opportunities(
     session: AsyncSession = Depends(get_db),
 ) -> list[OpportunityOutgoingDto]:
     try:
-        return list(await opportunity_service.update(session, dtos, current_user))
+        result = list(await opportunity_service.update(session, dtos, current_user))
+        await session.commit()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
