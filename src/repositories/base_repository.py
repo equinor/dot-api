@@ -136,7 +136,8 @@ class BaseRepository(Generic[T, IDType]):
             if existing_dp.id in incoming_dps_by_id:
                 incoming_dp = incoming_dps_by_id[existing_dp.id]
                 # Only update the probability field
-                existing_dp.probability = incoming_dp.probability
+                if existing_dp.probability != incoming_dp.probability:
+                    existing_dp.probability = incoming_dp.probability
             # If no match, ignore and leave existing discrete probability unchanged
 
         return existing_entity
