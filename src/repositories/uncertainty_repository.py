@@ -26,13 +26,7 @@ class UncertaintyRepository(BaseRepository[Uncertainty, uuid.UUID]):
 
         for n, entity_to_update in enumerate(entities_to_update):
             entity = entities[n]
-            entity_to_update.outcomes = [
-                await self.session.merge(outcome) for outcome in entity.outcomes
-            ]
-            entity_to_update.is_key = entity.is_key
-            entity_to_update.discrete_probabilities = [
-                await self.session.merge(x) for x in entity.discrete_probabilities
-            ]
+            entity_to_update = await self._update_unertainty(entity, entity_to_update)
             if entity.issue_id:
                 entity_to_update.issue_id = entity.issue_id
 

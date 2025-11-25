@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
@@ -17,7 +18,11 @@ from typing import (
 )
 from odata_query.sqlalchemy.shorthand import apply_odata_query
 from src.constants import PageSize
-import uuid
+from src.models import (
+    Uncertainty,
+    DiscreteProbability,
+    Outcome,
+)
 
 LoadOptions = List[_AbstractLoad]
 
@@ -110,3 +115,28 @@ class BaseRepository(Generic[T, IDType]):
     def sort_entity_collections_by_id(entity_lists: List[List[T]]):
         for entity_list in entity_lists:
             entity_list.sort(key=lambda entity: entity.id)
+
+    async def _update_unertainty(self, incoming_entity: Uncertainty, existing_entity: Uncertainty) -> Uncertainty:
+        """
+        Selective update of an existing Uncertainty entity with data from an incoming Uncertainty entity.
+        """
+        
+        existing_entity.is_key = incoming_entity.is_key
+        if incoming_entity.issue_id:
+            existing_entity.issue_id = incoming_entity.issue_id
+        
+        existing_entity.outcomes = [
+            await self.session.merge(outcome) for outcome in incoming_entity.outcomes
+        ]
+        
+        # Create a map of incoming discrete probabilities by ID for efficient lookup
+        incoming_dps_by_id = {dp.id: dp for dp in incoming_entity.discrete_probabilities}
+        
+        for existing_dp in existing_entity.discrete_probabilities:
+            if existing_dp.id in incoming_dps_by_id:
+                incoming_dp = incoming_dps_by_id[existing_dp.id]
+                # Only update the probability field
+                existing_dp.probability = incoming_dp.probability
+            # If no match, ignore and leave existing discrete probability unchanged
+
+        return existing_entity
