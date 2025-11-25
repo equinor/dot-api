@@ -1,5 +1,4 @@
 import uuid
-from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, Annotated
 from src.constants import Type, Boundary
