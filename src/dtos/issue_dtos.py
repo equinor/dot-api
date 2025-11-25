@@ -124,7 +124,7 @@ class IssueMapper:
         )
 
     @staticmethod
-    async def to_entity(dto: IssueIncomingDto, user_id: int, session: AsyncSession) -> Issue:
+    def to_entity(dto: IssueIncomingDto, user_id: int) -> Issue:
         # decision and uncertainty ids are not assigned here as the issue controls the decisions and uncertainties
         return Issue(
             id=dto.id,
@@ -137,7 +137,7 @@ class IssueMapper:
             user_id=user_id,
             node=NodeMapper.to_entity(dto.node) if dto.node else None,
             decision=DecisionMapper.to_entity(dto.decision) if dto.decision else None,
-            uncertainty=await UncertaintyMapper.to_entity(dto.uncertainty, session) if dto.uncertainty else None,
+            uncertainty=UncertaintyMapper.to_entity(dto.uncertainty) if dto.uncertainty else None,
             utility=UtilityMapper.to_entity(dto.utility) if dto.utility else None,
             value_metric=ValueMetricMapper.to_entity(dto.value_metric)
             if dto.value_metric
@@ -149,8 +149,8 @@ class IssueMapper:
         return [IssueMapper.to_outgoing_dto(entity) for entity in entities]
 
     @staticmethod
-    async def to_entities(dtos: list[IssueIncomingDto], user_id: int, session: AsyncSession) -> list[Issue]:
-        return [await IssueMapper.to_entity(dto, user_id, session) for dto in dtos]
+    def to_entities(dtos: list[IssueIncomingDto], user_id: int) -> list[Issue]:
+        return [IssueMapper.to_entity(dto, user_id) for dto in dtos]
 
 
 NodeOutgoingDto.model_rebuild()

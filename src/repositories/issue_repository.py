@@ -6,7 +6,6 @@ from src.models import (
     Issue,
     Edge,
     Node,
-    Uncertainty,
 )
 from src.repositories.query_extensions import QueryExtensions
 from src.repositories.base_repository import BaseRepository
