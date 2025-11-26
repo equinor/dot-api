@@ -20,8 +20,6 @@ from odata_query.sqlalchemy.shorthand import apply_odata_query
 from src.constants import PageSize
 from src.models import (
     Uncertainty,
-    DiscreteProbability,
-    Outcome,
 )
 
 LoadOptions = List[_AbstractLoad]
