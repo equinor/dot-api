@@ -1,5 +1,7 @@
 import uuid
 
+from typing import Any
+
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import get_history
 
@@ -11,37 +13,57 @@ from src.utils.session_info_handler import SessionInfoHandler
 
 class DiscreteProbabilityEventHandler:
     """Handles events that require discrete probability table recalculation."""
-    
+
+    subscribed_entities_delete = [Edge]
+    subscribed_entities_modified = [Issue, Uncertainty, Decision]
+    subscribed_entities_new = [Edge, Option, Outcome]
+
     def process_session_changes_before_flush(self, session: Session) -> None:
         """Process all session changes and determine which uncertainties need recalculation."""
-        if not (session.dirty or session.new or session.deleted):
+        # Filter to only subscribed entities
+        subscribed_dirty = [
+            entity for entity in session.dirty
+            if any(isinstance(entity, entity_type) for entity_type in self.subscribed_entities_modified)
+        ]
+        subscribed_deleted = [
+            entity for entity in session.deleted
+            if any(isinstance(entity, entity_type) for entity_type in self.subscribed_entities_delete)
+        ]
+        
+        if not (subscribed_dirty or subscribed_deleted):
             return
 
         session_info = SessionInfoHandler.get_session_info(session)
         
         # Process changes in order of dependency
-        session_info.affected_uncertainties.update(self._process_deletions(session))
-        session_info.affected_uncertainties.update(self._process_modifications(session))
+        session_info.affected_uncertainties.update(self._process_deletions(session, subscribed_deleted))
+        session_info.affected_uncertainties.update(self._process_modifications(session, subscribed_dirty))
         
         SessionInfoHandler.update_session_info(session, session_info)
 
     def process_session_changes_after_flush(self, session: Session) -> None:
         """Process all session changes and determine which uncertainties need recalculation."""
-        if not (session.dirty or session.new or session.deleted):
+        # Filter to only subscribed entities
+        subscribed_new = [
+            entity for entity in session.new 
+            if any(isinstance(entity, entity_type) for entity_type in self.subscribed_entities_new)
+        ]
+        
+        if not subscribed_new:
             return
         
         session_info = SessionInfoHandler.get_session_info(session)
         
         # Process changes in order of dependency
-        session_info.affected_uncertainties.update(self._process_additions(session))
+        session_info.affected_uncertainties.update(self._process_additions(session, subscribed_new))
         
         SessionInfoHandler.update_session_info(session, session_info)
     
-    def _process_deletions(self, session: Session) -> set[uuid.UUID]:
+    def _process_deletions(self, session: Session, deleted_entities: list[Any]) -> set[uuid.UUID]:
         """Process deleted entities and find affected uncertainties."""
         affected_uncertainties: set[uuid.UUID] = set()
         
-        for deleted_entity in session.deleted:
+        for deleted_entity in deleted_entities:
             if isinstance(deleted_entity, Edge):
                 affected_uncertainties.update(
                     edge_repository.find_effected_uncertainties(session, {deleted_entity.id})
@@ -49,12 +71,12 @@ class DiscreteProbabilityEventHandler:
         
         return affected_uncertainties
     
-    def _process_modifications(self, session: Session) -> set[uuid.UUID]:
+    def _process_modifications(self, session: Session, modified_entities: list[Any]) -> set[uuid.UUID]:
         """Process modified entities and find affected uncertainties."""
         affected_uncertainties: set[uuid.UUID] = set()
         issues_to_search: set[uuid.UUID] = set()
         
-        for modified_entity in session.dirty:
+        for modified_entity in modified_entities:
             if isinstance(modified_entity, Issue):
                 if self._has_boundary_change(modified_entity):
                     issues_to_search.add(modified_entity.id)
@@ -79,7 +101,7 @@ class DiscreteProbabilityEventHandler:
         
         return affected_uncertainties
     
-    def _process_additions(self, session: Session) -> set[uuid.UUID]:
+    def _process_additions(self, session: Session, new_entities: list[Any]) -> set[uuid.UUID]:
         """Process new entities and find affected uncertainties."""
         affected_uncertainties: set[uuid.UUID] = set()
         
@@ -87,7 +109,7 @@ class DiscreteProbabilityEventHandler:
         added_options: set[Option] = set()
         added_outcomes: set[Outcome] = set()
         
-        for new_entity in session.new:
+        for new_entity in new_entities:
             if isinstance(new_entity, Edge):
                 added_edges.add(new_entity.id)
             elif isinstance(new_entity, Option):
