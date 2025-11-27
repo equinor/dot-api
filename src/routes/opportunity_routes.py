@@ -13,7 +13,7 @@ from src.services.user_service import get_current_user
 from src.dtos.user_dtos import UserIncomingDto
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_db
-from src.utils.session_commit import commit_if_changed_async
+
 
 router = APIRouter(tags=["opportunities"])
 
@@ -27,7 +27,7 @@ async def create_opportunities(
 ) -> list[OpportunityOutgoingDto]:
     try:
         result = list(await opportunity_service.create(session, dtos, current_user))
-        await commit_if_changed_async(session)
+        await session.commit()
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -73,7 +73,7 @@ async def delete_opportunity(
 ):
     try:
         await opportunity_service.delete(session, [id])
-        await commit_if_changed_async(session)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -85,7 +85,7 @@ async def delete_opportunities(
 ):
     try:
         await opportunity_service.delete(session, ids)
-        await commit_if_changed_async(session)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -98,7 +98,7 @@ async def update_opportunities(
 ) -> list[OpportunityOutgoingDto]:
     try:
         result = list(await opportunity_service.update(session, dtos, current_user))
-        await commit_if_changed_async(session)
+        await session.commit()
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

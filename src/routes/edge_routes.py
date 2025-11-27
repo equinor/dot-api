@@ -11,7 +11,7 @@ from src.services.edge_service import EdgeService
 from src.dependencies import get_edge_service
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_db
-from src.utils.session_commit import commit_if_changed_async
+
 
 router = APIRouter(tags=["edges"])
 
@@ -24,7 +24,7 @@ async def create_edges(
 ) -> list[EdgeOutgoingDto]:
     try:
         result = list(await edge_service.create(session, dtos))
-        await commit_if_changed_async(session)
+        await session.commit()
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -38,7 +38,7 @@ async def get_edge(
 ) -> EdgeOutgoingDto:
     try:
         edges: list[EdgeOutgoingDto] = await edge_service.get(session, [id])
-        await commit_if_changed_async(session)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -69,7 +69,7 @@ async def delete_edge(
 ):
     try:
         await edge_service.delete(session, [id])
-        await commit_if_changed_async(session)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -81,7 +81,7 @@ async def delete_edges(
 ):
     try:
         await edge_service.delete(session, ids)
-        await commit_if_changed_async(session)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -93,7 +93,7 @@ async def update_edges(
 ) -> list[EdgeOutgoingDto]:
     try:
         result = list(await edge_service.update(session, dtos))
-        await commit_if_changed_async(session)
+        await session.commit()
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -11,7 +11,7 @@ from src.services.project_role_service import ProjectRoleService
 from src.dependencies import get_project_role_service
 from src.dtos.user_dtos import UserIncomingDto
 from src.dependencies import get_db
-from src.utils.session_commit import commit_if_changed_async
+
 
 router = APIRouter(tags=["project-roles"])
 
@@ -51,7 +51,7 @@ async def delete_project_role(
 ):
     try:
         await project_role_service.delete(session, [id], project_id, current_user)
-        await commit_if_changed_async(session)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -65,7 +65,7 @@ async def delete_project_roles(
 ):
     try:
         await project_role_service.delete(session, ids, project_id, current_user)
-        await commit_if_changed_async(session)
+        await session.commit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -78,7 +78,7 @@ async def update_project_role(
 ) -> Optional[list[ProjectRoleOutgoingDto]]:
     try:
         result = await project_role_service.update(session, dto, current_user)
-        await commit_if_changed_async(session)
+        await session.commit()
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
