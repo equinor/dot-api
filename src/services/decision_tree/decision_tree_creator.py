@@ -113,9 +113,9 @@ class DecisionTreeGraph():
                         treenode_id = parent_id
                         parent_id = await self.get_parent(treenode_id)
 
-                    decision_dtos = await self.find_matching_dtos(parent_labels, issue.uncertainty.discrete_probabilities)
+                    discrete_prob_dtos = await self.find_matching_dtos(parent_labels, issue.uncertainty.discrete_probabilities)
 
-                    for dto in decision_dtos:
+                    for dto in discrete_prob_dtos:
                         if dto.probability is not None:
                             probability_dto = ProbabilityDto(outcome_name=self.outcomes_lookup[dto.child_outcome_id.__str__()],
                                                              outcome_id=dto.child_outcome_id,
