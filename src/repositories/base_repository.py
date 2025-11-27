@@ -20,6 +20,8 @@ from odata_query.sqlalchemy.shorthand import apply_odata_query
 from src.constants import PageSize
 from src.models import (
     Uncertainty,
+    Node,
+    NodeStyle,
 )
 
 LoadOptions = List[_AbstractLoad]
@@ -114,7 +116,7 @@ class BaseRepository(Generic[T, IDType]):
         for entity_list in entity_lists:
             entity_list.sort(key=lambda entity: entity.id)
 
-    async def _update_unertainty(self, incoming_entity: Uncertainty, existing_entity: Uncertainty) -> Uncertainty:
+    async def _update_uncertainty(self, incoming_entity: Uncertainty, existing_entity: Uncertainty) -> Uncertainty:
         """
         Selective update of an existing Uncertainty entity with data from an incoming Uncertainty entity.
         """
@@ -122,10 +124,12 @@ class BaseRepository(Generic[T, IDType]):
         existing_entity.is_key = incoming_entity.is_key
         if incoming_entity.issue_id:
             existing_entity.issue_id = incoming_entity.issue_id
-        
-        existing_entity.outcomes = [
-            await self.session.merge(outcome) for outcome in incoming_entity.outcomes
-        ]
+
+
+        if existing_entity.outcomes != incoming_entity.outcomes:
+            existing_entity.outcomes = [
+                await self.session.merge(outcome) for outcome in incoming_entity.outcomes
+            ]
         
         # Create a map of incoming discrete probabilities by ID for efficient lookup
         incoming_dps_by_id = {dp.id: dp for dp in incoming_entity.discrete_probabilities}
@@ -138,4 +142,16 @@ class BaseRepository(Generic[T, IDType]):
                     existing_dp.probability = incoming_dp.probability
             # If no match, ignore and leave existing discrete probability unchanged
 
+        return existing_entity
+
+    def _update_node(self, incoming_entity: Node, existing_entity: Node):
+        existing_entity.name = incoming_entity.name
+        if incoming_entity.node_style and (existing_entity.node_style != incoming_entity.node_style):
+            existing_entity.node_style = self._update_node_style(incoming_entity.node_style, existing_entity.node_style)
+        return existing_entity
+        
+    @staticmethod
+    def _update_node_style(incoming_entity: NodeStyle, existing_entity: NodeStyle):
+        existing_entity.x_position = incoming_entity.x_position
+        existing_entity.y_position = incoming_entity.y_position
         return existing_entity

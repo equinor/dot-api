@@ -26,7 +26,7 @@ class UncertaintyRepository(BaseRepository[Uncertainty, uuid.UUID]):
 
         for n, entity_to_update in enumerate(entities_to_update):
             entity = entities[n]
-            entity_to_update = await self._update_unertainty(entity, entity_to_update)
+            entity_to_update = await self._update_uncertainty(entity, entity_to_update)
             if entity.issue_id:
                 entity_to_update.issue_id = entity.issue_id
 

@@ -1,29 +1,10 @@
 import uuid
-from typing import List, Dict, Any
-from dataclasses import dataclass
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload, joinedload
 from src.repositories.query_extensions import QueryExtensions
 from src.repositories.base_repository import BaseRepository
-from src.constants import NodeStates
-from src.dtos.edge_connection_dtos import EdgeConnection
 from src.models import (
     Node, 
-    Issue, 
-    Uncertainty, 
-    Edge, 
-    Decision
 )
-from src.constants import DecisionHierarchy, Boundary, Type
-
-@dataclass
-class UncertaintyConnectionRequest:
-    """Data structure for requesting edge connections for a specific uncertainty and outcome."""
-    outcome_id: uuid.UUID
-    option_ids: List[uuid.UUID]
-    outcome_ids: List[uuid.UUID]
-
 
 class NodeRepository(BaseRepository[Node, uuid.UUID]):
     def __init__(self, session: AsyncSession):
@@ -43,8 +24,8 @@ class NodeRepository(BaseRepository[Node, uuid.UUID]):
             entity_to_update.scenario_id = entity.scenario_id
             if entity.issue_id:
                 entity_to_update.issue_id = entity.issue_id
-            if entity.node_style:
-                entity_to_update.node_style = await self.session.merge(entity.node_style)
+            if entity.node_style and (entity.node_style != entity_to_update.node_style):
+                entity_to_update.node_style = self._update_node_style(entity.node_style, entity_to_update.node_style)
 
         await self.session.flush()
         return entities_to_update
