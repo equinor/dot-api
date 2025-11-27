@@ -8,6 +8,7 @@ from src.services.option_service import OptionService
 from src.dependencies import get_option_service
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_db
+from src.utils.session_commit import commit_if_changed_async
 
 router = APIRouter(tags=["options"])
 
@@ -20,7 +21,7 @@ async def create_options(
 ) -> list[OptionOutgoingDto]:
     try:
         result = list(await option_service.create(session, dtos))
-        await session.commit()
+        await commit_if_changed_async(session)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -64,7 +65,7 @@ async def delete_option(
 ):
     try:
         await option_service.delete(session, [id])
-        await session.commit()
+        await commit_if_changed_async(session)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -76,7 +77,7 @@ async def delete_options(
 ):
     try:
         await option_service.delete(session, ids)
-        await session.commit()
+        await commit_if_changed_async(session)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -88,7 +89,7 @@ async def update_options(
 ) -> list[OptionOutgoingDto]:
     try:
         result = list(await option_service.update(session, dtos))
-        await session.commit()
+        await commit_if_changed_async(session)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

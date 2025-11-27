@@ -11,6 +11,7 @@ from src.services.discrete_probability_service import DiscreteProbabilityService
 from src.dependencies import get_discrete_probability_service
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_db
+from src.utils.session_commit import commit_if_changed_async
 
 router = APIRouter(tags=["discrete_probabilities"])
 
@@ -54,7 +55,7 @@ async def update_discrete_probabilities(
 ) -> list[DiscreteProbabilityOutgoingDto]:
     try:
         result = list(await discrete_probability_service.update(session, dtos))
-        await session.commit()
+        await commit_if_changed_async(session)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

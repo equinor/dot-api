@@ -11,6 +11,7 @@ from src.services.value_metric_service import ValueMetricService
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_value_metric_service
 from src.dependencies import get_db
+from src.utils.session_commit import commit_if_changed_async
 
 router = APIRouter(tags=["value-metrics"])
 
@@ -55,7 +56,7 @@ async def delete_value_metric(
 ):
     try:
         await value_metric_service.delete(session, [id])
-        await session.commit()
+        await commit_if_changed_async(session)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -67,7 +68,7 @@ async def delete_value_metrics(
 ):
     try:
         await value_metric_service.delete(session, ids)
-        await session.commit()
+        await commit_if_changed_async(session)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -79,7 +80,7 @@ async def update_value_metrics(
 ) -> list[ValueMetricOutgoingDto]:
     try:
         result = list(await value_metric_service.update(session, dtos))
-        await session.commit()
+        await commit_if_changed_async(session)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -15,6 +15,7 @@ from src.services.user_service import get_current_user
 from src.dtos.user_dtos import UserIncomingDto
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_db
+from src.utils.session_commit import commit_if_changed_async
 
 router = APIRouter(tags=["projects"])
 
@@ -33,7 +34,7 @@ async def create_projects(
     """
     try:
         result = list(await project_service.create(session, dtos, current_user))
-        await session.commit()
+        await commit_if_changed_async(session)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -115,7 +116,7 @@ async def delete_project(
 ):
     try:
         await project_service.delete(session, [id], current_user)
-        await session.commit()
+        await commit_if_changed_async(session)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -129,7 +130,7 @@ async def update_projects(
 ) -> list[ProjectOutgoingDto]:
     try:
         result = list(await project_service.update(session, dtos, current_user))
-        await session.commit()
+        await commit_if_changed_async(session)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -9,6 +9,7 @@ from src.constants import SwaggerDocumentationConstants
 from src.dtos.user_dtos import UserOutgoingDto, UserIncomingDto
 from src.dependencies import get_user_service
 from src.dependencies import get_db
+from src.utils.session_commit import commit_if_changed_async
 
 router = APIRouter(tags=["user"])
 

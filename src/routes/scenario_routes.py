@@ -16,6 +16,7 @@ from src.dtos.user_dtos import UserIncomingDto
 from src.models.filters.scenario_filter import ScenarioFilter
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_db
+from src.utils.session_commit import commit_if_changed_async
 
 router = APIRouter(tags=["scenarios"])
 
@@ -33,7 +34,7 @@ async def create_scenarios(
     """
     try:
         result = list(await scenario_service.create(session, dtos, current_user))
-        await session.commit()
+        await commit_if_changed_async(session)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -148,7 +149,7 @@ async def delete_scenario(
 ):
     try:
         await scenario_service.delete(session, [id])
-        await session.commit()
+        await commit_if_changed_async(session)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -161,7 +162,7 @@ async def update_scenarios(
 ) -> list[ScenarioOutgoingDto]:
     try:
         result = list(await scenario_service.update(session, dtos, current_user))
-        await session.commit()
+        await commit_if_changed_async(session)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

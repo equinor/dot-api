@@ -8,6 +8,7 @@ from src.services.utility_service import UtilityService
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_utility_service
 from src.dependencies import get_db
+from src.utils.session_commit import commit_if_changed_async
 
 router = APIRouter(tags=["utilities"])
 
@@ -52,7 +53,7 @@ async def delete_utility(
 ):
     try:
         await utility_service.delete(session, [id])
-        await session.commit()
+        await commit_if_changed_async(session)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -64,7 +65,7 @@ async def delete_utilities(
 ):
     try:
         await utility_service.delete(session, ids)
-        await session.commit()
+        await commit_if_changed_async(session)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -76,7 +77,7 @@ async def update_utilities(
 ) -> list[UtilityOutgoingDto]:
     try:
         result = list(await utility_service.update(session, dtos))
-        await session.commit()
+        await commit_if_changed_async(session)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
