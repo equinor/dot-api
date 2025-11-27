@@ -50,7 +50,7 @@ class IssueRepository(BaseRepository[Issue, uuid.UUID]):
                 entity_to_update.node = self._update_node(entity.node, entity_to_update.node)
 
             if entity.decision and (entity_to_update.decision != entity.decision):
-                entity_to_update.decision = await self.session.merge(entity.decision)
+                entity_to_update.decision = await self._update_decision(entity.decision, entity_to_update.decision)
 
             if entity.uncertainty and entity_to_update.uncertainty and (entity_to_update.uncertainty != entity.uncertainty):
                 entity_to_update.uncertainty = await self._update_uncertainty(entity.uncertainty, entity_to_update.uncertainty)

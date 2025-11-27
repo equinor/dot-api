@@ -20,12 +20,7 @@ class DecisionRepository(BaseRepository[Decision, uuid.UUID]):
 
         for n, entity_to_update in enumerate(entities_to_update):
             entity = entities[n]
-            entity_to_update.options = [
-                await self.session.merge(option) for option in entity.options
-            ]
-            entity_to_update.type = entity.type
-            if entity.issue_id:
-                entity_to_update = entity.issue_id
-
+            entity_to_update = await self._update_decision(entity, entity_to_update)
+            
         await self.session.flush()
         return entities_to_update

@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,8 +21,12 @@ from odata_query.sqlalchemy.shorthand import apply_odata_query
 from src.constants import PageSize
 from src.models import (
     Uncertainty,
+    Decision,
     Node,
     NodeStyle,
+    Outcome,
+    Option,
+    DiscreteProbability,
 )
 
 LoadOptions = List[_AbstractLoad]
@@ -126,10 +131,8 @@ class BaseRepository(Generic[T, IDType]):
             existing_entity.issue_id = incoming_entity.issue_id
 
 
-        if existing_entity.outcomes != incoming_entity.outcomes:
-            existing_entity.outcomes = [
-                await self.session.merge(outcome) for outcome in incoming_entity.outcomes
-            ]
+        if (existing_entity.outcomes != incoming_entity.outcomes):
+            existing_entity.outcomes = await self._update_outcomes(incoming_entity.outcomes, existing_entity.outcomes)
         
         # Create a map of incoming discrete probabilities by ID for efficient lookup
         incoming_dps_by_id = {dp.id: dp for dp in incoming_entity.discrete_probabilities}
@@ -142,6 +145,58 @@ class BaseRepository(Generic[T, IDType]):
                     existing_dp.probability = incoming_dp.probability
             # If no match, ignore and leave existing discrete probability unchanged
 
+        return existing_entity
+    
+    async def _update_outcome(self, incoming_entity: Outcome, existing_entity: Outcome) -> Outcome:
+        existing_entity.name = incoming_entity.name
+        existing_entity.utility = incoming_entity.utility
+        return existing_entity
+    
+    async def _update_outcomes(self, incoming_entities: List[Outcome], existing_entities: List[Outcome]):
+        """
+        Updates existing_entities to match incoming_entities by:
+        - Updating outcomes that exist in both lists (matched by id)
+        - Creating new outcomes from incoming that don't exist in existing
+        - Deleting outcomes from existing that aren't in incoming
+        """
+        incoming_by_id = {outcome.id: outcome for outcome in incoming_entities}
+        existing_by_id = {outcome.id: outcome for outcome in existing_entities}
+        
+        # Update existing outcomes that are in incoming
+        common_ids = set(existing_by_id.keys()) & set(incoming_by_id.keys())
+        await asyncio.gather(*[
+            self._update_outcome(incoming_by_id[outcome_id], existing_by_id[outcome_id])
+            for outcome_id in common_ids
+        ])
+        
+        # Delete outcomes that are in existing but not in incoming
+        outcomes_to_delete = [outcome for outcome in existing_entities if outcome.id not in incoming_by_id]
+        if outcomes_to_delete:
+            # delete discrete probabilities using ORM to trigger cascade delete operation 
+            outcome_ids_to_delete = [outcome.id for outcome in outcomes_to_delete]
+            discrete_probs = await self.session.scalars(
+                select(DiscreteProbability).where(DiscreteProbability.child_outcome_id.in_(outcome_ids_to_delete))
+            )
+            await asyncio.gather(*[self.session.delete(dp) for dp in discrete_probs])
+            
+            # Remove outcomes from existing_entities list and delete from session
+            [existing_entities.remove(outcome) for outcome in outcomes_to_delete]
+            await asyncio.gather(*[self.session.delete(outcome) for outcome in outcomes_to_delete])
+        
+        # Create new outcomes that are in incoming but not in existing
+        new_outcomes = [outcome for outcome in incoming_entities if outcome.id not in existing_by_id]
+        if new_outcomes:
+            existing_entities.extend(new_outcomes)
+            [self.session.add(outcome) for outcome in new_outcomes]
+        
+        return existing_entities
+    
+    async def _update_decision(self, incoming_entity: Decision, existing_entity: Decision) -> Decision:
+        existing_entity.type = incoming_entity.type
+        if existing_entity.options != incoming_entity.options:
+            existing_entity.options = [
+                await self.session.merge(option) for option in incoming_entity.options
+            ]
         return existing_entity
 
     def _update_node(self, incoming_entity: Node, existing_entity: Node):
