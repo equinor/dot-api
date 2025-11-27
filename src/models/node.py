@@ -84,3 +84,17 @@ class Node(Base, BaseEntity):
             return [x.tail_node for x in self.tail_edges]
         except Exception:
             return []
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Node):
+            return False
+        return (
+            self.id == other.id and
+            self.scenario_id == other.scenario_id and
+            self.issue_id == other.issue_id and
+            self.name == other.name and
+            (self.node_style == other.node_style if self.node_style and other.node_style else self.node_style is other.node_style)
+        )
+
+    def __hash__(self) -> int:
+        return hash(self.id)

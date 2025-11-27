@@ -74,6 +74,29 @@ class DiscreteProbability(Base, BaseEntity):
         self.parent_outcomes = parent_outcomes or []
         self.parent_options = parent_options or []
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, DiscreteProbability):
+            return False
+        return (
+            self.id == other.id and
+            self.uncertainty_id == other.uncertainty_id and
+            self.child_outcome_id == other.child_outcome_id and
+            self.probability == other.probability and
+            len(self.parent_outcomes) == len(other.parent_outcomes) and
+            len(self.parent_options) == len(other.parent_options) and
+            all(po1.parent_outcome_id == po2.parent_outcome_id for po1, po2 in zip(
+                sorted(self.parent_outcomes, key=lambda x: x.parent_outcome_id), 
+                sorted(other.parent_outcomes, key=lambda x: x.parent_outcome_id)
+            )) and
+            all(po1.parent_option_id == po2.parent_option_id for po1, po2 in zip(
+                sorted(self.parent_options, key=lambda x: x.parent_option_id), 
+                sorted(other.parent_options, key=lambda x: x.parent_option_id)
+            ))
+        )
+
+    def __hash__(self) -> int:
+        return hash(self.id)
+
 
 # Event listeners to clean up orphaned DiscreteProbability records
 @listens_for(DiscreteProbabilityParentOutcome, "after_delete")

@@ -40,3 +40,19 @@ class Uncertainty(Base, BaseEntity):
         self.is_key = is_key
         if discrete_probabilities is not None:
             self.discrete_probabilities=discrete_probabilities
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Uncertainty):
+            return False
+        return (
+            self.id == other.id and
+            self.issue_id == other.issue_id and
+            self.is_key == other.is_key and
+            len(self.outcomes) == len(other.outcomes) and
+            all(out1 == out2 for out1, out2 in zip(sorted(self.outcomes, key=lambda x: x.id), sorted(other.outcomes, key=lambda x: x.id))) and
+            len(self.discrete_probabilities) == len(other.discrete_probabilities) and
+            all(dp1 == dp2 for dp1, dp2 in zip(sorted(self.discrete_probabilities, key=lambda x: x.id), sorted(other.discrete_probabilities, key=lambda x: x.id)))
+        )
+
+    def __hash__(self) -> int:
+        return hash(self.id)
