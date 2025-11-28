@@ -49,4 +49,4 @@ class Option(Base, BaseEntity):
         )
 
     def __hash__(self) -> int:
-        return hash(self.id)
+        return hash(uuid.uuid4())
