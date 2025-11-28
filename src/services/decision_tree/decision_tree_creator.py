@@ -33,14 +33,10 @@ class DecisionTreeGraph():
     async def add_edge(self, edge: EdgeUUIDDto) -> None:
         self.nx.add_edge(edge.tail, edge.head, name=edge.name) # type: ignore
 
-    async def get_parent(self, node: uuid.UUID) -> uuid.UUID | None:
+    async def get_parent(self, node: uuid.UUID) -> Optional[uuid.UUID]:
         parents = list(self.nx.predecessors(node)) # type: ignore
         return parents[0] if len(parents) > 0 else None # type: ignore
     
-    async def get_parents(self, node: uuid.UUID) -> list[uuid.UUID] | None:
-        parents = list(self.nx.predecessors(node)) # type: ignore
-        return parents if len(parents) > 0 else None # type: ignore
-
     async def to_issue_dtos(self) -> Optional[DecisionTreeDTO]:
         self.edge_names = nx.get_edge_attributes(self.nx, "name") # type: ignore
         tg = nx.readwrite.json_graph.tree_data(self.nx, self.root) # type: ignore
@@ -81,7 +77,7 @@ class DecisionTreeGraph():
         treenode_id = node.id
 
         parent_id = await self.get_parent(treenode_id)
-        while parent_id is not None:
+        while parent_id:
             n = self.edge_names[(parent_id, treenode_id)]
             id_string = n if id_string == "" else n + " - " + id_string
             treenode_id = parent_id
@@ -94,7 +90,8 @@ class DecisionTreeGraph():
                                 in_dtos : list[DiscreteProbabilityOutgoingDto]):
         out_dtos : list[DiscreteProbabilityOutgoingDto] = []
         for dto in in_dtos:
-            if  set(dto.parent_option_ids) == set(object_uuids):
+            combined_set = set(dto.parent_option_ids) | set(dto.parent_outcome_ids)
+            if  set(combined_set) == set(object_uuids):
                 out_dtos.append(dto)
         return out_dtos
     
@@ -102,26 +99,26 @@ class DecisionTreeGraph():
         treenode_id = node.id
         issue = node.issue
         probability_dtos : list[ProbabilityDto] = []
-        if isinstance(issue, IssueOutgoingDto):
-            if issue.type == Type.UNCERTAINTY.value:
-                if issue.uncertainty is not None and len(issue.uncertainty.discrete_probabilities) > 0:
-                    parent_labels : list[uuid.UUID] = []
-                    parent_id = await self.get_parent(treenode_id)
-                    while parent_id is not None:
-                        n = self.edge_names[(parent_id, treenode_id)]
-                        parent_labels.append(uuid.UUID(n))
-                        treenode_id = parent_id
-                        parent_id = await self.get_parent(treenode_id)
 
-                    discrete_prob_dtos = await self.find_matching_dtos(parent_labels, issue.uncertainty.discrete_probabilities)
+        if (isinstance(issue, IssueOutgoingDto) and issue.type == Type.UNCERTAINTY.value
+            and issue.uncertainty is not None and len(issue.uncertainty.discrete_probabilities) > 0):
+            parent_labels : list[uuid.UUID] = []
+            parent_id = await self.get_parent(treenode_id)
+            while parent_id:
+                n = self.edge_names[(parent_id, treenode_id)]
+                parent_labels.append(uuid.UUID(n))
+                treenode_id = parent_id
+                parent_id = await self.get_parent(treenode_id)
 
-                    for dto in discrete_prob_dtos:
-                        if dto.probability is not None:
-                            probability_dto = ProbabilityDto(outcome_name=self.outcomes_lookup[dto.child_outcome_id.__str__()],
-                                                             outcome_id=dto.child_outcome_id,
-                                                             probability_value=dto.probability,
-                                                             discrete_probability_id=dto.id)
-                            probability_dtos.append(probability_dto)
+            discrete_prob_dtos = await self.find_matching_dtos(parent_labels, issue.uncertainty.discrete_probabilities)
+
+            for dto in discrete_prob_dtos:
+                if dto.probability:
+                    probability_dto = ProbabilityDto(outcome_name=self.outcomes_lookup[dto.child_outcome_id.__str__()],
+                                                     outcome_id=dto.child_outcome_id,
+                                                     probability_value=dto.probability,
+                                                     discrete_probability_id=dto.id)
+                    probability_dtos.append(probability_dto)
 
         return probability_dtos
 
