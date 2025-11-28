@@ -1,11 +1,9 @@
 import uuid
-from typing import Optional, TYPE_CHECKING, Any
+from typing import Optional, TYPE_CHECKING
 from sqlalchemy import ForeignKey, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.engine import Connection
 from src.models.base import Base
 from src.models.base_entity import BaseEntity
-from sqlalchemy.event import listens_for
 from src.models.guid import GUID
 if TYPE_CHECKING:
     from src.models.outcome import Outcome
@@ -96,35 +94,3 @@ class DiscreteProbability(Base, BaseEntity):
 
     def __hash__(self) -> int:
         return hash(self.id)
-
-
-# Event listeners to clean up orphaned DiscreteProbability records
-@listens_for(DiscreteProbabilityParentOutcome, "after_delete")
-def cleanup_orphaned_discrete_probability_after_outcome_delete(mapper: Any, connection: Connection, target: DiscreteProbabilityParentOutcome) -> None:
-    _cleanup_orphaned_discrete_probability(connection, target.discrete_probability_id)
-
-
-@listens_for(DiscreteProbabilityParentOption, "after_delete")
-def cleanup_orphaned_discrete_probability_after_option_delete(mapper: Any, connection: Connection, target: DiscreteProbabilityParentOption) -> None:
-    _cleanup_orphaned_discrete_probability(connection, target.discrete_probability_id)
-
-
-def _cleanup_orphaned_discrete_probability(connection: Connection, discrete_probability_id: uuid.UUID) -> None:
-
-    # First delete all parent outcome relationships
-    connection.execute(
-        DiscreteProbabilityParentOutcome.__table__.delete()
-        .where(DiscreteProbabilityParentOutcome.discrete_probability_id == discrete_probability_id)
-    )
-    
-    # Then delete all parent option relationships
-    connection.execute(
-        DiscreteProbabilityParentOption.__table__.delete()
-        .where(DiscreteProbabilityParentOption.discrete_probability_id == discrete_probability_id)
-    )
-    
-    # Finally delete the DiscreteProbability record itself
-    connection.execute(
-        DiscreteProbability.__table__.delete()
-        .where(DiscreteProbability.id == discrete_probability_id)
-    )

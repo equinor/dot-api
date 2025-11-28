@@ -5,7 +5,10 @@ from typing import Any
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import get_history
 
-from src.models import (Edge, Issue, Outcome, Option, Uncertainty, Decision)
+from src.models import (
+    Edge, Issue, Outcome, Option, Uncertainty, Decision,
+    DiscreteProbability, DiscreteProbabilityParentOption, DiscreteProbabilityParentOutcome,
+)
 from src.constants import (Type, DecisionHierarchy, Boundary)
 
 from src.repositories import option_repository, outcome_repository, edge_repository, uncertainty_repository, issue_repository
@@ -14,7 +17,7 @@ from src.utils.session_info_handler import SessionInfoHandler
 class DiscreteProbabilityEventHandler:
     """Handles events that require discrete probability table recalculation."""
 
-    subscribed_entities_delete = [Edge]
+    subscribed_entities_delete = [Edge, DiscreteProbabilityParentOption, DiscreteProbabilityParentOutcome]
     subscribed_entities_modified = [Issue, Uncertainty, Decision]
     subscribed_entities_new = [Edge, Option, Outcome]
 
@@ -62,12 +65,35 @@ class DiscreteProbabilityEventHandler:
     def _process_deletions(self, session: Session, deleted_entities: list[Any]) -> set[uuid.UUID]:
         """Process deleted entities and find affected uncertainties."""
         affected_uncertainties: set[uuid.UUID] = set()
-        
+
+        discrete_probabilities_to_delete: set[uuid.UUID] = set()
         for deleted_entity in deleted_entities:
             if isinstance(deleted_entity, Edge):
                 affected_uncertainties.update(
                     edge_repository.find_effected_uncertainties(session, {deleted_entity.id})
                 )
+            if isinstance(deleted_entity, DiscreteProbabilityParentOutcome) or isinstance(deleted_entity, DiscreteProbabilityParentOption):
+                discrete_probabilities_to_delete.add(deleted_entity.discrete_probability_id)
+        
+        if discrete_probabilities_to_delete:
+            session.execute(
+                DiscreteProbabilityParentOutcome.__table__.delete()
+                .where(DiscreteProbabilityParentOutcome.discrete_probability_id.in_(discrete_probabilities_to_delete))
+            )
+
+            # Then delete all parent option relationships
+            session.execute(
+                DiscreteProbabilityParentOption.__table__.delete()
+                .where(DiscreteProbabilityParentOption.discrete_probability_id.in_(discrete_probabilities_to_delete))
+            )
+
+            # Finally delete the DiscreteProbability record itself
+            session.execute(
+                DiscreteProbability.__table__.delete()
+                .where(DiscreteProbability.id.in_(discrete_probabilities_to_delete))
+            )
+
+            
         
         return affected_uncertainties
     

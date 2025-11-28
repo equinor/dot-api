@@ -47,7 +47,10 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
     query = (
         select(Uncertainty).where(Uncertainty.id == id).options(
             selectinload(Uncertainty.outcomes),
-            selectinload(Uncertainty.discrete_probabilities),
+            selectinload(Uncertainty.discrete_probabilities).options(
+                selectinload(DiscreteProbability.parent_options),
+                selectinload(DiscreteProbability.parent_outcomes),
+            ),
             joinedload(Uncertainty.issue).options(
                 joinedload(Issue.node).options(
                     selectinload(Node.head_edges).options(
@@ -124,6 +127,6 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
                 )
             )
 
-    session.flush()
+    session.flush([entity])
     return
 
