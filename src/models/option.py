@@ -37,3 +37,16 @@ class Option(Base, BaseEntity):
         self.decision_id = decision_id
         self.name = name
         self.utility = utility
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Option):
+            return False
+        return (
+            self.id == other.id and
+            self.decision_id == other.decision_id and
+            self.name == other.name and
+            self.utility == other.utility
+        )
+
+    def __hash__(self) -> int:
+        return hash(uuid.uuid4())

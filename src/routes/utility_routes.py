@@ -9,6 +9,7 @@ from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_utility_service
 from src.dependencies import get_db
 
+
 router = APIRouter(tags=["utilities"])
 
 

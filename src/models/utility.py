@@ -29,3 +29,15 @@ class Utility(Base, BaseEntity):
         self.id = id
         self.issue_id = issue_id
         self.values = values
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Utility):
+            return False
+        return (
+            self.id == other.id and
+            self.issue_id == other.issue_id and
+            self.values == other.values
+        )
+
+    def __hash__(self) -> int:
+        return hash(uuid.uuid4())

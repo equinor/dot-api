@@ -12,6 +12,7 @@ from src.models.filters.issues_filter import IssueFilter
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_db
 
+
 router = APIRouter(tags=["issues"])
 
 

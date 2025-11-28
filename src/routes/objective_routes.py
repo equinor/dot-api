@@ -11,6 +11,7 @@ from src.dtos.user_dtos import UserIncomingDto
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_db
 
+
 router = APIRouter(tags=["objectives"])
 
 

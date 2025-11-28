@@ -36,3 +36,17 @@ class Decision(Base, BaseEntity):
         self.issue_id = issue_id
         self.options = options
         self.type = type
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Decision):
+            return False
+        return (
+            self.id == other.id and
+            self.issue_id == other.issue_id and
+            self.type == other.type and
+            len(self.options) == len(other.options) and
+            all(opt1 == opt2 for opt1, opt2 in zip(sorted(self.options, key=lambda x: x.id), sorted(other.options, key=lambda x: x.id)))
+        )
+
+    def __hash__(self) -> int:
+        return hash(uuid.uuid4())

@@ -27,29 +27,42 @@ class IssueRepository(BaseRepository[Issue, uuid.UUID]):
 
         for n, entity_to_update in enumerate(entities_to_update):
             entity = entities[n]
-            entity_to_update.scenario_id = entity.scenario_id
-            entity_to_update.type = entity.type
-            entity_to_update.boundary = entity.boundary
-            entity_to_update.name = entity.name
-            entity_to_update.description = entity.description
-            entity_to_update.order = entity.order
+            
+            if entity_to_update.scenario_id != entity.scenario_id:
+                entity_to_update.scenario_id = entity.scenario_id
 
-            if entity.node:
-                entity_to_update.node = await self.session.merge(entity.node)
+            if entity_to_update.type != entity.type:
+                entity_to_update.type = entity.type
 
-            if entity.decision:
-                entity_to_update.decision = await self.session.merge(entity.decision)
+            if entity_to_update.boundary != entity.boundary:
+                entity_to_update.boundary = entity.boundary
 
-            if entity.uncertainty and entity_to_update.uncertainty:
-                entity_to_update.uncertainty = await self._update_unertainty(entity.uncertainty, entity_to_update.uncertainty)
+            if entity_to_update.name != entity.name:
+                entity_to_update.name = entity.name
 
-            if entity.utility:
+            if entity_to_update.description != entity.description:
+                entity_to_update.description = entity.description
+
+            if entity_to_update.order != entity.order:
+                entity_to_update.order = entity.order
+
+            if entity.node and (entity_to_update.node != entity.node):
+                entity_to_update.node = self._update_node(entity.node, entity_to_update.node)
+
+            if entity.decision and (entity_to_update.decision != entity.decision):
+                entity_to_update.decision = await self._update_decision(entity.decision, entity_to_update.decision)
+
+            if entity.uncertainty and entity_to_update.uncertainty and (entity_to_update.uncertainty != entity.uncertainty):
+                entity_to_update.uncertainty = await self._update_uncertainty(entity.uncertainty, entity_to_update.uncertainty)
+
+            if entity.utility and (entity_to_update.utility != entity.utility):
                 entity_to_update.utility = await self.session.merge(entity.utility)
 
-            if entity.value_metric:
+            if entity.value_metric and (entity_to_update.value_metric != entity.value_metric):
                 entity_to_update.value_metric = await self.session.merge(entity.value_metric)
 
         await self.session.flush()
+            
         return entities_to_update
     
     async def clear_discrete_probability_tables(self, ids: list[uuid.UUID]):

@@ -36,3 +36,16 @@ class NodeStyle(Base, BaseEntity):
             self.node_id = node_id
         self.x_position = x_position
         self.y_position = y_position
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, NodeStyle):
+            return False
+        return (
+            self.id == other.id and
+            self.node_id == other.node_id and
+            self.x_position == other.x_position and
+            self.y_position == other.y_position
+        )
+
+    def __hash__(self) -> int:
+        return hash(uuid.uuid4())

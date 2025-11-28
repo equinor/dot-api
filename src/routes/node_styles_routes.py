@@ -9,6 +9,7 @@ from src.dependencies import get_node_style_service
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_db
 
+
 router = APIRouter(tags=["node_styles"])
 
 

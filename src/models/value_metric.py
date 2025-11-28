@@ -26,3 +26,15 @@ class ValueMetric(Base, BaseEntity):
         self.id = id
         self.issue_id = issue_id
         self.name = name
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, ValueMetric):
+            return False
+        return (
+            self.id == other.id and
+            self.issue_id == other.issue_id and
+            self.name == other.name
+        )
+
+    def __hash__(self) -> int:
+        return hash(uuid.uuid4())

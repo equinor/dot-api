@@ -10,6 +10,7 @@ from src.models.filters.node_filter import NodeFilter
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_db
 
+
 router = APIRouter(tags=["nodes"])
 
 

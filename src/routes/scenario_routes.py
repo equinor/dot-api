@@ -17,6 +17,7 @@ from src.models.filters.scenario_filter import ScenarioFilter
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_db
 
+
 router = APIRouter(tags=["scenarios"])
 
 

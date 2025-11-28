@@ -26,7 +26,7 @@ class UncertaintyRepository(BaseRepository[Uncertainty, uuid.UUID]):
 
         for n, entity_to_update in enumerate(entities_to_update):
             entity = entities[n]
-            entity_to_update = await self._update_unertainty(entity, entity_to_update)
+            entity_to_update = await self._update_uncertainty(entity, entity_to_update)
             if entity.issue_id:
                 entity_to_update.issue_id = entity.issue_id
 
@@ -47,7 +47,10 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
     query = (
         select(Uncertainty).where(Uncertainty.id == id).options(
             selectinload(Uncertainty.outcomes),
-            selectinload(Uncertainty.discrete_probabilities),
+            selectinload(Uncertainty.discrete_probabilities).options(
+                selectinload(DiscreteProbability.parent_options),
+                selectinload(DiscreteProbability.parent_outcomes),
+            ),
             joinedload(Uncertainty.issue).options(
                 joinedload(Issue.node).options(
                     selectinload(Node.head_edges).options(
@@ -124,6 +127,6 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
                 )
             )
 
-    session.flush()
+    session.flush([entity])
     return
 
