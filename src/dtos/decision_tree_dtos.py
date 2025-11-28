@@ -16,10 +16,17 @@ class EndPointNodeDto(BaseModel):
     type: str = "EndPoint"
 
 
+class ProbabilityDto(BaseModel):
+    outcome_name: str
+    outcome_id: uuid.UUID
+    probability_value: float
+    discrete_probability_id: uuid.UUID
+
+
 class TreeNodeDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     issue: IssueOutgoingDto | EndPointNodeDto
-
+    probabilities: Optional[list[ProbabilityDto]] = None
 
 class DecisionTreeDTO(BaseModel):
     tree_node: TreeNodeDto
