@@ -97,7 +97,7 @@ class DecisionTreeGraph():
                 out_dtos.append(dto)
         return out_dtos
     
-    async def get_probability_value(self, node: TreeNodeDto) -> list[ProbabilityDto] | None:
+    async def get_probability_value(self, node: TreeNodeDto) -> Optional[list[ProbabilityDto]]:
         treenode_id = node.id
         issue = node.issue
         probability_dtos : list[ProbabilityDto] = []
@@ -125,10 +125,6 @@ class DecisionTreeGraph():
                     probability_dtos.append(probability_dto)
 
             return probability_dtos
-
-        else:
-            return None
-
 
 class DecisionTreeCreator():
     def __init__(self) -> None:
