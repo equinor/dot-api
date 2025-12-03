@@ -6,7 +6,7 @@ from src.models.discrete_probability import DiscreteProbability, DiscreteProbabi
 class DiscreteProbabilityDto(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     uncertainty_id: uuid.UUID
-    child_outcome_id: uuid.UUID
+    outcome_id: uuid.UUID
     probability: Optional[float] = None
     parent_outcome_ids: List[uuid.UUID] = []
     parent_option_ids: List[uuid.UUID] = []
@@ -22,7 +22,7 @@ class DiscreteProbabilityMapper:
     def to_outgoing_dto(entity: DiscreteProbability) -> DiscreteProbabilityOutgoingDto:
         return DiscreteProbabilityOutgoingDto(
             id=entity.id,
-            child_outcome_id=entity.child_outcome_id,
+            outcome_id=entity.outcome_id,
             uncertainty_id=entity.uncertainty_id,
             probability=entity.probability,
             parent_outcome_ids=[x.parent_outcome_id for x in entity.parent_outcomes] if entity.parent_outcomes else [],
@@ -33,7 +33,7 @@ class DiscreteProbabilityMapper:
     def to_entity(dto: DiscreteProbabilityIncomingDto) -> DiscreteProbability:
         return DiscreteProbability(
             id=dto.id,
-            child_outcome_id=dto.child_outcome_id,
+            outcome_id=dto.outcome_id,
             uncertainty_id=dto.uncertainty_id,
             probability=dto.probability,
             parent_outcomes=[DiscreteProbabilityParentOutcome(discrete_probability_id=dto.id, parent_outcome_id=x) for x in dto.parent_outcome_ids],

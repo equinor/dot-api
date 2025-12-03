@@ -180,7 +180,7 @@ class BaseRepository(Generic[T, IDType]):
             # delete discrete probabilities using ORM to trigger cascade delete operation 
             outcome_ids_to_delete = [outcome.id for outcome in outcomes_to_delete]
             discrete_probs = await self.session.scalars(
-                select(DiscreteProbability).where(DiscreteProbability.child_outcome_id.in_(outcome_ids_to_delete))
+                select(DiscreteProbability).where(DiscreteProbability.outcome_id.in_(outcome_ids_to_delete))
             )
             await asyncio.gather(*[self.session.delete(dp) for dp in discrete_probs])
             

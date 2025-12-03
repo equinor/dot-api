@@ -59,7 +59,7 @@ async def test_update_probability(client: AsyncClient):
         id = uuid.uuid4(),
         uncertainty_id=uncert_id,
         probability=new_probability,
-        child_outcome_id= prob_to_update.child_outcome_id,
+        outcome_id= prob_to_update.outcome_id,
         parent_option_ids=prob_to_update.parent_option_ids,
         parent_outcome_ids=prob_to_update.parent_outcome_ids,
     )

@@ -300,7 +300,7 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
 
     discrete_probability_1=DiscreteProbability(
         id=discrete_probability_id_1,
-        child_outcome_id=outcome_id_1,
+        outcome_id=outcome_id_1,
         uncertainty_id=uncertainty_issue_id,
         probability=0.8,
         parent_options=[
@@ -313,7 +313,7 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
 
     discrete_probability_2=DiscreteProbability(
         id=discrete_probability_id_2,
-        child_outcome_id=outcome_id_1,
+        outcome_id=outcome_id_1,
         uncertainty_id=uncertainty_issue_id,
         probability=0.2,
         parent_options=[
@@ -326,7 +326,7 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
 
     discrete_probability_3=DiscreteProbability(
         id=discrete_probability_id_3,
-        child_outcome_id=outcome_id_1,
+        outcome_id=outcome_id_1,
         uncertainty_id=uncertainty_issue_id,
         probability=0.,
         parent_options=[
@@ -339,7 +339,7 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
 
     discrete_probability_4=DiscreteProbability(
         id=discrete_probability_id_4,
-        child_outcome_id=outcome_id_1,
+        outcome_id=outcome_id_1,
         uncertainty_id=uncertainty_issue_id,
         probability=0.,
         parent_options=[
@@ -352,7 +352,7 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
 
     discrete_probability_5=DiscreteProbability(
         id=discrete_probability_id_5,
-        child_outcome_id=outcome_id_2,
+        outcome_id=outcome_id_2,
         uncertainty_id=uncertainty_issue_id,
         probability=0.,
         parent_options=[
@@ -365,7 +365,7 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
 
     discrete_probability_6=DiscreteProbability(
         id=discrete_probability_id_6,
-        child_outcome_id=outcome_id_2,
+        outcome_id=outcome_id_2,
         uncertainty_id=uncertainty_issue_id,
         probability=1.,
         parent_options=[
@@ -378,7 +378,7 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
 
     discrete_probability_7=DiscreteProbability(
         id=discrete_probability_id_7,
-        child_outcome_id=outcome_id_2,
+        outcome_id=outcome_id_2,
         uncertainty_id=uncertainty_issue_id,
         probability=1.,
         parent_options=[
@@ -391,7 +391,7 @@ async def create_single_project_with_scenario(conn: AsyncConnection):
 
     discrete_probability_8=DiscreteProbability(
         id=discrete_probability_id_8,
-        child_outcome_id=outcome_id_2,
+        outcome_id=outcome_id_2,
         uncertainty_id=uncertainty_issue_id,
         probability=1.,
         parent_options=[
@@ -853,7 +853,7 @@ async def seed_database(
                         DiscreteProbability(
                             id=outcome_prob1_id,
                             uncertainty_id=issue_node_id,
-                            child_outcome_id=outcome1_id,
+                            outcome_id=outcome1_id,
                             probability=0.6,
                             parent_outcomes=[],
                             parent_options=[],
@@ -861,7 +861,7 @@ async def seed_database(
                         DiscreteProbability(
                             id=outcome_prob2_id,
                             uncertainty_id=issue_node_id,
-                            child_outcome_id=outcome2_id,
+                            outcome_id=outcome2_id,
                             probability=0.4,
                             parent_outcomes=[],
                             parent_options=[],
