@@ -39,11 +39,11 @@ class DiscreteUtility(Base, BaseEntity):
     __tablename__ = "discrete_utility"
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
 
-    child_value_metric_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("value_metric.id", ondelete="CASCADE"), index=True)
+    value_metric_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("value_metric.id", ondelete="CASCADE"), index=True)
     utility_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("utility.id"), index=True) # cascade delete handled in utility model
     utility_value: Mapped[Optional[float]] = mapped_column(Float(precision=14), default=None, nullable=True)
 
-    child_value_metric: Mapped["ValueMetric"] = relationship("ValueMetric", foreign_keys=[child_value_metric_id])
+    value_metric: Mapped["ValueMetric"] = relationship("ValueMetric", foreign_keys=[value_metric_id])
     utility: Mapped["Utility"] = relationship("Utility", back_populates="discrete_utilities", foreign_keys=[utility_id])
 
     parent_outcomes: Mapped[list["DiscreteUtilityParentOutcome"]] = relationship(
@@ -62,14 +62,14 @@ class DiscreteUtility(Base, BaseEntity):
         self,
         id: uuid.UUID,
         utility_id: uuid.UUID,
-        child_value_metric_id: uuid.UUID,  
+        value_metric_id: uuid.UUID,  
         utility_value: Optional[float] = None,
         parent_outcomes: Optional[list["DiscreteUtilityParentOutcome"]] = None,
         parent_options: Optional[list["DiscreteUtilityParentOption"]] = None,
     ):
         self.id = id
         self.utility_id = utility_id
-        self.child_value_metric_id = child_value_metric_id  
+        self.value_metric_id = value_metric_id  
         self.utility_value = utility_value
         self.parent_outcomes = parent_outcomes or []
         self.parent_options = parent_options or []
@@ -80,7 +80,7 @@ class DiscreteUtility(Base, BaseEntity):
         return (
             self.id == other.id and
             self.utility_id == other.utility_id and
-            self.child_value_metric_id == other.child_value_metric_id and 
+            self.value_metric_id == other.value_metric_id and 
             self.utility_value == other.utility_value and
             len(self.parent_outcomes) == len(other.parent_outcomes) and
             len(self.parent_options) == len(other.parent_options) and
