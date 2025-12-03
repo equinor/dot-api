@@ -21,8 +21,8 @@ class ValueMetricRepository(BaseRepository[ValueMetric, uuid.UUID]):
         for n, entity_to_update in enumerate(entities_to_update):
             entity = entities[n]
             entity_to_update.name = entity.name
-            if entity.issue_id:
-                entity_to_update = entity.issue_id
+            if entity.scenario_id:
+                entity_to_update = entity.scenario_id
 
         await self.session.flush()
         return entities_to_update

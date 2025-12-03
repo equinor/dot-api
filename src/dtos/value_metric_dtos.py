@@ -20,7 +20,7 @@ class ValueMetricOutgoingDto(ValueMetricDto):
 class ValueMetricMapper:
     @staticmethod
     def to_outgoing_dto(entity: ValueMetric) -> ValueMetricOutgoingDto:
-        return ValueMetricOutgoingDto(id=entity.id, name=entity.name, issue_id=entity.issue_id)
+        return ValueMetricOutgoingDto(id=entity.id, name=entity.name, issue_id=entity.scenario_id)
 
     @staticmethod
     def to_entity(dto: ValueMetricIncomingDto) -> ValueMetric:

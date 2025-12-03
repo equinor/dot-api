@@ -13,6 +13,7 @@ from src.models.base_entity import BaseEntity
 
 if TYPE_CHECKING:
     from src.models.issue import Issue
+    from src.models.discrete_utility import DiscreteUtility
 
 
 class Utility(Base, BaseEntity):
@@ -24,6 +25,12 @@ class Utility(Base, BaseEntity):
         String(DatabaseConstants.MAX_SHORT_STRING_LENGTH.value), default=""
     )
     issue: Mapped["Issue"] = relationship("Issue", back_populates="utility")
+    discrete_utilities: Mapped[list["DiscreteUtility"]] = relationship(
+        "DiscreteUtility",
+        back_populates="utility",
+        cascade="all, delete-orphan",
+        foreign_keys="[DiscreteUtility.utility_id]"
+    )
 
     def __init__(self, id: uuid.UUID, values: str, issue_id: uuid.UUID):
         self.id = id

@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from src.models.objective import Objective
     from src.models.opportunity import Opportunity
     from src.models.issue import Issue
+    from src.models import ValueMetric
 from src.models.project import Project
 from src.models.base_entity import BaseEntity
 from src.models.base_auditable_entity import BaseAuditableEntity
@@ -62,6 +63,11 @@ class Scenario(Base, BaseEntity, BaseAuditableEntity):
 
     edges: Mapped[list["Edge"]] = relationship(
         "Edge",
+        cascade="all, delete-orphan",
+    )
+
+    value_metrics: Mapped[list["ValueMetric"]] = relationship(
+        "ValueMetric",
         cascade="all, delete-orphan",
     )
 

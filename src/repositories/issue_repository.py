@@ -10,7 +10,7 @@ from src.models import (
 from src.repositories.query_extensions import QueryExtensions
 from src.repositories.base_repository import BaseRepository
 from src.constants import Type
-
+from src.utils.session_info_handler import SessionInfo
 
 class IssueRepository(BaseRepository[Issue, uuid.UUID]):
     def __init__(self, session: AsyncSession):
@@ -76,15 +76,16 @@ class IssueRepository(BaseRepository[Issue, uuid.UUID]):
         await self.session.flush()
 
 
-def find_effected_uncertainties(session: Session, issue_ids: set[uuid.UUID]) -> set[uuid.UUID]:
-    uncertainty_ids: set[uuid.UUID] = set()
+def find_effected_session_entities(session: Session, issue_ids: set[uuid.UUID]) -> SessionInfo:
+    session_info = SessionInfo()
 
     query = select(Issue).where(Issue.id.in_(issue_ids)).options(
         joinedload(Issue.node).options(
             selectinload(Node.tail_edges).options(
                 joinedload(Edge.head_node).options(
                     joinedload(Node.issue).options(
-                        joinedload(Issue.uncertainty)
+                        joinedload(Issue.utility),
+                        joinedload(Issue.uncertainty),
                     )
                 )
             )
@@ -96,6 +97,8 @@ def find_effected_uncertainties(session: Session, issue_ids: set[uuid.UUID]) -> 
     for issue in issues:
         for edge in issue.node.tail_edges:
             if edge.head_node.issue.type == Type.UNCERTAINTY.value and edge.head_node.issue.uncertainty:
-                uncertainty_ids.add(edge.head_node.issue.uncertainty.id)
+                session_info.affected_uncertainties.add(edge.head_node.issue.uncertainty.id)
+            if edge.head_node.issue.type == Type.UTILITY.value and edge.head_node.issue.utility:
+                session_info.affected_utilities.add(edge.head_node.issue.utility.id)
 
-    return uncertainty_ids
+    return session_info

@@ -11,20 +11,24 @@ from src.models.base_entity import BaseEntity
 from src.models.base import Base
 
 if TYPE_CHECKING:
-    from src.models.issue import Issue
+    from src.models import Scenario
 
 
 class ValueMetric(Base, BaseEntity):
     __tablename__ = "value_metric"
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
-    issue_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("issue.id"), index=True)
+    scenario_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("Scenario.id"), index=True)
 
     name: Mapped[str] = mapped_column(String, default="")
-    issue: Mapped["Issue"] = relationship("Issue", back_populates="value_metric")
+    scenario: Mapped["Scenario"] = relationship(
+        "Scenario", 
+        foreign_keys=[scenario_id],
+        back_populates="value_metrics"
+    )
 
-    def __init__(self, id: uuid.UUID, name: str, issue_id: uuid.UUID):
+    def __init__(self, id: uuid.UUID, name: str, scenario_id: uuid.UUID):
         self.id = id
-        self.issue_id = issue_id
+        self.scenario_id = scenario_id
         self.name = name
 
     def __eq__(self, other: object) -> bool:
@@ -32,7 +36,7 @@ class ValueMetric(Base, BaseEntity):
             return False
         return (
             self.id == other.id and
-            self.issue_id == other.issue_id and
+            self.scenario_id == other.scenario_id and
             self.name == other.name
         )
 
