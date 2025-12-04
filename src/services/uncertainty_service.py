@@ -50,3 +50,7 @@ class UncertaintyService:
         )
         result = UncertaintyMapper.to_outgoing_dtos(decisions)
         return result
+
+    async def recalculate_discrete_probability_tables_async(self, session: AsyncSession, ids: list[uuid.UUID]):
+        for id in ids:
+            await UncertaintyRepository(session).recalculate_discrete_probability_table_async(id)

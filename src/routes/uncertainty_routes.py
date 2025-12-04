@@ -84,3 +84,16 @@ async def update_uncertainties(
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/uncertainties/remake-probability-table")
+async def remake_probability_table(
+    ids: list[uuid.UUID] = Query([]),
+    uncertainty_service: UncertaintyService = Depends(get_uncertainty_service),
+    session: AsyncSession = Depends(get_db),
+):
+    try:
+        await uncertainty_service.recalculate_discrete_probability_tables_async(session, ids)
+        await session.commit()
+        return
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

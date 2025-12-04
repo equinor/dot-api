@@ -11,74 +11,39 @@ from src.constants import Type, DecisionHierarchy, Boundary
 
 from src.models import Issue, Node, Edge, Decision, Uncertainty
 
-class UncertaintyRepository(BaseRepository[Uncertainty, uuid.UUID]):
-    def __init__(self, session: AsyncSession):
-        super().__init__(
-            session,
-            Uncertainty,
-            query_extension_method=QueryExtensions.load_uncertainty_with_relationships,
-        )
 
-    async def update(self, entities: list[Uncertainty]) -> list[Uncertainty]:
-        entities_to_update = await self.get([entity.id for entity in entities])
-        # sort the entity lists to share the same order according to the entity.id
-        self.prepare_entities_for_update([entities, entities_to_update])
-
-        for n, entity_to_update in enumerate(entities_to_update):
-            entity = entities[n]
-            entity_to_update = await self._update_uncertainty(entity, entity_to_update)
-            if entity.issue_id:
-                entity_to_update.issue_id = entity.issue_id
-
-        await self.session.flush()
-        return entities_to_update
-
-    async def clear_discrete_probability_tables(self, ids: list[uuid.UUID]):
-        
-        entities = await self.get(ids)
-
-        for entity in entities:
-            entity.discrete_probabilities = []
-
-        await self.session.flush()
-
-def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
-
-    query = (
-        select(Uncertainty).where(Uncertainty.id == id).options(
-            selectinload(Uncertainty.outcomes),
-            selectinload(Uncertainty.discrete_probabilities).options(
-                selectinload(DiscreteProbability.parent_options),
-                selectinload(DiscreteProbability.parent_outcomes),
-            ),
-            joinedload(Uncertainty.issue).options(
-                joinedload(Issue.node).options(
-                    selectinload(Node.head_edges).options(
-                        joinedload(Edge.tail_node).options(
-                            joinedload(Node.issue).options(
-                                joinedload(Issue.uncertainty).options(
-                                    selectinload(Uncertainty.outcomes)
-                                ),
-                                joinedload(Issue.decision).options(
-                                    selectinload(Decision.options)
-                                )
+def uncertainty_table_load_query(id: uuid.UUID):
+    return select(Uncertainty).where(Uncertainty.id == id).options(
+        selectinload(Uncertainty.outcomes),
+        selectinload(Uncertainty.discrete_probabilities).options(
+            selectinload(DiscreteProbability.parent_options),
+            selectinload(DiscreteProbability.parent_outcomes),
+        ),
+        joinedload(Uncertainty.issue).options(
+            joinedload(Issue.node).options(
+                selectinload(Node.head_edges).options(
+                    joinedload(Edge.tail_node).options(
+                        joinedload(Node.issue).options(
+                            joinedload(Issue.uncertainty).options(
+                                selectinload(Uncertainty.outcomes)
+                            ),
+                            joinedload(Issue.decision).options(
+                                selectinload(Decision.options)
                             )
                         )
-                    ),
+                    )
                 ),
-                joinedload(Issue.uncertainty).options(
-                    selectinload(Uncertainty.outcomes)
-                ),                    
-                joinedload(Issue.decision).options(
-                    selectinload(Decision.options)
-                ),            
-            )
+            ),
+            joinedload(Issue.uncertainty).options(
+                selectinload(Uncertainty.outcomes)
+            ),                    
+            joinedload(Issue.decision).options(
+                selectinload(Decision.options)
+            ),            
         )
     )
-    entity: Uncertainty = (session.scalars(query)).unique().first()
-    if entity is None:
-        return
-
+    
+def perform_recalc(entity: Uncertainty):
     entity.discrete_probabilities = []
 
     parent_outcomes_list: List[List[uuid.UUID]] = []
@@ -128,3 +93,51 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
 
     return
 
+
+class UncertaintyRepository(BaseRepository[Uncertainty, uuid.UUID]):
+    def __init__(self, session: AsyncSession):
+        super().__init__(
+            session,
+            Uncertainty,
+            query_extension_method=QueryExtensions.load_uncertainty_with_relationships,
+        )
+
+    async def update(self, entities: list[Uncertainty]) -> list[Uncertainty]:
+        entities_to_update = await self.get([entity.id for entity in entities])
+        # sort the entity lists to share the same order according to the entity.id
+        self.prepare_entities_for_update([entities, entities_to_update])
+
+        for n, entity_to_update in enumerate(entities_to_update):
+            entity = entities[n]
+            entity_to_update = await self._update_uncertainty(entity, entity_to_update)
+            if entity.issue_id:
+                entity_to_update.issue_id = entity.issue_id
+
+        await self.session.flush()
+        return entities_to_update
+
+    async def clear_discrete_probability_tables(self, ids: list[uuid.UUID]):
+        
+        entities = await self.get(ids)
+
+        for entity in entities:
+            entity.discrete_probabilities = []
+
+        await self.session.flush()
+
+    async def recalculate_discrete_probability_table_async(self, id: uuid.UUID):
+        query = uncertainty_table_load_query(id)
+        entity: Uncertainty = (await self.session.scalars(query)).unique().first()
+        if entity is None:
+            return
+        perform_recalc(entity)    
+        await self.session.flush()
+
+def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
+
+    query = uncertainty_table_load_query(id)
+
+    entity: Uncertainty = (session.scalars(query)).unique().first()
+    if entity is None:
+        return
+    perform_recalc(entity)
