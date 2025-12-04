@@ -10,6 +10,7 @@ from src.dtos.user_dtos import UserOutgoingDto, UserIncomingDto
 from src.dependencies import get_user_service
 from src.dependencies import get_db
 
+
 router = APIRouter(tags=["user"])
 
 

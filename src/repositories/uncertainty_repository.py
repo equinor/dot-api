@@ -26,13 +26,7 @@ class UncertaintyRepository(BaseRepository[Uncertainty, uuid.UUID]):
 
         for n, entity_to_update in enumerate(entities_to_update):
             entity = entities[n]
-            entity_to_update.outcomes = [
-                await self.session.merge(outcome) for outcome in entity.outcomes
-            ]
-            entity_to_update.is_key = entity.is_key
-            entity_to_update.discrete_probabilities = [
-                await self.session.merge(x) for x in entity.discrete_probabilities
-            ]
+            entity_to_update = await self._update_uncertainty(entity, entity_to_update)
             if entity.issue_id:
                 entity_to_update.issue_id = entity.issue_id
 
@@ -53,7 +47,10 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
     query = (
         select(Uncertainty).where(Uncertainty.id == id).options(
             selectinload(Uncertainty.outcomes),
-            selectinload(Uncertainty.discrete_probabilities),
+            selectinload(Uncertainty.discrete_probabilities).options(
+                selectinload(DiscreteProbability.parent_options),
+                selectinload(DiscreteProbability.parent_outcomes),
+            ),
             joinedload(Uncertainty.issue).options(
                 joinedload(Issue.node).options(
                     selectinload(Node.head_edges).options(
@@ -105,8 +102,7 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
 
     # check if no valid edges and thus cannot be empty, but should be 1 row
     if len(parent_outcomes_list) == 0 and len(parent_options_list) == 0:
-        entity.discrete_probabilities = [DiscreteProbability(id = uuid.uuid4(), uncertainty_id=entity.id, child_outcome_id=x.id, probability=0) for x in entity.outcomes]
-        session.flush()
+        entity.discrete_probabilities = [DiscreteProbability(id = uuid.uuid4(), uncertainty_id=entity.id, outcome_id=x.id, probability=0) for x in entity.outcomes]
         return
     
     parent_combinations = list(product(*parent_outcomes_list, *parent_options_list))
@@ -114,7 +110,7 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
     all_options: List[uuid.UUID] = list(chain(*parent_options_list))
     all_outcomes: List[uuid.UUID] = list(chain(*parent_outcomes_list))
 
-    for child_outcome in entity.outcomes:
+    for outcome in entity.outcomes:
         for parent_combination in parent_combinations:
             parent_option_ids = filter(lambda x: x in all_options, parent_combination)
             parent_outcome_ids = filter(lambda x: x in all_outcomes, parent_combination)
@@ -123,13 +119,12 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
                 DiscreteProbability(
                     id = probability_id,
                     uncertainty_id=entity.id,
-                    child_outcome_id=child_outcome.id,
+                    outcome_id=outcome.id,
                     probability=0,
                     parent_outcomes=[DiscreteProbabilityParentOutcome(discrete_probability_id=probability_id, parent_outcome_id=x) for x in parent_outcome_ids],
                     parent_options=[DiscreteProbabilityParentOption(discrete_probability_id=probability_id, parent_option_id=x) for x in parent_option_ids],
                 )
             )
 
-    session.flush()
     return
 

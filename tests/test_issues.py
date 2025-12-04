@@ -104,25 +104,14 @@ async def test_update_issue(client: AsyncClient):
         OptionIncomingDto(name=x, utility=0, decision_id=example_issue.decision.id)
         for x in new_alternatives
     ]
-    new_probabilities = [0.1, 0.3, 0.6]
-    new_outcome_ids = [uuid4() for _ in new_probabilities]
+    new_outcomes_names = ["A", "B", "C"]
     new_outcomes = [
         OutcomeIncomingDto(
-            id=outcome_id, name=f"outcome_{i}", uncertainty_id=example_issue.uncertainty.id, utility=0
+            name=outcome, uncertainty_id=example_issue.uncertainty.id, utility=0
         )
-        for i, outcome_id in enumerate(new_outcome_ids)
+        for outcome in new_outcomes_names
     ]
-    new_discrete_probabilities = [
-        DiscreteProbabilityIncomingDto(
-            id=uuid4(),
-            uncertainty_id=example_issue.uncertainty.id,
-            probability=prob,
-            child_outcome_id=outcome_id,
-            parent_option_ids=[],
-            parent_outcome_ids=[],
-        )
-        for prob, outcome_id in zip(new_probabilities, new_outcome_ids)
-    ]
+
     new_type = Type.UNCERTAINTY
     new_boundary = Boundary.IN
     payload = [
@@ -138,7 +127,6 @@ async def test_update_issue(client: AsyncClient):
             ),
             uncertainty=UncertaintyIncomingDto(
                 id=example_issue.uncertainty.id, issue_id=example_issue.id, outcomes=new_outcomes,
-                discrete_probabilities=new_discrete_probabilities
             ),
             utility=None,
             value_metric=None,
@@ -151,10 +139,7 @@ async def test_update_issue(client: AsyncClient):
     response_content = parse_response_to_dtos_test(response, IssueOutgoingDto)
     r = response_content[0]
 
-    assert (
-        r.uncertainty is not None
-        and [x.probability for x in r.uncertainty.discrete_probabilities] == new_probabilities
-    )
+    assert r.uncertainty is not None and [x.name for x in r.uncertainty.outcomes] == new_outcomes_names
     assert r.decision is not None and [x.name for x in r.decision.options] == new_alternatives
     assert r.type == new_type
 

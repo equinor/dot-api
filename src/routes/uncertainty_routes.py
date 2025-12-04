@@ -12,6 +12,7 @@ from src.dependencies import get_uncertainty_service
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_db
 
+
 router = APIRouter(tags=["uncertainties"])
 
 
