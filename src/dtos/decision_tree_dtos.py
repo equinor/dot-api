@@ -34,4 +34,4 @@ class DecisionTreeDTO(BaseModel):
 
 class PartialOrderDTO(BaseModel):
     # list of issue ids
-    data: Optional[List[uuid.UUID]] = None
+    issue_ids: Optional[List[uuid.UUID]] = None

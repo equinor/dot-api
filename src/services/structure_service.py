@@ -50,4 +50,4 @@ class StructureService:
                                             nodes = issues,
                                             edges = edges)
         uuid_list = await decision_tree_creator.calculate_partial_order()
-        return PartialOrderDTO(data=uuid_list)
+        return PartialOrderDTO(issue_ids=uuid_list)
