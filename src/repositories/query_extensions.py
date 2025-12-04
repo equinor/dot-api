@@ -26,7 +26,7 @@ class QueryExtensions:
         return [
             selectinload(Uncertainty.outcomes),
             selectinload(Uncertainty.discrete_probabilities).options(
-                joinedload(DiscreteProbability.child_outcome),
+                joinedload(DiscreteProbability.outcome),
                 selectinload(DiscreteProbability.parent_options),
                 selectinload(DiscreteProbability.parent_outcomes),
             )
@@ -35,7 +35,7 @@ class QueryExtensions:
     @staticmethod
     def load_discrete_probability_with_relationships() -> list[_AbstractLoad]:
         return [
-            joinedload(DiscreteProbability.child_outcome),
+            joinedload(DiscreteProbability.outcome),
             joinedload(DiscreteProbability.uncertainty),
             selectinload(DiscreteProbability.parent_options),
             selectinload(DiscreteProbability.parent_outcomes),

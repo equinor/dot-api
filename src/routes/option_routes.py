@@ -9,6 +9,7 @@ from src.dependencies import get_option_service
 from src.constants import SwaggerDocumentationConstants
 from src.dependencies import get_db
 
+
 router = APIRouter(tags=["options"])
 
 
