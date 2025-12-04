@@ -104,12 +104,12 @@ async def test_update_issue(client: AsyncClient):
         OptionIncomingDto(name=x, utility=0, decision_id=example_issue.decision.id)
         for x in new_alternatives
     ]
-    new_outcomes = ["A", "B", "C"]
+    new_outcomes_names = ["A", "B", "C"]
     new_outcomes = [
         OutcomeIncomingDto(
             name=outcome, uncertainty_id=example_issue.uncertainty.id, utility=0
         )
-        for outcome in new_outcomes
+        for outcome in new_outcomes_names
     ]
 
     new_type = Type.UNCERTAINTY
@@ -139,7 +139,7 @@ async def test_update_issue(client: AsyncClient):
     response_content = parse_response_to_dtos_test(response, IssueOutgoingDto)
     r = response_content[0]
 
-    assert r.uncertainty is not None and [x.name for x in r.uncertainty.outcomes] == new_outcomes
+    assert r.uncertainty is not None and [x.name for x in r.uncertainty.outcomes] == new_outcomes_names
     assert r.decision is not None and [x.name for x in r.decision.options] == new_alternatives
     assert r.type == new_type
 
