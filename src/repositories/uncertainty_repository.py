@@ -103,7 +103,6 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
     # check if no valid edges and thus cannot be empty, but should be 1 row
     if len(parent_outcomes_list) == 0 and len(parent_options_list) == 0:
         entity.discrete_probabilities = [DiscreteProbability(id = uuid.uuid4(), uncertainty_id=entity.id, outcome_id=x.id, probability=0) for x in entity.outcomes]
-        session.flush()
         return
     
     parent_combinations = list(product(*parent_outcomes_list, *parent_options_list))
@@ -127,6 +126,5 @@ def recalculate_discrete_probability_table(session: Session, id: uuid.UUID):
                 )
             )
 
-    session.flush([entity])
     return
 
