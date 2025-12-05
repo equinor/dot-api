@@ -56,10 +56,7 @@ class IssueRepository(BaseRepository[Issue, uuid.UUID]):
                 entity_to_update.uncertainty = await self._update_uncertainty(entity.uncertainty, entity_to_update.uncertainty)
 
             if entity.utility and (entity_to_update.utility != entity.utility):
-                entity_to_update.utility = await self.session.merge(entity.utility)
-
-            if entity.value_metric and (entity_to_update.value_metric != entity.value_metric):
-                entity_to_update.value_metric = await self.session.merge(entity.value_metric)
+                entity_to_update.utility = await self._update_utility(entity.utility, entity_to_update.utility)
 
         await self.session.flush()
             

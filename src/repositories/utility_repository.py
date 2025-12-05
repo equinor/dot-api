@@ -11,6 +11,7 @@ from src.repositories.query_extensions import QueryExtensions
 from src.constants import Type, DecisionHierarchy, Boundary
 
 from src.models import Issue, Node, Edge, Decision, Uncertainty
+from src.constants import default_value_metric_id
 
 
 class UtilityRepository(BaseRepository[Utility, uuid.UUID]):
@@ -96,11 +97,9 @@ def recalculate_discrete_utility_table(session: Session, id: uuid.UUID):
             if not issue.decision or issue.decision.type != DecisionHierarchy.FOCUS.value: continue
             parent_options_list.append([x.id for x in issue.decision.options])
 
-    # check if no valid edges and thus cannot be empty, but should be 1 row
-    # TODO: Update condition when value metrics are available
-    # For now, we just create a single row with no children if there are no parent combinations
+    # since the utility table dimensions are determined entirly from the parents if there are no parents the utility table is not defined 
     if len(parent_outcomes_list) == 0 and len(parent_options_list) == 0:
-        entity.discrete_utilities = [DiscreteUtility(id = uuid.uuid4(), utility_id=entity.id, utility_value=0)]
+        entity.discrete_utilities = []
         session.flush()
         return
     
@@ -119,7 +118,7 @@ def recalculate_discrete_utility_table(session: Session, id: uuid.UUID):
             DiscreteUtility(
                 id = utility_id,
                 utility_id=entity.id,
-                # child_value_metric_id=...,  # TODO: Add when ready
+                value_metric_id=default_value_metric_id,
                 utility_value=0,
                 parent_outcomes=[DiscreteUtilityParentOutcome(discrete_utility_id=utility_id, parent_outcome_id=x) for x in parent_outcome_ids],
                 parent_options=[DiscreteUtilityParentOption(discrete_utility_id=utility_id, parent_option_id=x) for x in parent_option_ids],

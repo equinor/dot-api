@@ -22,6 +22,7 @@ from src.database import (
     get_connection_string_and_token,
     build_connection_url,
     validate_default_scenarios,
+    ensure_default_value_metric_exists,
 )
 from src.logger import get_dot_api_logger
 
@@ -169,6 +170,7 @@ class SessionManager:
 
         async for session in self.get_session():
             await validate_default_scenarios(session)
+            await ensure_default_value_metric_exists(session)
 
     async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
         """Yield a database session with the correct schema set."""
