@@ -37,11 +37,11 @@ class DiscreteProbabilityParentOption(Base):
 class DiscreteProbability(Base, BaseEntity):
     __tablename__ = "discrete_probability"
     id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True)
-    child_outcome_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("outcome.id", ondelete="CASCADE"), index=True)
+    outcome_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("outcome.id", ondelete="CASCADE"), index=True)
     uncertainty_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("uncertainty.id"), index=True) # cascade delete handled in uncertainty model
     probability: Mapped[Optional[float]] = mapped_column(Float(precision=14), default=None, nullable=True)
 
-    child_outcome: Mapped["Outcome"] = relationship("Outcome", foreign_keys=[child_outcome_id])
+    outcome: Mapped["Outcome"] = relationship("Outcome", foreign_keys=[outcome_id])
     uncertainty: Mapped["Uncertainty"] = relationship("Uncertainty", back_populates="discrete_probabilities", foreign_keys=[uncertainty_id])
 
     parent_outcomes: Mapped[list["DiscreteProbabilityParentOutcome"]] = relationship(
@@ -60,14 +60,14 @@ class DiscreteProbability(Base, BaseEntity):
         self,
         id: uuid.UUID,
         uncertainty_id: uuid.UUID,
-        child_outcome_id: uuid.UUID,
+        outcome_id: uuid.UUID,
         probability: Optional[float] = None,
         parent_outcomes: Optional[list["DiscreteProbabilityParentOutcome"]] = None,
         parent_options: Optional[list["DiscreteProbabilityParentOption"]] = None,
     ):
         self.id = id
         self.uncertainty_id = uncertainty_id
-        self.child_outcome_id = child_outcome_id
+        self.outcome_id = outcome_id
         self.probability = probability
         self.parent_outcomes = parent_outcomes or []
         self.parent_options = parent_options or []

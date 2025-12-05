@@ -8,7 +8,7 @@ class DiscreteProbabilityArrayManager:
     Manages a multidimensional array of discrete probabilities using xarray.
     """
     PARENT_IDS_DIM = 'parent_ids'
-    CHILD_OUTCOMES_DIM = 'child_outcomes'
+    OUTCOMES_DIM = 'outcomes'
     PROBABILITY_GRID_NAME = 'probability_grid'
     PARENT_SEPARATOR = ','
     all_parent_ids: set[str] = set()
@@ -31,7 +31,7 @@ class DiscreteProbabilityArrayManager:
             return xr.DataArray([])
         
         # Get all unique child outcomes
-        child_outcomes = sorted(set(p.child_outcome_id.__str__() for p in probabilities))
+        outcomes = sorted(set(p.outcome_id.__str__() for p in probabilities))
         
         # Create parent combinations
         parent_labels: list[str] = []
@@ -44,7 +44,7 @@ class DiscreteProbabilityArrayManager:
             if parent_label not in parent_labels:
                 parent_labels.append(parent_label)
             
-            probability_dict[(parent_label, prob.child_outcome_id.__str__())] = prob.probability
+            probability_dict[(parent_label, prob.outcome_id.__str__())] = prob.probability
         
         # Sort parent combinations for consistency
         parent_labels = sorted(parent_labels)
@@ -53,18 +53,18 @@ class DiscreteProbabilityArrayManager:
         data: List[List[float]] = []
         for parent_label in parent_labels:
             row: list[float] = []
-            for child_outcome in child_outcomes:
-                probability = probability_dict.get((parent_label, child_outcome), 0.0)
+            for outcome in outcomes:
+                probability = probability_dict.get((parent_label, outcome), 0.0)
                 row.append(probability)
             data.append(row)
         
         # Create xarray DataArray
         self.array = xr.DataArray(
             data,
-            dims=[self.PARENT_IDS_DIM, self.CHILD_OUTCOMES_DIM],
+            dims=[self.PARENT_IDS_DIM, self.OUTCOMES_DIM],
             coords={
                 self.PARENT_IDS_DIM: parent_labels,
-                self.CHILD_OUTCOMES_DIM: child_outcomes
+                self.OUTCOMES_DIM: outcomes
             },
             name=self.PROBABILITY_GRID_NAME
         )

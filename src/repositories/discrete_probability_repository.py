@@ -21,7 +21,7 @@ class DiscreteProbabilityRepository(BaseRepository[DiscreteProbability, uuid.UUI
         for n, entity_to_update in enumerate(entities_to_update):
             entity = entities[n]
             entity_to_update.probability = entity.probability
-            entity_to_update.child_outcome_id = entity.child_outcome_id
+            entity_to_update.outcome_id = entity.outcome_id
             entity_to_update.uncertainty_id = entity.uncertainty_id
             
             # Update parent outcomes

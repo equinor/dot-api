@@ -152,6 +152,11 @@ class BaseRepository(Generic[T, IDType]):
         existing_entity.utility = incoming_entity.utility
         return existing_entity
     
+    async def _update_option(self, incoming_entity: Option, existing_entity: Option) -> Option:
+        existing_entity.name = incoming_entity.name
+        existing_entity.utility = incoming_entity.utility
+        return existing_entity
+    
     async def _update_outcomes(self, incoming_entities: List[Outcome], existing_entities: List[Outcome]):
         """
         Updates existing_entities to match incoming_entities by:
@@ -175,7 +180,7 @@ class BaseRepository(Generic[T, IDType]):
             # delete discrete probabilities using ORM to trigger cascade delete operation 
             outcome_ids_to_delete = [outcome.id for outcome in outcomes_to_delete]
             discrete_probs = await self.session.scalars(
-                select(DiscreteProbability).where(DiscreteProbability.child_outcome_id.in_(outcome_ids_to_delete))
+                select(DiscreteProbability).where(DiscreteProbability.outcome_id.in_(outcome_ids_to_delete))
             )
             await asyncio.gather(*[self.session.delete(dp) for dp in discrete_probs])
             
@@ -191,12 +196,46 @@ class BaseRepository(Generic[T, IDType]):
         
         return existing_entities
     
+    async def _update_options(self, incoming_entities: List[Option], existing_entities: List[Option]):
+        """
+        Updates existing_entities to match incoming_entities by:
+        - Updating options that exist in both lists (matched by id)
+        - Creating new options from incoming that don't exist in existing
+        - Deleting options from existing that aren't in incoming
+        """
+        incoming_by_id = {option.id: option for option in incoming_entities}
+        existing_by_id = {option.id: option for option in existing_entities}
+        
+        # Update existing options that are in incoming
+        common_ids = set(existing_by_id.keys()) & set(incoming_by_id.keys())
+        await asyncio.gather(*[
+            self._update_option(incoming_by_id[option_id], existing_by_id[option_id])
+            for option_id in common_ids
+        ])
+        
+        # Delete options that are in existing but not in incoming
+        options_to_delete = [option for option in existing_entities if option.id not in incoming_by_id]
+        if options_to_delete:
+            # Remove options from existing_entities list and delete from session
+            [existing_entities.remove(option) for option in options_to_delete]
+            await asyncio.gather(*[self.session.delete(option) for option in options_to_delete])
+        
+        # Create new options that are in incoming but not in existing
+        new_options = [option for option in incoming_entities if option.id not in existing_by_id]
+        if new_options:
+            existing_entities.extend(new_options)
+            [self.session.add(option) for option in new_options]
+        
+        return existing_entities
+    
+    
     async def _update_decision(self, incoming_entity: Decision, existing_entity: Decision) -> Decision:
         existing_entity.type = incoming_entity.type
         if existing_entity.options != incoming_entity.options:
-            existing_entity.options = [
-                await self.session.merge(option) for option in incoming_entity.options
-            ]
+            existing_entity.options = await self._update_options(
+                incoming_entity.options,
+                existing_entity.options
+            )
         return existing_entity
 
     def _update_node(self, incoming_entity: Node, existing_entity: Node):
